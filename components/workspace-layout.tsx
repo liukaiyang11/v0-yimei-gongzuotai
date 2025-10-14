@@ -9,6 +9,7 @@ import { Sidebar } from "@/components/sidebar"
 import { KnowledgeBase } from "@/components/knowledge-base"
 import { IndustryKnowledgeBase } from "@/components/industry-knowledge-base"
 import { IndustryInsightsPage } from "@/components/industry-insights-page"
+import { AdComplianceReview } from "@/components/ad-compliance-review"
 
 export function WorkspaceLayout() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -17,6 +18,17 @@ export function WorkspaceLayout() {
     show: false,
     bookTitle: "",
   })
+  const [showAdCompliance, setShowAdCompliance] = useState(false)
+
+  const handleAppClick = (appId: string) => {
+    if (appId === "ad-compliance") {
+      setShowAdCompliance(true)
+    }
+  }
+
+  if (showAdCompliance) {
+    return <AdComplianceReview onBack={() => setShowAdCompliance(false)} />
+  }
 
   const renderContent = () => {
     if (activeSection === "知识库") {
@@ -28,7 +40,7 @@ export function WorkspaceLayout() {
     if (activeSection === "行业观察") {
       return <IndustryInsightsPage />
     }
-    return <LaunchpadGrid searchQuery={searchQuery} />
+    return <LaunchpadGrid searchQuery={searchQuery} onAppClick={handleAppClick} />
   }
 
   const showSearchBar = activeSection === "启动台"

@@ -22,10 +22,12 @@ import {
   Headphones,
   BarChart3,
   MessageSquare,
+  ShieldCheck,
 } from "lucide-react"
 
 interface LaunchpadGridProps {
   searchQuery: string
+  onAppClick?: (appId: string) => void
 }
 
 const apps = [
@@ -77,6 +79,16 @@ const apps = [
     gradient: "from-red-500 to-red-600",
     bgColor: "bg-red-500",
     action: "查看",
+    size: "regular",
+  },
+  {
+    id: "ad-compliance",
+    name: "医美广告法审核",
+    description: "智能合规审核",
+    icon: ShieldCheck,
+    gradient: "from-emerald-500 to-emerald-600",
+    bgColor: "bg-emerald-500",
+    action: "审核",
     size: "regular",
   },
   {
@@ -235,7 +247,7 @@ const apps = [
   },
 ]
 
-export function LaunchpadGrid({ searchQuery }: LaunchpadGridProps) {
+export function LaunchpadGrid({ searchQuery, onAppClick }: LaunchpadGridProps) {
   const [draggedApp, setDraggedApp] = useState<string | null>(null)
   const [dragOverApp, setDragOverApp] = useState<string | null>(null)
 
@@ -264,7 +276,6 @@ export function LaunchpadGrid({ searchQuery }: LaunchpadGridProps) {
     setDragOverApp(null)
     setDraggedApp(null)
 
-    // 这里可以实现文件夹合并逻辑
     if (draggedApp && draggedApp !== targetAppId) {
       console.log(`Combining ${draggedApp} with ${targetAppId}`)
     }
@@ -283,6 +294,7 @@ export function LaunchpadGrid({ searchQuery }: LaunchpadGridProps) {
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            onClick={() => onAppClick?.(app.id)}
           />
         ))}
       </div>
@@ -304,9 +316,10 @@ interface AppIconProps {
   onDragOver: (e: React.DragEvent, appId: string) => void
   onDragLeave: () => void
   onDrop: (e: React.DragEvent, appId: string) => void
+  onClick?: () => void
 }
 
-function AppIcon({ app, isDragged, isDragOver, onDragStart, onDragOver, onDragLeave, onDrop }: AppIconProps) {
+function AppIcon({ app, isDragged, isDragOver, onDragStart, onDragOver, onDragLeave, onDrop, onClick }: AppIconProps) {
   const Icon = app.icon
 
   return (
@@ -321,19 +334,17 @@ function AppIcon({ app, isDragged, isDragOver, onDragStart, onDragOver, onDragLe
       onDragOver={(e) => onDragOver(e, app.id)}
       onDragLeave={onDragLeave}
       onDrop={(e) => onDrop(e, app.id)}
+      onClick={onClick}
     >
       <div className="flex flex-col items-center gap-3">
-        {/* 图标容器 */}
         <div className="relative">
           {app.isFolder ? (
             <>
-              {/* 文件夹背景 */}
               <div
                 className={`w-24 h-24 rounded-3xl bg-gradient-to-br ${app.gradient} flex items-center justify-center shadow-2xl transition-all duration-300 group-hover:shadow-3xl`}
               >
                 <Icon className="w-10 h-10 text-white/90" />
               </div>
-              {/* 文件夹内的小图标网格 */}
               <div className="absolute top-2 right-2 grid grid-cols-2 gap-1.5">
                 {app.folderApps?.slice(0, 4).map((folderApp, index) => {
                   const FolderIcon = folderApp.icon
@@ -357,7 +368,6 @@ function AppIcon({ app, isDragged, isDragOver, onDragStart, onDragOver, onDragLe
           )}
         </div>
 
-        {/* 应用名称 */}
         <div className="text-center space-y-1">
           <h3 className="font-medium text-white text-sm leading-tight drop-shadow-md">{app.name}</h3>
           {app.description && (
