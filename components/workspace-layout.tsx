@@ -18,6 +18,10 @@ export function WorkspaceLayout() {
     show: false,
     bookTitle: "",
   })
+  const [coursePlayerState, setCoursePlayerState] = useState<{ show: boolean; courseTitle: string }>({
+    show: false,
+    courseTitle: "",
+  })
   const [showAdCompliance, setShowAdCompliance] = useState(false)
 
   const handleAppClick = (appId: string) => {
@@ -35,7 +39,14 @@ export function WorkspaceLayout() {
       return <KnowledgeBase />
     }
     if (activeSection === "行业知识库") {
-      return <IndustryKnowledgeBase onOpenBookReader={setBookReaderState} bookReaderState={bookReaderState} />
+      return (
+        <IndustryKnowledgeBase
+          onOpenBookReader={setBookReaderState}
+          bookReaderState={bookReaderState}
+          onOpenCoursePlayer={setCoursePlayerState}
+          coursePlayerState={coursePlayerState}
+        />
+      )
     }
     if (activeSection === "行业观察") {
       return <IndustryInsightsPage />
