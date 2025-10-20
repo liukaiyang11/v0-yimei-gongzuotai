@@ -10,6 +10,7 @@ import { KnowledgeBase } from "@/components/knowledge-base"
 import { IndustryKnowledgeBase } from "@/components/industry-knowledge-base"
 import { IndustryInsightsPage } from "@/components/industry-insights-page"
 import { AdComplianceReview } from "@/components/ad-compliance-review"
+import { AISalesAssistant } from "@/components/ai-sales-assistant"
 
 export function WorkspaceLayout() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -23,11 +24,19 @@ export function WorkspaceLayout() {
     courseTitle: "",
   })
   const [showAdCompliance, setShowAdCompliance] = useState(false)
+  const [showSalesAssistant, setShowSalesAssistant] = useState(false)
 
   const handleAppClick = (appId: string) => {
     if (appId === "ad-compliance") {
       setShowAdCompliance(true)
     }
+    if (appId === "sales-assistant") {
+      setShowSalesAssistant(true)
+    }
+  }
+
+  if (showSalesAssistant) {
+    return <AISalesAssistant onBack={() => setShowSalesAssistant(false)} />
   }
 
   if (showAdCompliance) {
