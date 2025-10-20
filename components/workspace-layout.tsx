@@ -11,7 +11,7 @@ import { IndustryKnowledgeBase } from "@/components/industry-knowledge-base"
 import { IndustryInsightsPage } from "@/components/industry-insights-page"
 import { AdComplianceReview } from "@/components/ad-compliance-review"
 import { AISalesAssistant } from "@/components/ai-sales-assistant"
-import { CollaborativeServiceWorkspace } from "@/components/collaborative-service-workspace"
+import { CollaborativeServicePlatform } from "@/components/collaborative-service-platform"
 
 export function WorkspaceLayout() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -41,7 +41,7 @@ export function WorkspaceLayout() {
   }
 
   if (showCollaborativeService) {
-    return <CollaborativeServiceWorkspace onBack={() => setShowCollaborativeService(false)} />
+    return <CollaborativeServicePlatform onBack={() => setShowCollaborativeService(false)} />
   }
 
   if (showSalesAssistant) {

@@ -35,7 +35,7 @@ const apps = [
   {
     id: "collaborative-service",
     name: "智能协同服务工作台",
-    description: "多角色协同服务",
+    description: "群聊协同·AI辅助",
     icon: Users,
     gradient: "from-blue-500 to-indigo-600",
     bgColor: "bg-blue-500",
