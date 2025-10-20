@@ -27,6 +27,15 @@ interface AdComplianceReviewProps {
   onBack: () => void
 }
 
+interface SensitiveIssue {
+  id: string
+  keyword: string
+  level: "high" | "medium" | "low"
+  reason: string
+  suggestion: string
+  position?: { page?: number; line?: number; x?: number; y?: number }
+}
+
 export function AdComplianceReview({ onBack }: AdComplianceReviewProps) {
   const [activeTab, setActiveTab] = useState("content-review")
 
@@ -79,12 +88,11 @@ function ContentReview() {
   const [contentType, setContentType] = useState<"text" | "image" | "document">("text")
   const [content, setContent] = useState("")
   const [isReviewed, setIsReviewed] = useState(false)
-  const [activeIssueId, setActiveIssueId] = useState<string | null>(null)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [previewUrl, setPreviewUrl] = useState<string>("")
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [selectedIssueId, setSelectedIssueId] = useState<string | null>(null)
   const reviewResultRef = useRef<HTMLDivElement>(null)
-  const suggestionRef = useRef<HTMLDivElement>(null)
 
   const platforms = [
     { id: "douyin", name: "抖音", icon: "🎵" },
@@ -97,14 +105,14 @@ function ContentReview() {
     { id: "jd", name: "京东", icon: "🐶" },
   ]
 
-  const issues = [
+  const issues: SensitiveIssue[] = [
     {
       id: "issue-1",
       keyword: "最好",
       level: "high",
       reason: "使用了绝对化用语",
       suggestion: "建议修改为'优质的'或'先进的'",
-      position: { start: 0, end: 2 }, // 在文本中的位置
+      position: { page: 1, line: 3 },
     },
     {
       id: "issue-2",
@@ -112,7 +120,7 @@ function ContentReview() {
       level: "high",
       reason: "夸大效果承诺",
       suggestion: "建议修改为'长效的'或'持久的'",
-      position: { start: 10, end: 12 },
+      position: { page: 2, line: 5 },
     },
     {
       id: "issue-3",
@@ -120,7 +128,7 @@ function ContentReview() {
       level: "medium",
       reason: "医疗效果保证性用语",
       suggestion: "建议修改为'改善'或'缓解'",
-      position: { start: 20, end: 22 },
+      position: { page: 3, line: 2 },
     },
   ]
 
@@ -129,135 +137,19 @@ function ContentReview() {
   }
 
   const handleIssueClick = (issueId: string) => {
-    setActiveIssueId(issueId)
-    const element = document.getElementById(`keyword-${issueId}`)
-    if (element) {
+    setSelectedIssueId(issueId)
+    const element = document.getElementById(issueId)
+    if (element && reviewResultRef.current) {
       element.scrollIntoView({ behavior: "smooth", block: "center" })
+      element.classList.add("animate-pulse")
+      setTimeout(() => {
+        element.classList.remove("animate-pulse")
+      }, 2000)
     }
   }
 
   const handleKeywordClick = (issueId: string) => {
-    setActiveIssueId(issueId)
-    const element = document.getElementById(`suggestion-${issueId}`)
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "center" })
-    }
-  }
-
-  const renderReviewResult = () => {
-    if (contentType === "text") {
-      let lastIndex = 0
-      const elements: React.ReactNode[] = []
-      const sortedIssues = [...issues].sort((a, b) => a.position.start - b.position.start)
-
-      sortedIssues.forEach((issue) => {
-        if (issue.position.start > lastIndex) {
-          elements.push(<span key={`text-${lastIndex}`}>{content.substring(lastIndex, issue.position.start)}</span>)
-        }
-
-        const isActive = activeIssueId === issue.id
-        elements.push(
-          <span
-            key={issue.id}
-            id={`keyword-${issue.id}`}
-            onClick={() => handleKeywordClick(issue.id)}
-            className={`cursor-pointer px-1 rounded transition-all ${
-              isActive
-                ? "bg-red-500 text-white ring-2 ring-red-400 ring-offset-2 ring-offset-slate-800"
-                : "bg-red-900/50 text-red-300 hover:bg-red-800/70"
-            }`}
-          >
-            {content.substring(issue.position.start, issue.position.end)}
-          </span>,
-        )
-
-        lastIndex = issue.position.end
-      })
-
-      if (lastIndex < content.length) {
-        elements.push(<span key={`text-${lastIndex}`}>{content.substring(lastIndex)}</span>)
-      }
-
-      return <div className="text-slate-300 leading-relaxed">{elements}</div>
-    }
-
-    if (contentType === "image" && previewUrl) {
-      return (
-        <div className="space-y-4">
-          <div className="relative border border-slate-700 rounded-lg overflow-hidden bg-slate-900">
-            <img src={previewUrl || "/placeholder.svg"} alt="审核结果" className="w-full h-auto" />
-            {issues.map((issue, index) => (
-              <div
-                key={issue.id}
-                id={`keyword-${issue.id}`}
-                onClick={() => handleKeywordClick(issue.id)}
-                className={`absolute cursor-pointer transition-all ${
-                  activeIssueId === issue.id
-                    ? "border-4 border-red-500 bg-red-500/30 ring-2 ring-red-400"
-                    : "border-2 border-red-500 bg-red-500/20 hover:bg-red-500/30"
-                }`}
-                style={{
-                  top: `${20 + index * 15}%`,
-                  left: `${20 + index * 10}%`,
-                  width: "30%",
-                  height: "20%",
-                }}
-              >
-                <div className="absolute -top-6 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                  {issue.keyword}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
-            <p className="text-sm text-slate-300">
-              检测到图片中包含敏感文字或图案，已用红框标注。点击红框或右侧建议卡片可查看详情。
-            </p>
-          </div>
-        </div>
-      )
-    }
-
-    if (contentType === "document") {
-      return (
-        <div className="space-y-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-lg p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <FileText className="w-8 h-8 text-blue-400" />
-              <div>
-                <p className="text-sm font-medium text-slate-200">{uploadedFiles[0]?.name}</p>
-                <p className="text-xs text-slate-500">文档审核结果</p>
-              </div>
-            </div>
-            <div className="space-y-2 text-sm text-slate-300">
-              {issues.map((issue, index) => {
-                const isActive = activeIssueId === issue.id
-                return (
-                  <p
-                    key={issue.id}
-                    id={`keyword-${issue.id}`}
-                    onClick={() => handleKeywordClick(issue.id)}
-                    className={`cursor-pointer p-2 rounded transition-all ${
-                      isActive ? "bg-red-900/50 ring-2 ring-red-400" : "hover:bg-slate-800"
-                    }`}
-                  >
-                    第{index + 1}页第{index + 3}行：检测到"
-                    <span
-                      className={`px-1 rounded ${isActive ? "bg-red-500 text-white" : "bg-red-900/50 text-red-300"}`}
-                    >
-                      {issue.keyword}
-                    </span>
-                    "
-                  </p>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      )
-    }
-
-    return null
+    setSelectedIssueId(issueId)
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -308,7 +200,7 @@ function ContentReview() {
 
   const handleExport = () => {
     if (contentType === "text") {
-      const modifiedText = content.replace(/(最好|绝对|第一|完美|永久|根治)/g, (match) => {
+      const modifiedText = content.replace(/(最好|永久|根治)/g, (match) => {
         const replacements: Record<string, string> = {
           最好: "优质的",
           绝对: "非常",
@@ -414,6 +306,28 @@ function ContentReview() {
                 {contentType === "image" && previewUrl && (
                   <div className="border border-slate-700 rounded-lg overflow-hidden bg-slate-900">
                     <img src={previewUrl || "/placeholder.svg"} alt="预览" className="w-full h-auto" />
+                    {issues.map((issue, index) => (
+                      <div
+                        key={issue.id}
+                        id={issue.id}
+                        onClick={() => handleKeywordClick(issue.id)}
+                        className={`absolute cursor-pointer transition-all ${
+                          selectedIssueId === issue.id
+                            ? "border-4 border-red-500 bg-red-500/40 ring-4 ring-red-400"
+                            : "border-2 border-red-500 bg-red-500/20 hover:bg-red-500/30"
+                        }`}
+                        style={{
+                          top: `${20 + index * 15}%`,
+                          left: `${20 + index * 10}%`,
+                          width: "120px",
+                          height: "120px",
+                        }}
+                      >
+                        <div className="absolute -top-6 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                          {issue.keyword}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -432,7 +346,149 @@ function ContentReview() {
         <h3 className="text-sm font-semibold text-slate-100 mb-4">审核结果</h3>
         <ScrollArea className="h-[calc(100vh-200px)]" ref={reviewResultRef}>
           {isReviewed ? (
-            <div className="space-y-4">{renderReviewResult()}</div>
+            <>
+              {contentType === "text" && (
+                <div className="prose prose-sm prose-invert max-w-none text-slate-300 leading-relaxed">
+                  {content.split(/(最好|永久|根治)/).map((part, index) => {
+                    const issue = issues.find((i) => i.keyword === part)
+                    if (issue) {
+                      return (
+                        <span
+                          key={index}
+                          id={issue.id}
+                          onClick={() => handleKeywordClick(issue.id)}
+                          className={`cursor-pointer px-1 rounded transition-all ${
+                            selectedIssueId === issue.id
+                              ? "bg-red-600 text-white ring-2 ring-red-400"
+                              : "bg-red-900/50 text-red-300 hover:bg-red-800"
+                          }`}
+                        >
+                          {part}
+                        </span>
+                      )
+                    }
+                    return <span key={index}>{part}</span>
+                  })}
+                </div>
+              )}
+
+              {contentType === "image" && previewUrl && (
+                <div className="space-y-4">
+                  <div className="relative border border-slate-700 rounded-lg overflow-hidden bg-slate-900">
+                    <img src={previewUrl || "/placeholder.svg"} alt="审核结果" className="w-full h-auto" />
+                    {issues.map((issue, index) => (
+                      <div
+                        key={issue.id}
+                        id={issue.id}
+                        onClick={() => handleKeywordClick(issue.id)}
+                        className={`absolute cursor-pointer transition-all ${
+                          selectedIssueId === issue.id
+                            ? "border-4 border-red-500 bg-red-500/40 ring-4 ring-red-400"
+                            : "border-2 border-red-500 bg-red-500/20 hover:bg-red-500/30"
+                        }`}
+                        style={{
+                          top: `${20 + index * 15}%`,
+                          left: `${20 + index * 10}%`,
+                          width: "120px",
+                          height: "120px",
+                        }}
+                      >
+                        <div className="absolute -top-6 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                          {issue.keyword}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <p className="text-sm text-slate-300">
+                      检测到图片中包含敏感文字或图案，已用红框标注。点击红框查看详情。
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {contentType === "document" && (
+                <div className="space-y-4">
+                  <div className="bg-slate-900 border border-slate-700 rounded-lg p-6">
+                    <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-700">
+                      <FileText className="w-8 h-8 text-blue-400" />
+                      <div>
+                        <p className="text-sm font-medium text-slate-200">{uploadedFiles[0]?.name}</p>
+                        <p className="text-xs text-slate-500">文档审核结果 - 共3页</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <div className="text-xs text-slate-500 font-semibold mb-2">第1页</div>
+                        <p className="text-sm text-slate-300 leading-relaxed">
+                          医美咨询师快速打消顾客怕受骗心理的5大招
+                        </p>
+                        <p className="text-sm text-slate-300 leading-relaxed">
+                          因为资美丽、贪便宜、贪权威、贪专家而来到了你的医院，也因为怕而不和你签单，她怕上当、怕失败、怕后悔，很多顾客无非是害怕手术不成功，担心价格比的医院贵。对专医院不放心，担心方一做不好了怎么办？
+                        </p>
+                        <p className="text-sm text-slate-300 leading-relaxed">
+                          如何打消顾客害怕的心理：你的形象要给顾客以安全感我们一直真实的一个理念就是，用90%的时间去获取顾客的信任，10%的时间来谈项目，其中咨询师的形象就是
+                          <span
+                            id="issue-1"
+                            onClick={() => handleKeywordClick("issue-1")}
+                            className={`cursor-pointer px-1 rounded transition-all ${
+                              selectedIssueId === "issue-1"
+                                ? "bg-red-600 text-white ring-2 ring-red-400"
+                                : "bg-red-900/50 text-red-300 hover:bg-red-800"
+                            }`}
+                          >
+                            最好
+                          </span>
+                          的信任点。
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="text-xs text-slate-500 font-semibold mb-2">第2页</div>
+                        <p className="text-sm text-slate-300 leading-relaxed">
+                          专业度有多深顾客信任就有多高咨询师真正需要的不是销售技巧多么，而是你的专业水平有多高。专业与不专业，你一开口，从外散发出对专业的自信度，就会赢得顾客的信赖，包装到位就是不一样！
+                        </p>
+                        <p className="text-sm text-slate-300 leading-relaxed">
+                          坦诚告诉顾客可能存在的风险介绍完项目的优点之后，不要去隐瞒项目的风险，光其是女顾客，第六感觉非常强，看你顺眼就信你，所以咨询师千万要注意自己的补充，在形象、人格还是马虎，包装到位就是不一样！当你介绍完项目的优点之后，要坦诚地告诉顾客这个项目可能存在的风险，并提出解决的方案，而不是一味推销错价项目。让顾客感受到你心为她着想，而不是只想赚钱。这个项目的效果可以
+                          <span
+                            id="issue-2"
+                            onClick={() => handleKeywordClick("issue-2")}
+                            className={`cursor-pointer px-1 rounded transition-all ${
+                              selectedIssueId === "issue-2"
+                                ? "bg-red-600 text-white ring-2 ring-red-400"
+                                : "bg-red-900/50 text-red-300 hover:bg-red-800"
+                            }`}
+                          >
+                            永久
+                          </span>
+                          保持，让您的肌肤重返年轻态。
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="text-xs text-slate-500 font-semibold mb-2">第3页</div>
+                        <p className="text-sm text-slate-300 leading-relaxed">
+                          建立长期信任关系只关注一次性交易，而是要建立长期的信任关系。通过优质的服务和真诚的态度，让顾客成为你的忠实粉丝。当你介绍完项目的优点之后，不要去隐瞒项目的风险，并提出此方案，让顾客感受到你心为她着想。我们的治疗方案可以
+                          <span
+                            id="issue-3"
+                            onClick={() => handleKeywordClick("issue-3")}
+                            className={`cursor-pointer px-1 rounded transition-all ${
+                              selectedIssueId === "issue-3"
+                                ? "bg-red-600 text-white ring-2 ring-red-400"
+                                : "bg-red-900/50 text-red-300 hover:bg-red-800"
+                            }`}
+                          >
+                            根治
+                          </span>
+                          您的皮肤问题，让您重获自信。
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-12 text-slate-500">
               <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -453,51 +509,53 @@ function ContentReview() {
             </Button>
           )}
         </div>
-        <ScrollArea className="h-[calc(100vh-200px)]" ref={suggestionRef}>
+        <ScrollArea className="h-[calc(100vh-200px)]">
           {isReviewed ? (
             <div className="space-y-3">
-              {issues.map((issue) => {
-                const isActive = activeIssueId === issue.id
-                return (
-                  <Card
-                    key={issue.id}
-                    id={`suggestion-${issue.id}`}
-                    onClick={() => handleIssueClick(issue.id)}
-                    className={`p-4 border-l-4 cursor-pointer transition-all ${
-                      isActive
-                        ? "border-l-red-500 bg-slate-700 ring-2 ring-red-400 shadow-lg"
-                        : "border-l-red-500 bg-slate-800 hover:bg-slate-700"
-                    } border-slate-700`}
+              {issues.map((issue) => (
+                <Card
+                  key={issue.id}
+                  onClick={() => handleIssueClick(issue.id)}
+                  className={`p-4 border-l-4 cursor-pointer transition-all ${
+                    selectedIssueId === issue.id
+                      ? "border-l-red-600 bg-slate-700 border-slate-600 ring-2 ring-red-500"
+                      : "border-l-red-500 bg-slate-800 border-slate-700 hover:bg-slate-750"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-slate-100">{issue.keyword}</span>
+                      <Badge
+                        variant={issue.level === "high" ? "destructive" : "secondary"}
+                        className={issue.level === "high" ? "bg-red-900 text-red-200" : "bg-slate-700 text-slate-300"}
+                      >
+                        {issue.level === "high" ? "高风险" : "中风险"}
+                      </Badge>
+                      {issue.position && (
+                        <span className="text-xs text-slate-500">
+                          {issue.position.page && `第${issue.position.page}页`}
+                          {issue.position.line && ` 第${issue.position.line}行`}
+                        </span>
+                      )}
+                    </div>
+                    <AlertCircle className="w-4 h-4 text-red-400" />
+                  </div>
+                  <p className="text-sm text-slate-400 mb-2">{issue.reason}</p>
+                  <div className="bg-blue-900/30 border border-blue-800 rounded p-3 mb-3">
+                    <p className="text-sm text-blue-300">{issue.suggestion}</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                    }}
                   >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-slate-100">{issue.keyword}</span>
-                        <Badge
-                          variant={issue.level === "high" ? "destructive" : "secondary"}
-                          className={issue.level === "high" ? "bg-red-900 text-red-200" : "bg-slate-700 text-slate-300"}
-                        >
-                          {issue.level === "high" ? "高风险" : "中风险"}
-                        </Badge>
-                      </div>
-                      <AlertCircle className="w-4 h-4 text-red-400" />
-                    </div>
-                    <p className="text-sm text-slate-400 mb-2">{issue.reason}</p>
-                    <div className="bg-blue-900/30 border border-blue-800 rounded p-3 mb-3">
-                      <p className="text-sm text-blue-300">{issue.suggestion}</p>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                      }}
-                    >
-                      一键替换
-                    </Button>
-                  </Card>
-                )
-              })}
+                    一键替换
+                  </Button>
+                </Card>
+              ))}
             </div>
           ) : (
             <div className="text-center py-12 text-slate-500">
