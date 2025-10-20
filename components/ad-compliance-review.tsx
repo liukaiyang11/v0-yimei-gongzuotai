@@ -79,10 +79,12 @@ function ContentReview() {
   const [contentType, setContentType] = useState<"text" | "image" | "document">("text")
   const [content, setContent] = useState("")
   const [isReviewed, setIsReviewed] = useState(false)
-  const [highlightedContent, setHighlightedContent] = useState("")
+  const [activeIssueId, setActiveIssueId] = useState<string | null>(null)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [previewUrl, setPreviewUrl] = useState<string>("")
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const reviewResultRef = useRef<HTMLDivElement>(null)
+  const suggestionRef = useRef<HTMLDivElement>(null)
 
   const platforms = [
     { id: "douyin", name: "抖音", icon: "🎵" },
@@ -95,15 +97,167 @@ function ContentReview() {
     { id: "jd", name: "京东", icon: "🐶" },
   ]
 
+  const issues = [
+    {
+      id: "issue-1",
+      keyword: "最好",
+      level: "high",
+      reason: "使用了绝对化用语",
+      suggestion: "建议修改为'优质的'或'先进的'",
+      position: { start: 0, end: 2 }, // 在文本中的位置
+    },
+    {
+      id: "issue-2",
+      keyword: "永久",
+      level: "high",
+      reason: "夸大效果承诺",
+      suggestion: "建议修改为'长效的'或'持久的'",
+      position: { start: 10, end: 12 },
+    },
+    {
+      id: "issue-3",
+      keyword: "根治",
+      level: "medium",
+      reason: "医疗效果保证性用语",
+      suggestion: "建议修改为'改善'或'缓解'",
+      position: { start: 20, end: 22 },
+    },
+  ]
+
   const handleReview = () => {
-    if (contentType === "text") {
-      const highlighted = content.replace(
-        /(最好|绝对|第一|完美|永久|根治)/g,
-        '<span class="bg-red-900/50 text-red-300 px-1 rounded">$1</span>',
-      )
-      setHighlightedContent(highlighted)
-    }
     setIsReviewed(true)
+  }
+
+  const handleIssueClick = (issueId: string) => {
+    setActiveIssueId(issueId)
+    const element = document.getElementById(`keyword-${issueId}`)
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" })
+    }
+  }
+
+  const handleKeywordClick = (issueId: string) => {
+    setActiveIssueId(issueId)
+    const element = document.getElementById(`suggestion-${issueId}`)
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" })
+    }
+  }
+
+  const renderReviewResult = () => {
+    if (contentType === "text") {
+      let lastIndex = 0
+      const elements: React.ReactNode[] = []
+      const sortedIssues = [...issues].sort((a, b) => a.position.start - b.position.start)
+
+      sortedIssues.forEach((issue) => {
+        if (issue.position.start > lastIndex) {
+          elements.push(<span key={`text-${lastIndex}`}>{content.substring(lastIndex, issue.position.start)}</span>)
+        }
+
+        const isActive = activeIssueId === issue.id
+        elements.push(
+          <span
+            key={issue.id}
+            id={`keyword-${issue.id}`}
+            onClick={() => handleKeywordClick(issue.id)}
+            className={`cursor-pointer px-1 rounded transition-all ${
+              isActive
+                ? "bg-red-500 text-white ring-2 ring-red-400 ring-offset-2 ring-offset-slate-800"
+                : "bg-red-900/50 text-red-300 hover:bg-red-800/70"
+            }`}
+          >
+            {content.substring(issue.position.start, issue.position.end)}
+          </span>,
+        )
+
+        lastIndex = issue.position.end
+      })
+
+      if (lastIndex < content.length) {
+        elements.push(<span key={`text-${lastIndex}`}>{content.substring(lastIndex)}</span>)
+      }
+
+      return <div className="text-slate-300 leading-relaxed">{elements}</div>
+    }
+
+    if (contentType === "image" && previewUrl) {
+      return (
+        <div className="space-y-4">
+          <div className="relative border border-slate-700 rounded-lg overflow-hidden bg-slate-900">
+            <img src={previewUrl || "/placeholder.svg"} alt="审核结果" className="w-full h-auto" />
+            {issues.map((issue, index) => (
+              <div
+                key={issue.id}
+                id={`keyword-${issue.id}`}
+                onClick={() => handleKeywordClick(issue.id)}
+                className={`absolute cursor-pointer transition-all ${
+                  activeIssueId === issue.id
+                    ? "border-4 border-red-500 bg-red-500/30 ring-2 ring-red-400"
+                    : "border-2 border-red-500 bg-red-500/20 hover:bg-red-500/30"
+                }`}
+                style={{
+                  top: `${20 + index * 15}%`,
+                  left: `${20 + index * 10}%`,
+                  width: "30%",
+                  height: "20%",
+                }}
+              >
+                <div className="absolute -top-6 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                  {issue.keyword}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
+            <p className="text-sm text-slate-300">
+              检测到图片中包含敏感文字或图案，已用红框标注。点击红框或右侧建议卡片可查看详情。
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    if (contentType === "document") {
+      return (
+        <div className="space-y-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <FileText className="w-8 h-8 text-blue-400" />
+              <div>
+                <p className="text-sm font-medium text-slate-200">{uploadedFiles[0]?.name}</p>
+                <p className="text-xs text-slate-500">文档审核结果</p>
+              </div>
+            </div>
+            <div className="space-y-2 text-sm text-slate-300">
+              {issues.map((issue, index) => {
+                const isActive = activeIssueId === issue.id
+                return (
+                  <p
+                    key={issue.id}
+                    id={`keyword-${issue.id}`}
+                    onClick={() => handleKeywordClick(issue.id)}
+                    className={`cursor-pointer p-2 rounded transition-all ${
+                      isActive ? "bg-red-900/50 ring-2 ring-red-400" : "hover:bg-slate-800"
+                    }`}
+                  >
+                    第{index + 1}页第{index + 3}行：检测到"
+                    <span
+                      className={`px-1 rounded ${isActive ? "bg-red-500 text-white" : "bg-red-900/50 text-red-300"}`}
+                    >
+                      {issue.keyword}
+                    </span>
+                    "
+                  </p>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    return null
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,27 +331,6 @@ function ContentReview() {
       alert("正在导出修改后的文件...")
     }
   }
-
-  const issues = [
-    {
-      keyword: "最好",
-      level: "high",
-      reason: "使用了绝对化用语",
-      suggestion: "建议修改为'优质的'或'先进的'",
-    },
-    {
-      keyword: "永久",
-      level: "high",
-      reason: "夸大效果承诺",
-      suggestion: "建议修改为'长效的'或'持久的'",
-    },
-    {
-      keyword: "根治",
-      level: "medium",
-      reason: "医疗效果保证性用语",
-      suggestion: "建议修改为'改善'或'缓解'",
-    },
-  ]
 
   return (
     <div className="flex h-full">
@@ -281,12 +414,6 @@ function ContentReview() {
                 {contentType === "image" && previewUrl && (
                   <div className="border border-slate-700 rounded-lg overflow-hidden bg-slate-900">
                     <img src={previewUrl || "/placeholder.svg"} alt="预览" className="w-full h-auto" />
-                    {/* 模拟标注敏感区域 */}
-                    <div className="absolute top-20 left-20 w-32 h-32 border-2 border-red-500 bg-red-500/20 rounded">
-                      <div className="absolute -top-6 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                        敏感内容
-                      </div>
-                    </div>
                   </div>
                 )}
               </div>
@@ -303,58 +430,9 @@ function ContentReview() {
       {/* 中栏：审核结果区 */}
       <div className="w-1/3 border-r border-slate-700 bg-slate-800 p-6">
         <h3 className="text-sm font-semibold text-slate-100 mb-4">审核结果</h3>
-        <ScrollArea className="h-[calc(100vh-200px)]">
+        <ScrollArea className="h-[calc(100vh-200px)]" ref={reviewResultRef}>
           {isReviewed ? (
-            <>
-              {contentType === "text" && (
-                <div
-                  className="prose prose-sm prose-invert max-w-none text-slate-300"
-                  dangerouslySetInnerHTML={{ __html: highlightedContent || "暂无内容" }}
-                />
-              )}
-
-              {contentType === "image" && previewUrl && (
-                <div className="space-y-4">
-                  <div className="relative border border-slate-700 rounded-lg overflow-hidden bg-slate-900">
-                    <img src={previewUrl || "/placeholder.svg"} alt="审核结果" className="w-full h-auto" />
-                    {/* 模拟标注敏感区域 */}
-                    <div className="absolute top-20 left-20 w-32 h-32 border-2 border-red-500 bg-red-500/20 rounded">
-                      <div className="absolute -top-6 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                        敏感内容
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
-                    <p className="text-sm text-slate-300">检测到图片中包含敏感文字或图案，已用红框标注。</p>
-                  </div>
-                </div>
-              )}
-
-              {contentType === "document" && (
-                <div className="space-y-4">
-                  <div className="bg-slate-900 border border-slate-700 rounded-lg p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <FileText className="w-8 h-8 text-blue-400" />
-                      <div>
-                        <p className="text-sm font-medium text-slate-200">{uploadedFiles[0]?.name}</p>
-                        <p className="text-xs text-slate-500">文档审核结果</p>
-                      </div>
-                    </div>
-                    <div className="space-y-2 text-sm text-slate-300">
-                      <p>
-                        第1页第3行：检测到"<span className="bg-red-900/50 text-red-300 px-1 rounded">最好</span>"
-                      </p>
-                      <p>
-                        第2页第5行：检测到"<span className="bg-red-900/50 text-red-300 px-1 rounded">永久</span>"
-                      </p>
-                      <p>
-                        第3页第2行：检测到"<span className="bg-red-900/50 text-red-300 px-1 rounded">根治</span>"
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
+            <div className="space-y-4">{renderReviewResult()}</div>
           ) : (
             <div className="text-center py-12 text-slate-500">
               <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -375,36 +453,51 @@ function ContentReview() {
             </Button>
           )}
         </div>
-        <ScrollArea className="h-[calc(100vh-200px)]">
+        <ScrollArea className="h-[calc(100vh-200px)]" ref={suggestionRef}>
           {isReviewed ? (
             <div className="space-y-3">
-              {issues.map((issue, index) => (
-                <Card key={index} className="p-4 border-l-4 border-l-red-500 bg-slate-800 border-slate-700">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-slate-100">{issue.keyword}</span>
-                      <Badge
-                        variant={issue.level === "high" ? "destructive" : "secondary"}
-                        className={issue.level === "high" ? "bg-red-900 text-red-200" : "bg-slate-700 text-slate-300"}
-                      >
-                        {issue.level === "high" ? "高风险" : "中风险"}
-                      </Badge>
-                    </div>
-                    <AlertCircle className="w-4 h-4 text-red-400" />
-                  </div>
-                  <p className="text-sm text-slate-400 mb-2">{issue.reason}</p>
-                  <div className="bg-blue-900/30 border border-blue-800 rounded p-3 mb-3">
-                    <p className="text-sm text-blue-300">{issue.suggestion}</p>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="w-full bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600"
+              {issues.map((issue) => {
+                const isActive = activeIssueId === issue.id
+                return (
+                  <Card
+                    key={issue.id}
+                    id={`suggestion-${issue.id}`}
+                    onClick={() => handleIssueClick(issue.id)}
+                    className={`p-4 border-l-4 cursor-pointer transition-all ${
+                      isActive
+                        ? "border-l-red-500 bg-slate-700 ring-2 ring-red-400 shadow-lg"
+                        : "border-l-red-500 bg-slate-800 hover:bg-slate-700"
+                    } border-slate-700`}
                   >
-                    一键替换
-                  </Button>
-                </Card>
-              ))}
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-slate-100">{issue.keyword}</span>
+                        <Badge
+                          variant={issue.level === "high" ? "destructive" : "secondary"}
+                          className={issue.level === "high" ? "bg-red-900 text-red-200" : "bg-slate-700 text-slate-300"}
+                        >
+                          {issue.level === "high" ? "高风险" : "中风险"}
+                        </Badge>
+                      </div>
+                      <AlertCircle className="w-4 h-4 text-red-400" />
+                    </div>
+                    <p className="text-sm text-slate-400 mb-2">{issue.reason}</p>
+                    <div className="bg-blue-900/30 border border-blue-800 rounded p-3 mb-3">
+                      <p className="text-sm text-blue-300">{issue.suggestion}</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                      }}
+                    >
+                      一键替换
+                    </Button>
+                  </Card>
+                )
+              })}
             </div>
           ) : (
             <div className="text-center py-12 text-slate-500">
