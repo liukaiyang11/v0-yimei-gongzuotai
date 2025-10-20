@@ -1,13 +1,44 @@
 "use client"
 
 import { useState } from "react"
-import { Home, Download, MoreHorizontal, Play, Pause, Volume2, Maximize, FileText, Network, Send } from "lucide-react"
+import {
+  Home,
+  Download,
+  MoreHorizontal,
+  Play,
+  Pause,
+  Volume2,
+  Maximize,
+  FileText,
+  Network,
+  Send,
+  Bold,
+  Italic,
+  Underline,
+  List,
+  ListOrdered,
+  Link,
+  ImageIcon,
+  Table,
+  Code,
+  AlignLeft,
+  Undo,
+  Redo,
+  Smile,
+  MoreVertical,
+  Maximize2,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface CoursePlayerProps {
   courseTitle: string
@@ -73,6 +104,21 @@ export function CoursePlayer({ courseTitle, onBack }: CoursePlayerProps) {
   const [activeGuideTab, setActiveGuideTab] = useState("original")
   const [question, setQuestion] = useState("")
   const [deepThinking, setDeepThinking] = useState(true)
+
+  const [noteTitle, setNoteTitle] = useState("")
+  const [noteContent, setNoteContent] = useState("")
+
+  const [rewriteTab, setRewriteTab] = useState("settings")
+  const [rewriteMethod, setRewriteMethod] = useState("summary")
+  const [rewriteSources, setRewriteSources] = useState<string[]>(["document"])
+  const [rewriteDescription, setRewriteDescription] = useState("")
+  const [targetAudience, setTargetAudience] = useState("customer")
+  const [writingStyle, setWritingStyle] = useState("wechat")
+
+  const [mindmapTab, setMindmapTab] = useState("generate")
+  const [mindmapView, setMindmapView] = useState("map")
+  const [mindmapRequirement, setMindmapRequirement] = useState("")
+  const [mindmapLanguage, setMindmapLanguage] = useState("chinese")
 
   return (
     <div className="fixed left-20 top-0 right-0 bottom-0 bg-slate-900 flex flex-col">
@@ -323,20 +369,482 @@ export function CoursePlayer({ courseTitle, onBack }: CoursePlayerProps) {
               </div>
             </TabsContent>
 
-            <TabsContent value="chat" className="flex-1 p-4">
-              <div className="text-gray-400 text-center py-8">对话功能开发中...</div>
+            <TabsContent value="chat" className="flex-1 flex flex-col mt-0 overflow-hidden">
+              <ScrollArea className="flex-1 p-4">
+                <div className="space-y-6">
+                  {/* 全文概述 */}
+                  <div className="space-y-3">
+                    <h3 className="text-white font-medium flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-blue-500" />
+                      全文概述
+                    </h3>
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <span>已深度思考</span>
+                      <span>原文共计9443字，读完预计9分钟。</span>
+                      <a href="#" className="text-blue-400 hover:underline">
+                        AI在7s内完成阅读并生成总结
+                      </a>
+                    </div>
+                    <div className="bg-slate-700/50 rounded-lg p-4 space-y-3 text-gray-300 text-sm leading-relaxed">
+                      <p>
+                        好的，我现在需要处理用户的查询，为他生成一份结构良好的文案概述。首先，我需要理解用户提供的参考内容，理解其中的核心要素。
+                      </p>
+                      <p>
+                        用户提供的文案内容主要分为两部分：首先是月套餐对公司活和营销策略的影响，其次是医美行业的现状、挑战及未来展望。我需要将这两个主题整合到概述中，按照引言、主题概述、方法步骤、适用读者、价格评估和结论。
+                      </p>
+                      <p>
+                        用户要求述还不超过6句话，总字数500以内，每句话不超过100字。因此，我需要提炼每个部分的关键点。
+                      </p>
+                      <p>首先，引言要突出减肥药的成功和营销策略的分析，主题概述需要概括医美行业的分析。</p>
+                      <p>
+                        需要注意用户可能的深层需求：他们可能希望提炼出营销策略的关键点，用于商业决策或行业分析。因此，概述需要简洁准确，信息准确。适用读者应为医美行业从业者、营销策略研究者、行业从业者及消费者。价格评估需要简洁调整，结合是否符合格式要求。
+                      </p>
+                      <p>
+                        需要注意用户可能的深层需求：他们可能希望提炼出营销策略的关键点，用于商业决策或行业分析。因此，概述需要简洁准确，信息准确。适用读者应为医美行业从业者、营销策略研究者、行业从业者及消费者。价格评估需要简洁调整，结合是否符合格式要求。
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 文档概述 */}
+                  <div className="space-y-3">
+                    <h3 className="text-white font-medium">2. 文案概述:</h3>
+                    <div className="text-gray-300 text-sm leading-relaxed space-y-2">
+                      <p>
+                        &lt;文案以LVMH集团被诺和诺德代欧洲市值首位为引，串联医疗与医美两大主题，前半篇聚焦于诺和诺德尿病药意外转型减肥药领域，市值突破3万亿超越奢驰马逊和，后半篇深度解构医美行业现状，包装历史溯源、营销模式及监管动向，指出行业面临人才短缺与监管趋严问题，住在政策规范与消费升级下将黄金发展期，全文通过案例对比（医药创新VS消费医疗）与数据聚焦，帮助医疗投资者、医美从业者及消费群体把握行业兴场动向，既展现医疗疗产品界价值，又揭示医疗债值与消费升级融合趋势有服务价值。&gt;
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 您可以提问我这些 */}
+                  <div className="space-y-3">
+                    <h3 className="text-white font-medium flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-blue-500" />
+                      您可以提问我这些
+                    </h3>
+                    <div className="space-y-2">
+                      <button className="w-full text-left p-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm text-gray-300 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                        帮我总结视频中的核心要点，包括不限于人物、观点、目的、步骤、结论、建议等。
+                        <span className="ml-auto text-blue-400">→</span>
+                      </button>
+                      <button className="w-full text-left p-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm text-gray-300 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                        帮我预测出视频中的金句和要点信息。
+                        <span className="ml-auto text-blue-400">→</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 历史问题 */}
+                  <div className="space-y-2 text-sm text-gray-400">
+                    <p>马斯克提到的减肥药物是什么？2023年医美行业监管的指导文件及哪些部门？</p>
+                  </div>
+                </div>
+              </ScrollArea>
+
+              {/* 底部输入框 */}
+              <div className="p-4 border-t border-slate-700">
+                <div className="relative">
+                  <Textarea
+                    placeholder="请输入您的问题，点击发送按钮进行对话"
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 pr-12 resize-none"
+                    rows={3}
+                  />
+                  <Button size="icon" className="absolute bottom-2 right-2 bg-blue-600 hover:bg-blue-700">
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between mt-2">
+                  <Button size="sm" variant="ghost" className="text-gray-400 hover:text-white">
+                    <FileText className="w-4 h-4 mr-1" />
+                    包网通用
+                  </Button>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">深度思考R1</span>
+                    <Switch checked={deepThinking} onCheckedChange={setDeepThinking} />
+                  </div>
+                </div>
+              </div>
             </TabsContent>
 
-            <TabsContent value="mindmap" className="flex-1 p-4">
-              <div className="text-gray-400 text-center py-8">思维导图功能开发中...</div>
+            <TabsContent value="mindmap" className="flex-1 flex flex-col mt-0 overflow-hidden">
+              <div className="border-b border-slate-700">
+                <div className="flex items-center px-4">
+                  <button
+                    className={`px-4 py-3 text-sm ${mindmapTab === "generate" ? "text-blue-400 border-b-2 border-blue-400" : "text-gray-400"}`}
+                    onClick={() => setMindmapTab("generate")}
+                  >
+                    生成思维导图
+                  </button>
+                  <button
+                    className={`px-4 py-3 text-sm ${mindmapTab === "history" ? "text-blue-400 border-b-2 border-blue-400" : "text-gray-400"}`}
+                    onClick={() => setMindmapTab("history")}
+                  >
+                    导图生成记录
+                  </button>
+                </div>
+              </div>
+
+              {mindmapTab === "generate" && (
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  <ScrollArea className="flex-1 p-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-white font-medium">生成结果</h3>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant={mindmapView === "outline" ? "default" : "ghost"}
+                            onClick={() => setMindmapView("outline")}
+                            className={mindmapView === "outline" ? "bg-blue-600" : "text-gray-300"}
+                          >
+                            大纲
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={mindmapView === "map" ? "default" : "ghost"}
+                            onClick={() => setMindmapView("map")}
+                            className={mindmapView === "map" ? "bg-blue-600" : "text-gray-300"}
+                          >
+                            导图
+                          </Button>
+                          <Button size="sm" variant="ghost" className="text-gray-300">
+                            <Download className="w-4 h-4 mr-1" />
+                            下载
+                          </Button>
+                          <Button size="sm" variant="ghost" className="text-gray-300">
+                            <Maximize2 className="w-4 h-4 mr-1" />
+                            全屏
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* 思维导图展示 */}
+                      <div className="bg-slate-700/30 rounded-lg p-6 min-h-[400px] flex items-center justify-center">
+                        <img src="/placeholder.svg?height=400&width=600" alt="思维导图" className="max-w-full h-auto" />
+                      </div>
+
+                      {/* 生成要求 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">
+                          生成要求<span className="text-red-400">（必填）</span>
+                        </h3>
+                        <Textarea
+                          placeholder="请输入生成思维导图的需求。例如，分析文档的核心要点、关键信息、核心术语，用300字来总结全文的主要内容，要求逻辑严谨和逻辑构清晰。"
+                          value={mindmapRequirement}
+                          onChange={(e) => setMindmapRequirement(e.target.value)}
+                          className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 min-h-[100px]"
+                        />
+                      </div>
+
+                      {/* 输出语言 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">输出语言：</h3>
+                        <div className="flex items-center gap-4">
+                          <button
+                            className={`px-4 py-2 rounded-lg ${mindmapLanguage === "chinese" ? "bg-blue-600 text-white" : "bg-slate-700 text-gray-300"}`}
+                            onClick={() => setMindmapLanguage("chinese")}
+                          >
+                            中文
+                          </button>
+                          <button
+                            className={`px-4 py-2 rounded-lg ${mindmapLanguage === "english" ? "bg-blue-600 text-white" : "bg-slate-700 text-gray-300"}`}
+                            onClick={() => setMindmapLanguage("english")}
+                          >
+                            英文
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollArea>
+
+                  <div className="p-4 border-t border-slate-700">
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                      <FileText className="w-4 h-4 mr-2" />
+                      立即生成
+                    </Button>
+                  </div>
+                </div>
+              )}
             </TabsContent>
 
-            <TabsContent value="notes" className="flex-1 p-4">
-              <div className="text-gray-400 text-center py-8">笔记功能开发中...</div>
+            <TabsContent value="notes" className="flex-1 flex flex-col mt-0 overflow-hidden">
+              <div className="flex-1 flex flex-col overflow-hidden">
+                {/* 富文本编辑器工具栏 */}
+                <div className="border-b border-slate-700 p-2 space-y-2">
+                  {/* 第一行工具栏 */}
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <Select defaultValue="normal">
+                      <SelectTrigger className="w-20 h-8 bg-slate-700 border-slate-600 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="normal">正文</SelectItem>
+                        <SelectItem value="h1">标题1</SelectItem>
+                        <SelectItem value="h2">标题2</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="w-px h-6 bg-slate-600 mx-1" />
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <Smile className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <Bold className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <Underline className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <Italic className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
+                    <div className="w-px h-6 bg-slate-600 mx-1" />
+                    <Button size="sm" variant="ghost" className="h-8 px-2 text-gray-300 text-xs">
+                      默认字号
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 px-2 text-gray-300 text-xs">
+                      默认字体
+                    </Button>
+                  </div>
+
+                  {/* 第二行工具栏 */}
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <Button size="sm" variant="ghost" className="h-8 px-2 text-gray-300 text-xs">
+                      默认行高
+                    </Button>
+                    <div className="w-px h-6 bg-slate-600 mx-1" />
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <List className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <ListOrdered className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <Smile className="w-4 h-4" />
+                    </Button>
+                    <div className="w-px h-6 bg-slate-600 mx-1" />
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <Smile className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <Link className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <ImageIcon className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <Table className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <Code className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <AlignLeft className="w-4 h-4" />
+                    </Button>
+                    <div className="w-px h-6 bg-slate-600 mx-1" />
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <Undo className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                      <Redo className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 笔记内容区域 */}
+                <ScrollArea className="flex-1 p-4">
+                  <div className="space-y-4">
+                    <Input
+                      placeholder="请输入标题"
+                      value={noteTitle}
+                      onChange={(e) => setNoteTitle(e.target.value)}
+                      className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 text-lg font-medium"
+                    />
+                    <Textarea
+                      placeholder="请输入内容..."
+                      value={noteContent}
+                      onChange={(e) => setNoteContent(e.target.value)}
+                      className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 min-h-[400px] resize-none"
+                    />
+                  </div>
+                </ScrollArea>
+              </div>
             </TabsContent>
 
-            <TabsContent value="rewrite" className="flex-1 p-4">
-              <div className="text-gray-400 text-center py-8">改写功能开发中...</div>
+            <TabsContent value="rewrite" className="flex-1 flex flex-col mt-0 overflow-hidden">
+              <div className="border-b border-slate-700">
+                <div className="flex items-center px-4">
+                  <button
+                    className={`px-4 py-3 text-sm ${rewriteTab === "settings" ? "text-blue-400 border-b-2 border-blue-400" : "text-gray-400"}`}
+                    onClick={() => setRewriteTab("settings")}
+                  >
+                    改写设置
+                  </button>
+                  <button
+                    className={`px-4 py-3 text-sm ${rewriteTab === "result" ? "text-blue-400 border-b-2 border-blue-400" : "text-gray-400"}`}
+                    onClick={() => setRewriteTab("result")}
+                  >
+                    改写结果
+                  </button>
+                </div>
+              </div>
+
+              {rewriteTab === "settings" && (
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  <ScrollArea className="flex-1 p-4">
+                    <div className="space-y-6">
+                      {/* 改写方式 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">
+                          改写方式<span className="text-red-400">（必填）</span>
+                        </h3>
+                        <RadioGroup value={rewriteMethod} onValueChange={setRewriteMethod}>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="summary" id="summary" />
+                            <Label htmlFor="summary" className="text-gray-300">
+                              全文总结
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="polish" id="polish" />
+                            <Label htmlFor="polish" className="text-gray-300">
+                              逐段润色
+                            </Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+
+                      {/* 信息来源 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">信息来源</h3>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="document"
+                              checked={rewriteSources.includes("document")}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setRewriteSources([...rewriteSources, "document"])
+                                } else {
+                                  setRewriteSources(rewriteSources.filter((s) => s !== "document"))
+                                }
+                              }}
+                            />
+                            <Label htmlFor="document" className="text-gray-300">
+                              当前文档内容
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="chat"
+                              checked={rewriteSources.includes("chat")}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setRewriteSources([...rewriteSources, "chat"])
+                                } else {
+                                  setRewriteSources(rewriteSources.filter((s) => s !== "chat"))
+                                }
+                              }}
+                            />
+                            <Label htmlFor="chat" className="text-gray-300">
+                              当前AI对话
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="notes"
+                              checked={rewriteSources.includes("notes")}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setRewriteSources([...rewriteSources, "notes"])
+                                } else {
+                                  setRewriteSources(rewriteSources.filter((s) => s !== "notes"))
+                                }
+                              }}
+                            />
+                            <Label htmlFor="notes" className="text-gray-300">
+                              笔记内容
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox id="knowledge" disabled />
+                            <Label htmlFor="knowledge" className="text-gray-500">
+                              知识库（敬请期待）
+                            </Label>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 优化描述 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">
+                          优化描述<span className="text-red-400">（必填）</span>
+                        </h3>
+                        <Textarea
+                          placeholder="请输入全文总结的需求。例如，分析文档的核心要点、关键信息、核心术语，用300字来总结全文的主要内容，要求逻辑严谨和逻辑构清晰。"
+                          value={rewriteDescription}
+                          onChange={(e) => setRewriteDescription(e.target.value)}
+                          className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 min-h-[100px]"
+                        />
+                      </div>
+
+                      {/* 目标读者是 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">目标读者是</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {["customer", "staff", "doctor", "nurse"].map((audience) => (
+                            <button
+                              key={audience}
+                              className={`px-4 py-2 rounded-lg ${targetAudience === audience ? "bg-blue-600 text-white" : "bg-slate-700 text-gray-300"}`}
+                              onClick={() => setTargetAudience(audience)}
+                            >
+                              {audience === "customer" && "医美客户"}
+                              {audience === "staff" && "医护人员"}
+                              {audience === "doctor" && "医美师"}
+                              {audience === "nurse" && "护士"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 预期写作风格 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">预期写作风格</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {["wechat", "xiaohongshu", "douyin"].map((style) => (
+                            <button
+                              key={style}
+                              className={`px-4 py-2 rounded-lg ${writingStyle === style ? "bg-blue-600 text-white" : "bg-slate-700 text-gray-300"}`}
+                              onClick={() => setWritingStyle(style)}
+                            >
+                              {style === "wechat" && "公众号"}
+                              {style === "xiaohongshu" && "小红书"}
+                              {style === "douyin" && "抖音"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollArea>
+
+                  <div className="p-4 border-t border-slate-700">
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                      <FileText className="w-4 h-4 mr-2" />
+                      立即生成
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {rewriteTab === "result" && (
+                <div className="flex-1 p-4">
+                  <div className="text-gray-400 text-center py-8">请先在改写设置中配置并生成内容</div>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
