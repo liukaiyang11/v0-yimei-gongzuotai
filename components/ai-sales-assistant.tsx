@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Home, Search, TrendingUp, DollarSign, Package, Clock, Lightbulb, ChevronRight, Star } from "lucide-react"
+import { ArrowLeft, Search, TrendingUp, DollarSign, Package, Clock, Lightbulb, ChevronRight, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -99,8 +99,8 @@ export function AISalesAssistant({ onBack }: AISalesAssistantProps) {
     <div className="fixed inset-0 left-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 z-50">
       {/* 顶部导航栏 */}
       <div className="h-16 border-b border-slate-700/50 bg-slate-900/80 backdrop-blur-sm flex items-center px-6">
-        <Button variant="ghost" size="icon" onClick={onBack} className="text-slate-300 hover:text-white">
-          <Home className="w-5 h-5" />
+        <Button variant="ghost" size="icon" onClick={onBack} className="hover:bg-slate-700 text-slate-200">
+          <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="ml-4 flex items-center space-x-2">
           <DollarSign className="w-5 h-5 text-blue-400" />

@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState } from "react"
 import {
-  Home,
   Search,
   Plus,
   Send,
@@ -17,6 +16,7 @@ import {
   FileText,
   Clock,
   CheckCircle,
+  ArrowLeft,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -55,13 +55,8 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
       {/* 顶部导航栏 */}
       <div className="h-16 bg-slate-800/50 backdrop-blur-sm border-b border-slate-700/50 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onBack}
-            className="text-slate-300 hover:text-white hover:bg-slate-700/50"
-          >
-            <Home className="w-5 h-5" />
+          <Button variant="ghost" size="icon" onClick={onBack} className="hover:bg-slate-700 text-slate-200">
+            <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
             <h1 className="text-xl font-semibold text-white">智能协同服务工作台</h1>
