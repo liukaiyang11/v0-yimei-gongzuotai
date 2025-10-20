@@ -1037,65 +1037,281 @@ function QALibrary({ showNewQADialog, setShowNewQADialog }: any) {
 
 // 深度知识库
 function DocumentLibrary({ showUploadDialog, setShowUploadDialog }: any) {
-  const documents = [
-    { name: "热玛吉操作手册.pdf", type: "PDF", date: "2025-10-15", status: "已就绪" },
-    { name: "玻尿酸注射指南.docx", type: "DOCX", date: "2025-10-12", status: "已就绪" },
-    { name: "术后护理标准.pdf", type: "PDF", date: "2025-10-10", status: "索引中..." },
+  const [currentPath, setCurrentPath] = useState<string[]>([])
+  const [selectedItems, setSelectedItems] = useState<number[]>([])
+
+  // 角色分类的一级文件夹
+  const rootFolders = [
+    { id: 1, name: "咨询师知识库", type: "folder", date: "2025-10-15", fileCount: 12 },
+    { id: 2, name: "医生知识库", type: "folder", date: "2025-10-14", fileCount: 28 },
+    { id: 3, name: "护士知识库", type: "folder", date: "2025-10-13", fileCount: 15 },
+    { id: 4, name: "通用知识库", type: "folder", date: "2025-10-12", fileCount: 8 },
   ]
 
+  // 文件夹内的文档示例
+  const documents = [
+    {
+      id: 101,
+      name: "AI生成合同_2025-9-17",
+      type: "document",
+      date: "2025-09-28 10:10:59",
+      status: "启用",
+      words: 1606,
+    },
+    {
+      id: 102,
+      name: "劳动合同（word范本）",
+      type: "document",
+      date: "2025-09-28 10:10:47",
+      status: "启用",
+      words: 1478,
+    },
+    { id: 103, name: "合同文档", type: "document", date: "2025-09-28 10:10:47", status: "启用", words: 411 },
+  ]
+
+  // 当前显示的内容
+  const currentItems = currentPath.length === 0 ? rootFolders : documents
+
+  // 进入文件夹
+  const enterFolder = (folderName: string) => {
+    setCurrentPath([...currentPath, folderName])
+  }
+
+  // 返回上一级
+  const goBack = () => {
+    if (currentPath.length > 0) {
+      setCurrentPath(currentPath.slice(0, -1))
+    }
+  }
+
+  // 返回根目录
+  const goToRoot = () => {
+    setCurrentPath([])
+  }
+
+  // 切换选中状态
+  const toggleSelect = (id: number) => {
+    if (selectedItems.includes(id)) {
+      setSelectedItems(selectedItems.filter((item) => item !== id))
+    } else {
+      setSelectedItems([...selectedItems, id])
+    }
+  }
+
+  // 全选/取消全选
+  const toggleSelectAll = () => {
+    if (selectedItems.length === currentItems.length) {
+      setSelectedItems([])
+    } else {
+      setSelectedItems(currentItems.map((item) => item.id))
+    }
+  }
+
   return (
-    <div className="h-full flex flex-col">
-      <div className="p-6 border-b border-slate-700/50 flex items-center justify-between">
-        <div className="flex-1 max-w-md">
-          <div className="relative">
+    <div className="h-full flex flex-col bg-slate-900/30">
+      {/* 顶部操作栏 */}
+      <div className="p-4 border-b border-slate-700/50 flex items-center justify-between bg-slate-800/30">
+        <div className="flex items-center gap-3">
+          {currentPath.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goBack}
+              className="text-slate-300 hover:text-white hover:bg-slate-700/50"
+            >
+              返回
+            </Button>
+          )}
+          {currentPath.length === 0 ? (
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              新建文件夹
+            </Button>
+          ) : (
+            <>
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-2" />
+                新建文件夹
+              </Button>
+              <Button
+                variant="outline"
+                className="border-slate-600 text-slate-300 hover:bg-slate-700/50 bg-transparent"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                上传文档
+              </Button>
+            </>
+          )}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="relative w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
-              placeholder="搜索文档..."
+              placeholder="文件名/文档类名称"
               className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
             />
           </div>
+          <div className="flex items-center gap-2 text-slate-400">
+            <span className="text-sm">开始日期</span>
+            <span className="text-sm">至</span>
+            <span className="text-sm">结束日期</span>
+          </div>
         </div>
-        <Button onClick={() => setShowUploadDialog(true)} className="bg-blue-600 hover:bg-blue-700">
-          <Upload className="w-4 h-4 mr-2" />
-          上传文档
-        </Button>
       </div>
 
-      <ScrollArea className="flex-1 p-6">
-        <div className="space-y-3 max-w-5xl mx-auto">
-          {documents.map((doc, idx) => (
-            <div
-              key={idx}
-              className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50 flex items-center justify-between"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-blue-400" />
-                </div>
-                <div>
-                  <h4 className="font-medium text-white">{doc.name}</h4>
-                  <div className="flex items-center gap-3 mt-1">
-                    <span className="text-sm text-slate-400">{doc.type}</span>
-                    <span className="text-sm text-slate-400">{doc.date}</span>
-                    <Badge variant={doc.status === "已就绪" ? "default" : "secondary"} className="text-xs">
-                      {doc.status}
-                    </Badge>
-                  </div>
-                </div>
+      {/* 面包屑导航 */}
+      {currentPath.length > 0 && (
+        <div className="px-6 py-3 border-b border-slate-700/50 bg-slate-800/20">
+          <div className="flex items-center gap-2 text-sm">
+            <button onClick={goToRoot} className="text-slate-400 hover:text-white transition-colors">
+              个人知识库
+            </button>
+            {currentPath.map((folder, idx) => (
+              <div key={idx} className="flex items-center gap-2">
+                <span className="text-slate-600">&gt;</span>
+                <span className="text-white">{folder}</span>
               </div>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
-                  <Download className="w-4 h-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-red-500">
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 表格内容 */}
+      <ScrollArea className="flex-1">
+        <div className="p-6">
+          <div className="bg-slate-800/50 rounded-lg border border-slate-700/50 overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-slate-700/50 hover:bg-slate-700/30">
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={selectedItems.length === currentItems.length && currentItems.length > 0}
+                      onCheckedChange={toggleSelectAll}
+                      className="border-slate-600"
+                    />
+                  </TableHead>
+                  <TableHead className="text-slate-300 font-semibold">
+                    {currentPath.length === 0 ? "知识库名称" : "文件夹/文档名称"}
+                  </TableHead>
+                  <TableHead className="text-slate-300 font-semibold">创建时间</TableHead>
+                  {currentPath.length === 0 ? (
+                    <TableHead className="text-slate-300 font-semibold">文件数</TableHead>
+                  ) : (
+                    <>
+                      <TableHead className="text-slate-300 font-semibold">状态</TableHead>
+                      <TableHead className="text-slate-300 font-semibold">字数</TableHead>
+                    </>
+                  )}
+                  <TableHead className="text-slate-300 font-semibold w-20">操作</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {currentItems.map((item) => (
+                  <TableRow key={item.id} className="border-slate-700/50 hover:bg-slate-700/30">
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedItems.includes(item.id)}
+                        onCheckedChange={() => toggleSelect(item.id)}
+                        className="border-slate-600"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        {item.type === "folder" ? (
+                          <>
+                            <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                              <svg
+                                className="w-5 h-5 text-blue-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                                />
+                              </svg>
+                            </div>
+                            <button
+                              onClick={() => enterFolder(item.name)}
+                              className="text-white hover:text-blue-400 transition-colors font-medium"
+                            >
+                              {item.name}
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                              <FileText className="w-5 h-5 text-blue-400" />
+                            </div>
+                            <span className="text-white">{item.name}</span>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-slate-300">{item.date}</TableCell>
+                    {currentPath.length === 0 ? (
+                      <TableCell className="text-slate-300">{(item as any).fileCount}</TableCell>
+                    ) : (
+                      <>
+                        <TableCell>
+                          <Badge className="bg-blue-600 hover:bg-blue-700">{(item as any).status}</Badge>
+                        </TableCell>
+                        <TableCell className="text-slate-300">{(item as any).words?.toLocaleString()}</TableCell>
+                      </>
+                    )}
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-slate-800 border-slate-700">
+                          {item.type === "folder" ? (
+                            <>
+                              <DropdownMenuItem
+                                onClick={() => enterFolder(item.name)}
+                                className="text-slate-300 hover:bg-slate-700"
+                              >
+                                打开
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">重命名</DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-400 hover:bg-slate-700">删除</DropdownMenuItem>
+                            </>
+                          ) : (
+                            <>
+                              <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">查看</DropdownMenuItem>
+                              <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">应用</DropdownMenuItem>
+                              <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">收藏</DropdownMenuItem>
+                              <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">重命名</DropdownMenuItem>
+                              <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">移动</DropdownMenuItem>
+                              <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">复制</DropdownMenuItem>
+                              <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">导出</DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-400 hover:bg-slate-700">删除</DropdownMenuItem>
+                            </>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {currentItems.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-slate-400">没有更多了</p>
             </div>
-          ))}
+          )}
         </div>
       </ScrollArea>
 
+      {/* 上传文档对话框 */}
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
         <DialogContent className="bg-slate-800 border-slate-700 text-white">
           <DialogHeader>
