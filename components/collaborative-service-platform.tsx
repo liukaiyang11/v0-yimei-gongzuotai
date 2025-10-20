@@ -134,20 +134,165 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
       "张小美您好！热玛吉术后24-48小时内出现轻微红肿是完全正常的恢复现象，这是皮肤组织受热刺激后的自然反应。根据您的档案，您昨天下午进行的治疗，目前的红肿程度在预期范围内。\n\n建议您：\n1. 继续进行冷敷，每次15-20分钟\n2. 避免使用刺激性护肤品\n3. 注意防晒，避免高温环境\n4. 多喝水促进新陈代谢\n\n如症状加重或持续不退，请及时联系我们。",
   })
 
-  const customers = [
-    { name: "张小美", role: "咨询师", project: "热玛吉术后第2天", status: "high", avatar: "张", stage: "术后跟踪" },
-    { name: "王美丽", role: "护士", project: "光子嫩肤术前7天", status: "medium", avatar: "王", stage: "已预约" },
+  const allCustomers = [
+    // 售前客户（咨询师角色）
+    {
+      name: "刘小姐",
+      role: "咨询师",
+      project: "玻尿酸咨询中",
+      status: "medium",
+      avatar: "刘",
+      stage: "新线索",
+      stageFilter: "售前",
+    },
+    {
+      name: "陈女士",
+      role: "咨询师",
+      project: "热玛吉方案确认",
+      status: "high",
+      avatar: "陈",
+      stage: "方案确认中",
+      stageFilter: "售前",
+    },
+    {
+      name: "赵美丽",
+      role: "咨询师",
+      project: "光子嫩肤咨询",
+      status: "low",
+      avatar: "赵",
+      stage: "待建档",
+      stageFilter: "售前",
+    },
+
+    // 术前客户（医生和护士角色）
+    {
+      name: "王美丽",
+      role: "医生",
+      project: "光子嫩肤术前准备",
+      status: "medium",
+      avatar: "王",
+      stage: "已预约",
+      stageFilter: "术前",
+    },
+    {
+      name: "李娜",
+      role: "护士",
+      project: "玻尿酸术前7天",
+      status: "low",
+      avatar: "李",
+      stage: "已预约",
+      stageFilter: "术前",
+    },
+    {
+      name: "周小姐",
+      role: "医生",
+      project: "肉毒素术前检查",
+      status: "medium",
+      avatar: "周",
+      stage: "已预约",
+      stageFilter: "术前",
+    },
+
+    // 术后客户（医生和护士角色）
+    {
+      name: "张小美",
+      role: "医生",
+      project: "热玛吉术后第2天",
+      status: "high",
+      avatar: "张",
+      stage: "术后跟踪",
+      stageFilter: "术后",
+    },
+    {
+      name: "孙丽丽",
+      role: "护士",
+      project: "玻尿酸术后第5天",
+      status: "medium",
+      avatar: "孙",
+      stage: "术后跟踪",
+      stageFilter: "术后",
+    },
+    {
+      name: "吴小姐",
+      role: "医生",
+      project: "光子嫩肤术后30天",
+      status: "low",
+      avatar: "吴",
+      stage: "服务完成",
+      stageFilter: "术后",
+    },
   ]
 
+  // 根据筛选条件过滤客户
+  const customers = filterStage === "全部" ? allCustomers : allCustomers.filter((c) => c.stageFilter === filterStage)
+
   const messages = [
-    { sender: "customer", content: "医生您好，我昨天做完热玛吉，脸上有点红肿，这正常吗？", time: "14:30" },
+    {
+      sender: "customer",
+      name: "张小美",
+      content: "医生您好，我昨天做完热玛吉，脸上有点红肿，这正常吗？",
+      time: "14:30",
+      avatar: "张",
+    },
+    {
+      sender: "doctor",
+      name: "李医生",
+      content: "您好张小美，术后24-48小时内轻微红肿是正常现象，这是皮肤组织受热刺激后的自然反应。",
+      time: "14:32",
+      avatar: "李",
+    },
+    { sender: "customer", name: "张小美", content: "那我需要注意什么吗？", time: "14:33", avatar: "张" },
+    {
+      sender: "nurse",
+      name: "王护士",
+      content: "您好，我是王护士。建议您继续冷敷，每次15-20分钟，避免使用刺激性护肤品。",
+      time: "14:35",
+      avatar: "王",
+    },
+    {
+      sender: "consultant",
+      name: "张咨询师",
+      content: "张小美您好，我会持续关注您的恢复情况，有任何问题随时联系我们。",
+      time: "14:37",
+      avatar: "张",
+    },
+    { sender: "customer", name: "张小美", content: "好的，谢谢各位老师！", time: "14:38", avatar: "张" },
   ]
+
+  const getRoleBgColor = (sender: string) => {
+    switch (sender) {
+      case "customer":
+        return "bg-slate-700/50"
+      case "doctor":
+        return "bg-blue-600/80"
+      case "nurse":
+        return "bg-green-600/80"
+      case "consultant":
+        return "bg-purple-600/80"
+      default:
+        return "bg-slate-700/50"
+    }
+  }
+
+  const getRoleLabel = (sender: string) => {
+    switch (sender) {
+      case "customer":
+        return "客户"
+      case "doctor":
+        return "医生"
+      case "nurse":
+        return "护士"
+      case "consultant":
+        return "咨询师"
+      default:
+        return ""
+    }
+  }
 
   return (
     <div className="flex h-full">
-      {/* 左侧：会话列表 */}
       <div className="w-80 bg-slate-800/30 border-r border-slate-700/50 flex flex-col">
-        <div className="p-4 space-y-3">
+        <div className="p-4 space-y-3 flex-shrink-0">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
@@ -209,53 +354,64 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
         </ScrollArea>
       </div>
 
-      {/* 中间：聊天窗口 */}
       <div className="flex-1 flex flex-col bg-slate-900/30">
-        <div className="h-14 bg-slate-800/30 border-b border-slate-700/50 flex items-center justify-between px-6">
+        <div className="h-14 bg-slate-800/30 border-b border-slate-700/50 flex items-center justify-between px-6 flex-shrink-0">
           <h3 className="text-white font-medium">
-            与 {selectedCustomer} 的会话 - {customers.find((c) => c.name === selectedCustomer)?.stage || "术后跟踪"}
+            与 {selectedCustomer} 的会话 - {allCustomers.find((c) => c.name === selectedCustomer)?.stage || "术后跟踪"}
           </h3>
         </div>
 
-        <ScrollArea className="flex-1 p-6">
-          <div className="space-y-4 max-w-4xl mx-auto">
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.sender === "customer" ? "justify-start" : "justify-end"}`}>
-                <div
-                  className={`max-w-xl ${msg.sender === "customer" ? "bg-slate-700/50" : "bg-blue-600"} rounded-lg p-4`}
-                >
-                  <p className="text-sm text-slate-400 mb-1">
-                    {msg.sender === "customer" ? "客户" : "医生"} {msg.time}
-                  </p>
-                  <p className="text-white">{msg.content}</p>
-                </div>
-              </div>
-            ))}
+        <ScrollArea className="flex-1">
+          <div className="p-6">
+            <div className="space-y-4 max-w-4xl mx-auto">
+              {messages.map((msg, idx) => (
+                <div key={idx} className="flex items-start gap-3">
+                  <Avatar
+                    className={`w-10 h-10 flex-shrink-0 ${msg.sender === "customer" ? "bg-slate-600" : "bg-blue-600"}`}
+                  >
+                    <AvatarFallback className="text-white text-sm">{msg.avatar}</AvatarFallback>
+                  </Avatar>
 
-            {aiDraft.show && (
-              <div className="border-2 border-dashed border-yellow-500/50 bg-yellow-500/10 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Badge className="bg-yellow-600 hover:bg-yellow-700">AI助手草稿 · 待审核</Badge>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm font-medium text-white">{msg.name}</span>
+                      <Badge variant="outline" className="text-xs border-slate-600 text-slate-400">
+                        {getRoleLabel(msg.sender)}
+                      </Badge>
+                      <span className="text-xs text-slate-500">{msg.time}</span>
+                    </div>
+                    <div className={`${getRoleBgColor(msg.sender)} rounded-lg p-3 inline-block max-w-xl`}>
+                      <p className="text-white">{msg.content}</p>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-white whitespace-pre-line mb-4">{aiDraft.content}</p>
-                <div className="flex gap-2">
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                    直接发送
-                  </Button>
-                  <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 bg-transparent">
-                    <Edit3 className="w-4 h-4 mr-1" />
-                    编辑
-                  </Button>
-                  <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 bg-transparent">
-                    忽略
-                  </Button>
+              ))}
+
+              {aiDraft.show && (
+                <div className="border-2 border-dashed border-yellow-500/50 bg-yellow-500/10 rounded-lg p-4 mt-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge className="bg-yellow-600 hover:bg-yellow-700">AI助手草稿 · 待审核</Badge>
+                  </div>
+                  <p className="text-white whitespace-pre-line mb-4">{aiDraft.content}</p>
+                  <div className="flex gap-2">
+                    <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                      直接发送
+                    </Button>
+                    <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 bg-transparent">
+                      <Edit3 className="w-4 h-4 mr-1" />
+                      编辑
+                    </Button>
+                    <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 bg-transparent">
+                      忽略
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </ScrollArea>
 
-        <div className="p-4 bg-slate-800/30 border-t border-slate-700/50">
+        <div className="p-4 bg-slate-800/30 border-t border-slate-700/50 flex-shrink-0">
           <div className="flex gap-2">
             <Textarea
               placeholder="输入消息..."
@@ -270,75 +426,78 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
         </div>
       </div>
 
-      {/* 右侧：动态客户档案 */}
-      <div className="w-96 bg-slate-800/30 border-l border-slate-700/50 p-6 overflow-y-auto">
-        <div className="space-y-6">
-          <div className="text-center">
-            <Avatar className="w-20 h-20 mx-auto mb-3 bg-blue-600">
-              <AvatarFallback className="text-2xl text-white">张</AvatarFallback>
-            </Avatar>
-            <h3 className="text-xl font-semibold text-white">{selectedCustomer}</h3>
-            <Badge className="mt-2 bg-orange-600 hover:bg-orange-700">热玛吉术后第2天</Badge>
+      <div className="w-96 bg-slate-800/30 border-l border-slate-700/50 flex flex-col">
+        <ScrollArea className="flex-1">
+          <div className="p-6">
+            <div className="space-y-6">
+              <div className="text-center">
+                <Avatar className="w-20 h-20 mx-auto mb-3 bg-blue-600">
+                  <AvatarFallback className="text-2xl text-white">张</AvatarFallback>
+                </Avatar>
+                <h3 className="text-xl font-semibold text-white">{selectedCustomer}</h3>
+                <Badge className="mt-2 bg-orange-600 hover:bg-orange-700">热玛吉术后第2天</Badge>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4" />
+                    基本信息
+                  </h4>
+                  <div className="bg-slate-700/30 rounded-lg p-4 space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">年龄</span>
+                      <span className="text-white">32岁</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">肤质</span>
+                      <span className="text-white">敏感混合性</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">过敏史</span>
+                      <span className="text-white">无</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium text-slate-400 mb-2">当前项目</h4>
+                  <div className="bg-slate-700/30 rounded-lg p-4 space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">项目</span>
+                      <span className="text-white">第五代热玛吉面部抗衰</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">操作时间</span>
+                      <span className="text-white">2025-10-18</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">主治医生</span>
+                      <span className="text-white">李医生</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-yellow-500" />
+                    当前阶段关怀要点
+                  </h4>
+                  <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                    <ul className="space-y-2 text-sm text-slate-300">
+                      <li>• 术后24-48小时内轻微红肿正常</li>
+                      <li>• 避免高温环境，如桑拿、温泉</li>
+                      <li>• 加强保湿，使用温和护肤产品</li>
+                      <li>• 避免刺激性、美白、去角质产品</li>
+                      <li>• 仪器清洁，避免辛辣刺激食物</li>
+                      <li>• 让顾客因熟悉而安得来，打消顾客怕来的不安</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <div className="space-y-4">
-            <div>
-              <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4" />
-                基本信息
-              </h4>
-              <div className="bg-slate-700/30 rounded-lg p-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">年龄</span>
-                  <span className="text-white">32岁</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">肤质</span>
-                  <span className="text-white">敏感混合性</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">过敏史</span>
-                  <span className="text-white">无</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-medium text-slate-400 mb-2">当前项目</h4>
-              <div className="bg-slate-700/30 rounded-lg p-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">项目</span>
-                  <span className="text-white">第五代热玛吉面部抗衰</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">操作时间</span>
-                  <span className="text-white">2025-10-18</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">主治医生</span>
-                  <span className="text-white">李医生</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-yellow-500" />
-                当前阶段关怀要点
-              </h4>
-              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
-                <ul className="space-y-2 text-sm text-slate-300">
-                  <li>• 术后24-48小时内轻微红肿正常</li>
-                  <li>• 避免高温环境，如桑拿、温泉</li>
-                  <li>• 加强保湿，使用温和护肤产品</li>
-                  <li>• 避免刺激性、美白、去角质产品</li>
-                  <li>• 仪器清洁，避免辛辣刺激食物</li>
-                  <li>• 让顾客因熟悉而安得来，打消顾客怕来的不安</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
+        </ScrollArea>
       </div>
     </div>
   )
