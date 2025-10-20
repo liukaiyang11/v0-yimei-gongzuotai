@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import {
   Home,
@@ -13,6 +15,8 @@ import {
   MoreVertical,
   AlertCircle,
   FileText,
+  Clock,
+  CheckCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -505,62 +509,239 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
 
 // 客户旅程看板
 function KanbanBoard() {
+  const [draggedCard, setDraggedCard] = useState<any>(null)
+  const [dragOverStage, setDragOverStage] = useState<string | null>(null)
+  const [showAutomationPreview, setShowAutomationPreview] = useState(false)
+  const [automationActions, setAutomationActions] = useState<string[]>([])
+  const [showAutomationResult, setShowAutomationResult] = useState(false)
+  const [executedActions, setExecutedActions] = useState<string[]>([])
+
   const stages = [
-    { id: "new", name: "新线索", count: 5, color: "bg-blue-600" },
-    { id: "filing", name: "待建档", count: 3, color: "bg-purple-600" },
-    { id: "planning", name: "方案确认中", count: 8, color: "bg-yellow-600" },
-    { id: "scheduled", name: "已预约", count: 12, color: "bg-green-600" },
-    { id: "followup", name: "术后跟踪", count: 15, color: "bg-orange-600" },
-    { id: "completed", name: "服务完成", count: 23, color: "bg-slate-600" },
+    { id: "new", name: "新线索", count: 3, color: "bg-blue-600" },
+    { id: "filing", name: "待建档", count: 1, color: "bg-purple-600" },
+    { id: "planning", name: "方案确认中", count: 1, color: "bg-yellow-600" },
+    { id: "scheduled", name: "已预约", count: 3, color: "bg-green-600" },
+    { id: "followup", name: "术后跟踪", count: 2, color: "bg-orange-600" },
+    { id: "completed", name: "服务完成", count: 1, color: "bg-slate-600" },
   ]
 
-  const customers = [
-    { name: "张小美", project: "热玛吉", stage: "followup", doctor: "李医生" },
-    { name: "王美丽", project: "玻尿酸", stage: "scheduled", doctor: "张医生" },
-    { name: "李娜", project: "光子嫩肤", stage: "planning", doctor: "王医生" },
-  ]
+  // 与智能服务群聊对应的客户数据
+  const [customers, setCustomers] = useState([
+    // 新线索
+    { id: 1, name: "刘小姐", project: "玻尿酸咨询", stage: "new", doctor: "张咨询师", daysInStage: 2, avatar: "刘" },
+    { id: 2, name: "陈女士", project: "热玛吉咨询", stage: "new", doctor: "张咨询师", daysInStage: 1, avatar: "陈" },
+    { id: 3, name: "林小姐", project: "光子嫩肤咨询", stage: "new", doctor: "张咨询师", daysInStage: 3, avatar: "林" },
+
+    // 待建档
+    { id: 4, name: "赵美丽", project: "光子嫩肤", stage: "filing", doctor: "张咨询师", daysInStage: 1, avatar: "赵" },
+
+    // 方案确认中
+    { id: 5, name: "陈女士", project: "热玛吉", stage: "planning", doctor: "李医生", daysInStage: 2, avatar: "陈" },
+
+    // 已预约
+    { id: 6, name: "王美丽", project: "光子嫩肤", stage: "scheduled", doctor: "李医生", daysInStage: 5, avatar: "王" },
+    { id: 7, name: "李娜", project: "玻尿酸填充", stage: "scheduled", doctor: "王护士", daysInStage: 7, avatar: "李" },
+    {
+      id: 8,
+      name: "周小姐",
+      project: "肉毒素注射",
+      stage: "scheduled",
+      doctor: "李医生",
+      daysInStage: 3,
+      avatar: "周",
+    },
+
+    // 术后跟踪
+    { id: 9, name: "张小美", project: "热玛吉", stage: "followup", doctor: "李医生", daysInStage: 2, avatar: "张" },
+    {
+      id: 10,
+      name: "孙丽丽",
+      project: "玻尿酸填充",
+      stage: "followup",
+      doctor: "王护士",
+      daysInStage: 5,
+      avatar: "孙",
+    },
+
+    // 服务完成
+    {
+      id: 11,
+      name: "吴小姐",
+      project: "光子嫩肤",
+      stage: "completed",
+      doctor: "李医生",
+      daysInStage: 30,
+      avatar: "吴",
+    },
+  ])
+
+  // 获取自动化规则
+  const getAutomationRules = (fromStage: string, toStage: string, customer: any) => {
+    const rules: string[] = []
+
+    if (fromStage === "scheduled" && toStage === "followup") {
+      rules.push(`📱 发送术后注意事项给${customer.name}`)
+      rules.push(`👩‍⚕️ 创建护士回访任务`)
+      rules.push(`📋 设置术后第1天问卷提醒`)
+      rules.push(`📋 设置术后第3天问卷提醒`)
+      rules.push(`📋 设置术后第7天问卷提醒`)
+    } else if (fromStage === "new" && toStage === "filing") {
+      rules.push(`📝 创建客户档案`)
+      rules.push(`📞 安排初次咨询`)
+      rules.push(`📧 发送欢迎邮件`)
+    } else if (fromStage === "filing" && toStage === "planning") {
+      rules.push(`📋 生成方案模板`)
+      rules.push(`👨‍⚕️ 分配主治医生`)
+      rules.push(`💰 发送报价单`)
+    } else if (fromStage === "planning" && toStage === "scheduled") {
+      rules.push(`📅 创建预约日程`)
+      rules.push(`📱 发送术前准备事项`)
+      rules.push(`🔔 设置术前提醒`)
+    } else if (fromStage === "followup" && toStage === "completed") {
+      rules.push(`✅ 标记服务完成`)
+      rules.push(`⭐ 发送满意度调查`)
+      rules.push(`🎁 发送优惠券`)
+    }
+
+    return rules
+  }
+
+  // 拖拽开始
+  const handleDragStart = (e: React.DragEvent, customer: any) => {
+    setDraggedCard(customer)
+    e.dataTransfer.effectAllowed = "move"
+  }
+
+  // 拖拽经过
+  const handleDragOver = (e: React.DragEvent, stageId: string) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "move"
+
+    if (draggedCard && draggedCard.stage !== stageId) {
+      setDragOverStage(stageId)
+      const actions = getAutomationRules(draggedCard.stage, stageId, draggedCard)
+      setAutomationActions(actions)
+      setShowAutomationPreview(actions.length > 0)
+    }
+  }
+
+  // 拖拽离开
+  const handleDragLeave = () => {
+    setDragOverStage(null)
+    setShowAutomationPreview(false)
+  }
+
+  // 放置
+  const handleDrop = (e: React.DragEvent, targetStage: string) => {
+    e.preventDefault()
+
+    if (draggedCard && draggedCard.stage !== targetStage) {
+      // 更新客户阶段
+      setCustomers(
+        customers.map((c) =>
+          c.id === draggedCard.id
+            ? {
+                ...c,
+                stage: targetStage,
+                daysInStage: 0,
+              }
+            : c,
+        ),
+      )
+
+      // 显示自动化执行结果
+      const actions = getAutomationRules(draggedCard.stage, targetStage, draggedCard)
+      setExecutedActions(actions)
+      setShowAutomationResult(true)
+
+      // 3秒后自动关闭结果提示
+      setTimeout(() => {
+        setShowAutomationResult(false)
+      }, 3000)
+    }
+
+    setDraggedCard(null)
+    setDragOverStage(null)
+    setShowAutomationPreview(false)
+  }
+
+  // 拖拽结束
+  const handleDragEnd = () => {
+    setDraggedCard(null)
+    setDragOverStage(null)
+    setShowAutomationPreview(false)
+  }
 
   return (
-    <div className="h-full p-6 overflow-x-auto">
+    <div className="h-full p-6 overflow-x-auto relative">
       <div className="flex gap-4 h-full min-w-max">
         {stages.map((stage) => (
-          <div key={stage.id} className="w-80 bg-slate-800/30 rounded-lg border border-slate-700/50 flex flex-col">
+          <div
+            key={stage.id}
+            className={`w-80 bg-slate-800/30 rounded-lg border-2 transition-all ${
+              dragOverStage === stage.id ? "border-blue-500 bg-blue-500/10" : "border-slate-700/50"
+            } flex flex-col`}
+            onDragOver={(e) => handleDragOver(e, stage.id)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, stage.id)}
+          >
             <div className="p-4 border-b border-slate-700/50">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-white">{stage.name}</h3>
-                <Badge className={`${stage.color}`}>{stage.count}</Badge>
+                <Badge className={`${stage.color}`}>{customers.filter((c) => c.stage === stage.id).length}</Badge>
               </div>
             </div>
             <ScrollArea className="flex-1 p-4">
               <div className="space-y-3">
                 {customers
                   .filter((c) => c.stage === stage.id)
-                  .map((customer, idx) => (
+                  .map((customer) => (
                     <div
-                      key={idx}
-                      className="bg-slate-700/50 rounded-lg p-4 cursor-move hover:bg-slate-700/70 transition-colors border border-slate-600/50"
+                      key={customer.id}
+                      className={`bg-slate-700/50 rounded-lg p-4 cursor-move hover:bg-slate-700/70 transition-all border border-slate-600/50 ${
+                        draggedCard?.id === customer.id ? "opacity-50 scale-95" : ""
+                      }`}
                       draggable
+                      onDragStart={(e) => handleDragStart(e, customer)}
+                      onDragEnd={handleDragEnd}
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-medium text-white">{customer.name}</h4>
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="w-10 h-10 bg-blue-600">
+                            <AvatarFallback className="text-white">{customer.avatar}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h4 className="font-medium text-white">{customer.name}</h4>
+                            <p className="text-xs text-slate-400">{customer.project}</p>
+                          </div>
+                        </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem>查看详情</DropdownMenuItem>
-                            <DropdownMenuItem>编辑信息</DropdownMenuItem>
+                          <DropdownMenuContent className="bg-slate-800 border-slate-700">
+                            <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">查看详情</DropdownMenuItem>
+                            <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">编辑信息</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                      <p className="text-sm text-slate-400 mb-2">{customer.project}</p>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="w-6 h-6 bg-blue-600">
-                          <AvatarFallback className="text-xs text-white">{customer.doctor[0]}</AvatarFallback>
-                        </Avatar>
-                        <span className="text-xs text-slate-400">{customer.doctor}</span>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Avatar className="w-5 h-5 bg-blue-600">
+                            <AvatarFallback className="text-xs text-white">{customer.doctor[0]}</AvatarFallback>
+                          </Avatar>
+                          <span className="text-slate-400">{customer.doctor}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-sm">
+                          <Clock className="w-4 h-4 text-orange-400" />
+                          <span className="text-slate-400">
+                            滞留 <span className="text-orange-400 font-medium">{customer.daysInStage}</span> 天
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -569,6 +750,47 @@ function KanbanBoard() {
           </div>
         ))}
       </div>
+
+      {/* 拖拽预览提示 */}
+      {showAutomationPreview && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 border-2 border-blue-500 rounded-lg p-4 shadow-2xl z-50 max-w-md">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <h4 className="text-white font-semibold mb-2">即将触发自动化动作</h4>
+              <ul className="space-y-1">
+                {automationActions.map((action, idx) => (
+                  <li key={idx} className="text-sm text-slate-300">
+                    {action}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 自动化执行结果 */}
+      {showAutomationResult && (
+        <div className="fixed top-20 right-8 bg-green-600 border border-green-500 rounded-lg p-4 shadow-2xl z-50 max-w-md animate-in slide-in-from-right">
+          <div className="flex items-start gap-3">
+            <CheckCircle className="w-6 h-6 text-white flex-shrink-0" />
+            <div className="flex-1">
+              <h4 className="text-white font-semibold mb-2">自动化任务已执行</h4>
+              <ul className="space-y-1">
+                {executedActions.map((action, idx) => (
+                  <li key={idx} className="text-sm text-white/90 flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3" />
+                    {action}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
