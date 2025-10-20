@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useRef } from "react"
-import { ArrowLeft, Search, Plus, Upload, FileText, AlertCircle, Sparkles, X } from "lucide-react"
+import { ArrowLeft, Search, Plus, Upload, FileText, AlertCircle, Sparkles, X, Download, ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -75,45 +75,107 @@ export function AdComplianceReview({ onBack }: AdComplianceReviewProps) {
 
 // 广告内容审核组件
 function ContentReview() {
+  const [selectedPlatform, setSelectedPlatform] = useState("douyin")
+  const [contentType, setContentType] = useState<"text" | "image" | "document">("text")
   const [content, setContent] = useState("")
   const [isReviewed, setIsReviewed] = useState(false)
   const [highlightedContent, setHighlightedContent] = useState("")
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
+  const [previewUrl, setPreviewUrl] = useState<string>("")
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const platforms = [
+    { id: "douyin", name: "抖音", icon: "🎵" },
+    { id: "wechat-channels", name: "视频号", icon: "💬" },
+    { id: "kuaishou", name: "快手", icon: "⚡" },
+    { id: "xiaohongshu", name: "小红书", icon: "📕" },
+    { id: "xianyu", name: "闲鱼", icon: "🐟" },
+    { id: "taobao", name: "淘宝", icon: "🛒" },
+    { id: "pinduoduo", name: "拼多多", icon: "🍊" },
+    { id: "jd", name: "京东", icon: "🐶" },
+  ]
+
   const handleReview = () => {
-    // 模拟审核逻辑
-    const highlighted = content.replace(
-      /(最好|绝对|第一|完美|永久|根治)/g,
-      '<span class="bg-red-900/50 text-red-300 px-1 rounded">$1</span>',
-    )
-    setHighlightedContent(highlighted)
+    if (contentType === "text") {
+      const highlighted = content.replace(
+        /(最好|绝对|第一|完美|永久|根治)/g,
+        '<span class="bg-red-900/50 text-red-300 px-1 rounded">$1</span>',
+      )
+      setHighlightedContent(highlighted)
+    }
     setIsReviewed(true)
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
-    if (files) {
-      const newFiles = Array.from(files)
-      setUploadedFiles((prev) => [...prev, ...newFiles])
+    if (files && files.length > 0) {
+      const file = files[0]
+      setUploadedFiles([file])
+
+      if (file.type.startsWith("image/")) {
+        setContentType("image")
+        const url = URL.createObjectURL(file)
+        setPreviewUrl(url)
+      } else if (file.type === "application/pdf" || file.name.endsWith(".docx")) {
+        setContentType("document")
+        setPreviewUrl("")
+      }
     }
   }
 
-  const handleRemoveFile = (index: number) => {
-    setUploadedFiles((prev) => prev.filter((_, i) => i !== index))
+  const handleRemoveFile = () => {
+    setUploadedFiles([])
+    setPreviewUrl("")
+    setContentType("text")
+    setIsReviewed(false)
   }
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     const files = e.dataTransfer.files
-    if (files) {
-      const newFiles = Array.from(files)
-      setUploadedFiles((prev) => [...prev, ...newFiles])
+    if (files && files.length > 0) {
+      const file = files[0]
+      setUploadedFiles([file])
+
+      if (file.type.startsWith("image/")) {
+        setContentType("image")
+        const url = URL.createObjectURL(file)
+        setPreviewUrl(url)
+      } else if (file.type === "application/pdf" || file.name.endsWith(".docx")) {
+        setContentType("document")
+        setPreviewUrl("")
+      }
     }
   }
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
+  }
+
+  const handleExport = () => {
+    if (contentType === "text") {
+      const modifiedText = content.replace(/(最好|绝对|第一|完美|永久|根治)/g, (match) => {
+        const replacements: Record<string, string> = {
+          最好: "优质的",
+          绝对: "非常",
+          第一: "领先的",
+          完美: "理想的",
+          永久: "长效的",
+          根治: "改善",
+        }
+        return replacements[match] || match
+      })
+
+      const blob = new Blob([modifiedText], { type: "text/plain" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = "修改后的广告文案.txt"
+      a.click()
+      URL.revokeObjectURL(url)
+    } else if (contentType === "image" || contentType === "document") {
+      alert("正在导出修改后的文件...")
+    }
   }
 
   const issues = [
@@ -141,60 +203,92 @@ function ContentReview() {
     <div className="flex h-full">
       {/* 左栏：输入区 */}
       <div className="w-1/3 border-r border-slate-700 bg-slate-800 p-6 flex flex-col gap-4">
+        <div>
+          <label className="text-sm font-medium text-slate-300 mb-2 block">选择投放平台</label>
+          <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
+            <SelectTrigger className="bg-slate-900 border-slate-700 text-slate-100">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-slate-800 border-slate-700">
+              {platforms.map((platform) => (
+                <SelectItem key={platform.id} value={platform.id} className="text-slate-100">
+                  <span className="mr-2">{platform.icon}</span>
+                  {platform.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="flex-1 flex flex-col gap-4">
           <div>
-            <label className="text-sm font-medium text-slate-300 mb-2 block">输入广告文案</label>
-            <Textarea
-              placeholder="请输入需要审核的广告文案..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="min-h-[200px] resize-none bg-slate-900 border-slate-700 text-slate-100 placeholder:text-slate-500"
-            />
-          </div>
+            <label className="text-sm font-medium text-slate-300 mb-2 block">输入广告内容或上传文件</label>
 
-          <div>
-            <label className="text-sm font-medium text-slate-300 mb-2 block">上传图片/文档</label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept=".jpg,.jpeg,.png,.pdf"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer bg-slate-900/50"
-            >
-              <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-              <p className="text-sm text-slate-300">点击或拖拽文件到此处上传</p>
-              <p className="text-xs text-slate-500 mt-1">支持 JPG、PNG、PDF 格式</p>
-            </div>
+            {uploadedFiles.length === 0 ? (
+              <>
+                <Textarea
+                  placeholder="请输入需要审核的广告文案，或点击下方上传图片/文档..."
+                  value={content}
+                  onChange={(e) => {
+                    setContent(e.target.value)
+                    setContentType("text")
+                  }}
+                  className="min-h-[200px] resize-none bg-slate-900 border-slate-700 text-slate-100 placeholder:text-slate-500 mb-3"
+                />
 
-            {uploadedFiles.length > 0 && (
-              <div className="mt-3 space-y-2">
-                {uploadedFiles.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between bg-slate-900 border border-slate-700 rounded px-3 py-2"
-                  >
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileText className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                      <span className="text-sm text-slate-300 truncate">{file.name}</span>
-                      <span className="text-xs text-slate-500 flex-shrink-0">{(file.size / 1024).toFixed(1)} KB</span>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.pdf,.docx"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors cursor-pointer bg-slate-900/50"
+                >
+                  <Upload className="w-6 h-6 text-slate-400 mx-auto mb-2" />
+                  <p className="text-sm text-slate-300">或点击/拖拽上传图片或文档</p>
+                  <p className="text-xs text-slate-500 mt-1">支持 JPG、PNG、PDF、DOCX 格式</p>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between bg-slate-900 border border-slate-700 rounded px-4 py-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    {contentType === "image" ? (
+                      <ImageIcon className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                    ) : (
+                      <FileText className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-300 truncate font-medium">{uploadedFiles[0].name}</p>
+                      <p className="text-xs text-slate-500">{(uploadedFiles[0].size / 1024).toFixed(1)} KB</p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 text-slate-400 hover:text-red-400"
-                      onClick={() => handleRemoveFile(index)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
                   </div>
-                ))}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-slate-400 hover:text-red-400"
+                    onClick={handleRemoveFile}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {contentType === "image" && previewUrl && (
+                  <div className="border border-slate-700 rounded-lg overflow-hidden bg-slate-900">
+                    <img src={previewUrl || "/placeholder.svg"} alt="预览" className="w-full h-auto" />
+                    {/* 模拟标注敏感区域 */}
+                    <div className="absolute top-20 left-20 w-32 h-32 border-2 border-red-500 bg-red-500/20 rounded">
+                      <div className="absolute -top-6 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                        敏感内容
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -211,10 +305,56 @@ function ContentReview() {
         <h3 className="text-sm font-semibold text-slate-100 mb-4">审核结果</h3>
         <ScrollArea className="h-[calc(100vh-200px)]">
           {isReviewed ? (
-            <div
-              className="prose prose-sm prose-invert max-w-none text-slate-300"
-              dangerouslySetInnerHTML={{ __html: highlightedContent || "暂无内容" }}
-            />
+            <>
+              {contentType === "text" && (
+                <div
+                  className="prose prose-sm prose-invert max-w-none text-slate-300"
+                  dangerouslySetInnerHTML={{ __html: highlightedContent || "暂无内容" }}
+                />
+              )}
+
+              {contentType === "image" && previewUrl && (
+                <div className="space-y-4">
+                  <div className="relative border border-slate-700 rounded-lg overflow-hidden bg-slate-900">
+                    <img src={previewUrl || "/placeholder.svg"} alt="审核结果" className="w-full h-auto" />
+                    {/* 模拟标注敏感区域 */}
+                    <div className="absolute top-20 left-20 w-32 h-32 border-2 border-red-500 bg-red-500/20 rounded">
+                      <div className="absolute -top-6 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                        敏感内容
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <p className="text-sm text-slate-300">检测到图片中包含敏感文字或图案，已用红框标注。</p>
+                  </div>
+                </div>
+              )}
+
+              {contentType === "document" && (
+                <div className="space-y-4">
+                  <div className="bg-slate-900 border border-slate-700 rounded-lg p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <FileText className="w-8 h-8 text-blue-400" />
+                      <div>
+                        <p className="text-sm font-medium text-slate-200">{uploadedFiles[0]?.name}</p>
+                        <p className="text-xs text-slate-500">文档审核结果</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-sm text-slate-300">
+                      <p>
+                        第1页第3行：检测到"<span className="bg-red-900/50 text-red-300 px-1 rounded">最好</span>"
+                      </p>
+                      <p>
+                        第2页第5行：检测到"<span className="bg-red-900/50 text-red-300 px-1 rounded">永久</span>"
+                      </p>
+                      <p>
+                        第3页第2行：检测到"<span className="bg-red-900/50 text-red-300 px-1 rounded">根治</span>"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-12 text-slate-500">
               <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -226,7 +366,15 @@ function ContentReview() {
 
       {/* 右栏：修改建议区 */}
       <div className="flex-1 bg-slate-900 p-6">
-        <h3 className="text-sm font-semibold text-slate-100 mb-4">修改建议</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-slate-100">修改建议</h3>
+          {isReviewed && (
+            <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={handleExport}>
+              <Download className="w-4 h-4 mr-2" />
+              一键导出
+            </Button>
+          )}
+        </div>
         <ScrollArea className="h-[calc(100vh-200px)]">
           {isReviewed ? (
             <div className="space-y-3">
