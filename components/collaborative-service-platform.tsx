@@ -62,25 +62,37 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
             <p className="text-sm text-slate-400">以群聊为中心 · AI为辅助 · 真人为决策</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="absolute left-1/2 -translate-x-1/2 flex gap-2">
           <Button
             variant={activeTab === "chat" ? "default" : "ghost"}
             onClick={() => setActiveTab("chat")}
-            className={activeTab === "chat" ? "bg-blue-600 hover:bg-blue-700" : "text-slate-300 hover:text-white"}
+            className={
+              activeTab === "chat"
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
+            }
           >
             智能服务群聊
           </Button>
           <Button
             variant={activeTab === "kanban" ? "default" : "ghost"}
             onClick={() => setActiveTab("kanban")}
-            className={activeTab === "kanban" ? "bg-blue-600 hover:bg-blue-700" : "text-slate-300 hover:text-white"}
+            className={
+              activeTab === "kanban"
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
+            }
           >
             客户旅程看板
           </Button>
           <Button
             variant={activeTab === "knowledge" ? "default" : "ghost"}
             onClick={() => setActiveTab("knowledge")}
-            className={activeTab === "knowledge" ? "bg-blue-600 hover:bg-blue-700" : "text-slate-300 hover:text-white"}
+            className={
+              activeTab === "knowledge"
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
+            }
           >
             知识库管理
           </Button>
@@ -121,8 +133,8 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
   })
 
   const customers = [
-    { name: "张小美", role: "咨询师", project: "热玛吉术后第2天", status: "high", avatar: "张" },
-    { name: "王美丽", role: "护士", project: "光子嫩肤术前7天", status: "medium", avatar: "王" },
+    { name: "张小美", role: "咨询师", project: "热玛吉术后第2天", status: "high", avatar: "张", stage: "术后跟踪" },
+    { name: "王美丽", role: "护士", project: "光子嫩肤术前7天", status: "medium", avatar: "王", stage: "已预约" },
   ]
 
   const messages = [
@@ -198,16 +210,9 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
       {/* 中间：聊天窗口 */}
       <div className="flex-1 flex flex-col bg-slate-900/30">
         <div className="h-14 bg-slate-800/30 border-b border-slate-700/50 flex items-center justify-between px-6">
-          <h3 className="text-white font-medium">与 {selectedCustomer} 的会话 - 热玛吉术后第2天</h3>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 bg-transparent">
-              <Plus className="w-4 h-4 mr-1" />
-              内部讨论
-            </Button>
-            <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 bg-transparent">
-              查看档案
-            </Button>
-          </div>
+          <h3 className="text-white font-medium">
+            与 {selectedCustomer} 的会话 - {customers.find((c) => c.name === selectedCustomer)?.stage || "术后跟踪"}
+          </h3>
         </div>
 
         <ScrollArea className="flex-1 p-6">
