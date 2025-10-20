@@ -30,8 +30,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface CollaborativeServicePlatformProps {
   onBack: () => void
@@ -441,18 +442,100 @@ function KnowledgeCenter({ showNewQADialog, setShowNewQADialog, showUploadDialog
 
 // 精准问答库
 function QALibrary({ showNewQADialog, setShowNewQADialog }: any) {
-  const qaItems = [
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showImportDialog, setShowImportDialog] = useState(false)
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [selectedQA, setSelectedQA] = useState<any>(null)
+  const [editingQA, setEditingQA] = useState<any>(null)
+
+  // 问答数据
+  const [qaItems, setQaItems] = useState([
     {
-      question: "热玛吉术后红肿正常吗？",
-      answer: "术后24-48小时内轻微红肿是正常现象...",
-      tags: ["医生", "热玛吉", "术后1-3天", "术后反应"],
+      id: 1,
+      query: "热玛吉术后红肿正常吗？",
+      answer: "术后24-48小时内轻微红肿是正常现象，这是皮肤组织受热刺激后的自然反应...",
+      roles: ["医生", "护士"],
+      projects: ["热玛吉"],
+      stages: ["术后1-3天", "术后7天"],
+      types: ["术后反应"],
     },
     {
-      question: "玻尿酸填充后多久可以化妆？",
-      answer: "建议术后24小时后再化妆...",
-      tags: ["护士", "玻尿酸", "术后1-3天", "护理方法"],
+      id: 2,
+      query: "玻尿酸填充后多久可以化妆？",
+      answer: "建议术后24小时后再化妆，使用温和的化妆品...",
+      roles: ["护士", "咨询师"],
+      projects: ["玻尿酸填充"],
+      stages: ["术后1-3天"],
+      types: ["护理方法"],
     },
-  ]
+  ])
+
+  // 选项配置
+  const roleOptions = ["医生", "护士", "咨询师"]
+  const projectOptions = ["玻尿酸填充", "热玛吉", "光子嫩肤", "超声炮", "水光针", "肉毒素"]
+  const stageOptions = ["售前咨询", "术前准备", "术后1-3天", "术后7天", "术后30天", "长期维养"]
+  const typeOptions = ["价格咨询", "术后反应", "护理方法", "效果预期", "预约改期", "投诉建议"]
+
+  // 新建问答表单状态
+  const [newQA, setNewQA] = useState({
+    query: "",
+    answer: "",
+    roles: [] as string[],
+    projects: [] as string[],
+    stages: [] as string[],
+    types: [] as string[],
+  })
+
+  // 下载Excel模板
+  const downloadTemplate = () => {
+    // 创建模板数据
+    const template = [
+      ["query", "answer", "roles", "projects", "stages", "types"],
+      ["示例问题", "示例答案", "医生,护士", "热玛吉", "术后1-3天", "术后反应"],
+    ]
+
+    // 转换为CSV格式
+    const csvContent = template.map((row) => row.join(",")).join("\n")
+    const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+    link.href = URL.createObjectURL(blob)
+    link.download = "问答库导入模板.csv"
+    link.click()
+  }
+
+  // 删除问答
+  const handleDelete = () => {
+    if (selectedQA) {
+      setQaItems(qaItems.filter((item) => item.id !== selectedQA.id))
+      setShowDeleteDialog(false)
+      setSelectedQA(null)
+    }
+  }
+
+  // 保存新建问答
+  const handleSaveNew = () => {
+    if (newQA.query && newQA.answer) {
+      setQaItems([...qaItems, { ...newQA, id: Date.now() }])
+      setNewQA({
+        query: "",
+        answer: "",
+        roles: [],
+        projects: [],
+        stages: [],
+        types: [],
+      })
+      setShowNewQADialog(false)
+    }
+  }
+
+  // 保存编辑
+  const handleSaveEdit = () => {
+    if (editingQA) {
+      setQaItems(qaItems.map((item) => (item.id === editingQA.id ? editingQA : item)))
+      setShowEditDialog(false)
+      setEditingQA(null)
+    }
+  }
 
   return (
     <div className="h-full flex flex-col">
@@ -466,99 +549,485 @@ function QALibrary({ showNewQADialog, setShowNewQADialog }: any) {
             />
           </div>
         </div>
-        <Button onClick={() => setShowNewQADialog(true)} className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="w-4 h-4 mr-2" />
-          新建问答
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={downloadTemplate}
+            className="border-slate-600 text-slate-300 hover:bg-slate-700/50 bg-transparent"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            下载模板
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setShowImportDialog(true)}
+            className="border-slate-600 text-slate-300 hover:bg-slate-700/50"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            批量导入
+          </Button>
+          <Button onClick={() => setShowNewQADialog(true)} className="bg-blue-600 hover:bg-blue-700">
+            <Plus className="w-4 h-4 mr-2" />
+            新建问答
+          </Button>
+        </div>
       </div>
 
-      <ScrollArea className="flex-1 p-6">
-        <div className="space-y-4 max-w-5xl mx-auto">
-          {qaItems.map((item, idx) => (
-            <div key={idx} className="bg-slate-800/50 rounded-lg p-6 border border-slate-700/50">
-              <div className="flex items-start justify-between mb-3">
-                <h4 className="text-lg font-medium text-white">{item.question}</h4>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-slate-400">
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem>编辑</DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-500">删除</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <p className="text-slate-300 mb-4">{item.answer}</p>
-              <div className="flex flex-wrap gap-2">
-                {item.tags.map((tag, tagIdx) => (
-                  <Badge key={tagIdx} variant="outline" className="border-slate-600 text-slate-300">
-                    {tag}
-                  </Badge>
+      <ScrollArea className="flex-1">
+        <div className="p-6">
+          <div className="bg-slate-800/50 rounded-lg border border-slate-700/50 overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-slate-700/50 hover:bg-slate-700/30">
+                  <TableHead className="text-slate-300 font-semibold">Query</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">Answer</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">角色</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">适用项目</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">适用阶段</TableHead>
+                  <TableHead className="text-slate-300 font-semibold">问题类型</TableHead>
+                  <TableHead className="text-slate-300 font-semibold w-20">操作</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {qaItems.map((item) => (
+                  <TableRow key={item.id} className="border-slate-700/50 hover:bg-slate-700/30">
+                    <TableCell className="text-white max-w-xs">
+                      <div className="truncate">{item.query}</div>
+                    </TableCell>
+                    <TableCell className="text-slate-300 max-w-md">
+                      <div className="truncate">{item.answer}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {item.roles.map((role, idx) => (
+                          <Badge key={idx} variant="outline" className="border-blue-500/50 text-blue-300 text-xs">
+                            {role}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {item.projects.map((project, idx) => (
+                          <Badge key={idx} variant="outline" className="border-purple-500/50 text-purple-300 text-xs">
+                            {project}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {item.stages.map((stage, idx) => (
+                          <Badge key={idx} variant="outline" className="border-green-500/50 text-green-300 text-xs">
+                            {stage}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {item.types.map((type, idx) => (
+                          <Badge key={idx} variant="outline" className="border-orange-500/50 text-orange-300 text-xs">
+                            {type}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-slate-800 border-slate-700">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setEditingQA({ ...item })
+                              setShowEditDialog(true)
+                            }}
+                            className="text-slate-300 hover:bg-slate-700"
+                          >
+                            <Edit3 className="w-4 h-4 mr-2" />
+                            编辑
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedQA(item)
+                              setShowDeleteDialog(true)
+                            }}
+                            className="text-red-400 hover:bg-slate-700"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            删除
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </div>
-            </div>
-          ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </ScrollArea>
 
+      {/* 新建问答对话框 */}
       <Dialog open={showNewQADialog} onOpenChange={setShowNewQADialog}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl">
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>新建问答</DialogTitle>
+            <DialogTitle>新建问答对</DialogTitle>
             <DialogDescription className="text-slate-400">添加标准化问答对，确保AI回复的准确性</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>标准问题</Label>
-              <Input placeholder="输入标准问题..." className="bg-slate-700/50 border-slate-600 text-white" />
-            </div>
-            <div>
-              <Label>标准答案</Label>
-              <Textarea
-                placeholder="输入标准答案..."
-                className="min-h-[120px] bg-slate-700/50 border-slate-600 text-white"
+              <Label className="text-slate-300">Query *</Label>
+              <Input
+                placeholder="输入标准问题..."
+                value={newQA.query}
+                onChange={(e) => setNewQA({ ...newQA, query: e.target.value })}
+                className="bg-slate-700/50 border-slate-600 text-white mt-1"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>适用角色</Label>
-                <Select>
-                  <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                    <SelectValue placeholder="选择角色" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="doctor">医生</SelectItem>
-                    <SelectItem value="nurse">护士</SelectItem>
-                    <SelectItem value="consultant">咨询师</SelectItem>
-                  </SelectContent>
-                </Select>
+            <div>
+              <Label className="text-slate-300">Answer *</Label>
+              <Textarea
+                placeholder="输入标准答案..."
+                value={newQA.answer}
+                onChange={(e) => setNewQA({ ...newQA, answer: e.target.value })}
+                className="min-h-[120px] bg-slate-700/50 border-slate-600 text-white mt-1"
+              />
+            </div>
+
+            <div>
+              <Label className="text-slate-300 mb-2 block">适用角色</Label>
+              <div className="flex flex-wrap gap-3">
+                {roleOptions.map((role) => (
+                  <div key={role} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`role-${role}`}
+                      checked={newQA.roles.includes(role)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setNewQA({ ...newQA, roles: [...newQA.roles, role] })
+                        } else {
+                          setNewQA({ ...newQA, roles: newQA.roles.filter((r) => r !== role) })
+                        }
+                      }}
+                      className="border-slate-600"
+                    />
+                    <label htmlFor={`role-${role}`} className="text-sm text-slate-300 cursor-pointer">
+                      {role}
+                    </label>
+                  </div>
+                ))}
               </div>
-              <div>
-                <Label>适用项目</Label>
-                <Select>
-                  <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                    <SelectValue placeholder="选择项目" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="thermage">热玛吉</SelectItem>
-                    <SelectItem value="hyaluronic">玻尿酸</SelectItem>
-                    <SelectItem value="photon">光子嫩肤</SelectItem>
-                  </SelectContent>
-                </Select>
+            </div>
+
+            <div>
+              <Label className="text-slate-300 mb-2 block">适用项目</Label>
+              <div className="flex flex-wrap gap-3">
+                {projectOptions.map((project) => (
+                  <div key={project} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`project-${project}`}
+                      checked={newQA.projects.includes(project)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setNewQA({ ...newQA, projects: [...newQA.projects, project] })
+                        } else {
+                          setNewQA({ ...newQA, projects: newQA.projects.filter((p) => p !== project) })
+                        }
+                      }}
+                      className="border-slate-600"
+                    />
+                    <label htmlFor={`project-${project}`} className="text-sm text-slate-300 cursor-pointer">
+                      {project}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-slate-300 mb-2 block">适用阶段</Label>
+              <div className="flex flex-wrap gap-3">
+                {stageOptions.map((stage) => (
+                  <div key={stage} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`stage-${stage}`}
+                      checked={newQA.stages.includes(stage)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setNewQA({ ...newQA, stages: [...newQA.stages, stage] })
+                        } else {
+                          setNewQA({ ...newQA, stages: newQA.stages.filter((s) => s !== stage) })
+                        }
+                      }}
+                      className="border-slate-600"
+                    />
+                    <label htmlFor={`stage-${stage}`} className="text-sm text-slate-300 cursor-pointer">
+                      {stage}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-slate-300 mb-2 block">问题类型</Label>
+              <div className="flex flex-wrap gap-3">
+                {typeOptions.map((type) => (
+                  <div key={type} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`type-${type}`}
+                      checked={newQA.types.includes(type)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setNewQA({ ...newQA, types: [...newQA.types, type] })
+                        } else {
+                          setNewQA({ ...newQA, types: newQA.types.filter((t) => t !== type) })
+                        }
+                      }}
+                      className="border-slate-600"
+                    />
+                    <label htmlFor={`type-${type}`} className="text-sm text-slate-300 cursor-pointer">
+                      {type}
+                    </label>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setShowNewQADialog(false)}
+              onClick={() => {
+                setShowNewQADialog(false)
+                setNewQA({
+                  query: "",
+                  answer: "",
+                  roles: [],
+                  projects: [],
+                  stages: [],
+                  types: [],
+                })
+              }}
               className="border-slate-600 text-slate-300"
             >
               取消
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700">保存</Button>
+            <Button onClick={handleSaveNew} className="bg-blue-600 hover:bg-blue-700">
+              保存
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 编辑问答对话框 */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>编辑问答对</DialogTitle>
+          </DialogHeader>
+          {editingQA && (
+            <div className="space-y-4">
+              <div>
+                <Label className="text-slate-300">Query *</Label>
+                <Input
+                  value={editingQA.query}
+                  onChange={(e) => setEditingQA({ ...editingQA, query: e.target.value })}
+                  className="bg-slate-700/50 border-slate-600 text-white mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-slate-300">Answer *</Label>
+                <Textarea
+                  value={editingQA.answer}
+                  onChange={(e) => setEditingQA({ ...editingQA, answer: e.target.value })}
+                  className="min-h-[120px] bg-slate-700/50 border-slate-600 text-white mt-1"
+                />
+              </div>
+
+              <div>
+                <Label className="text-slate-300 mb-2 block">适用角色</Label>
+                <div className="flex flex-wrap gap-3">
+                  {roleOptions.map((role) => (
+                    <div key={role} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`edit-role-${role}`}
+                        checked={editingQA.roles.includes(role)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setEditingQA({ ...editingQA, roles: [...editingQA.roles, role] })
+                          } else {
+                            setEditingQA({ ...editingQA, roles: editingQA.roles.filter((r: string) => r !== role) })
+                          }
+                        }}
+                        className="border-slate-600"
+                      />
+                      <label htmlFor={`edit-role-${role}`} className="text-sm text-slate-300 cursor-pointer">
+                        {role}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-slate-300 mb-2 block">适用项目</Label>
+                <div className="flex flex-wrap gap-3">
+                  {projectOptions.map((project) => (
+                    <div key={project} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`edit-project-${project}`}
+                        checked={editingQA.projects.includes(project)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setEditingQA({ ...editingQA, projects: [...editingQA.projects, project] })
+                          } else {
+                            setEditingQA({
+                              ...editingQA,
+                              projects: editingQA.projects.filter((p: string) => p !== project),
+                            })
+                          }
+                        }}
+                        className="border-slate-600"
+                      />
+                      <label htmlFor={`edit-project-${project}`} className="text-sm text-slate-300 cursor-pointer">
+                        {project}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-slate-300 mb-2 block">适用阶段</Label>
+                <div className="flex flex-wrap gap-3">
+                  {stageOptions.map((stage) => (
+                    <div key={stage} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`edit-stage-${stage}`}
+                        checked={editingQA.stages.includes(stage)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setEditingQA({ ...editingQA, stages: [...editingQA.stages, stage] })
+                          } else {
+                            setEditingQA({ ...editingQA, stages: editingQA.stages.filter((s: string) => s !== stage) })
+                          }
+                        }}
+                        className="border-slate-600"
+                      />
+                      <label htmlFor={`edit-stage-${stage}`} className="text-sm text-slate-300 cursor-pointer">
+                        {stage}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-slate-300 mb-2 block">问题类型</Label>
+                <div className="flex flex-wrap gap-3">
+                  {typeOptions.map((type) => (
+                    <div key={type} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`edit-type-${type}`}
+                        checked={editingQA.types.includes(type)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setEditingQA({ ...editingQA, types: [...editingQA.types, type] })
+                          } else {
+                            setEditingQA({ ...editingQA, types: editingQA.types.filter((t: string) => t !== type) })
+                          }
+                        }}
+                        className="border-slate-600"
+                      />
+                      <label htmlFor={`edit-type-${type}`} className="text-sm text-slate-300 cursor-pointer">
+                        {type}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowEditDialog(false)
+                setEditingQA(null)
+              }}
+              className="border-slate-600 text-slate-300"
+            >
+              取消
+            </Button>
+            <Button onClick={handleSaveEdit} className="bg-blue-600 hover:bg-blue-700">
+              保存
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 删除确认对话框 */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle>确认删除</DialogTitle>
+            <DialogDescription className="text-slate-400">确定要删除这条问答吗？此操作无法撤销。</DialogDescription>
+          </DialogHeader>
+          {selectedQA && (
+            <div className="bg-slate-700/30 rounded-lg p-4">
+              <p className="text-white font-medium mb-2">{selectedQA.query}</p>
+              <p className="text-slate-400 text-sm">{selectedQA.answer}</p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowDeleteDialog(false)
+                setSelectedQA(null)
+              }}
+              className="border-slate-600 text-slate-300"
+            >
+              取消
+            </Button>
+            <Button onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+              确认删除
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 批量导入对话框 */}
+      <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle>批量导入问答</DialogTitle>
+            <DialogDescription className="text-slate-400">请先下载模板，按照格式填写后上传</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center">
+              <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+              <p className="text-slate-300 mb-2">拖拽Excel文件到此处或点击上传</p>
+              <p className="text-sm text-slate-400">支持 .xlsx, .xls, .csv 格式</p>
+              <Button variant="outline" className="mt-4 border-slate-600 text-slate-300 bg-transparent">
+                选择文件
+              </Button>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowImportDialog(false)}
+              className="border-slate-600 text-slate-300"
+            >
+              取消
+            </Button>
+            <Button className="bg-blue-600 hover:bg-blue-700">开始导入</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
