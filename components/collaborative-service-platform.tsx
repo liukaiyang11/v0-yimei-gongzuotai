@@ -33,6 +33,7 @@ import { Label } from "@/components/ui/label"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 
 interface CollaborativeServicePlatformProps {
   onBack: () => void
@@ -452,7 +453,7 @@ function QALibrary({ showNewQADialog, setShowNewQADialog }: any) {
   const [qaItems, setQaItems] = useState([
     {
       id: 1,
-      query: "热玛吉术后红肿正常吗？",
+      query: "热玛吉术后红肿吗？",
       answer: "术后24-48小时内轻微红肿是正常现象，这是皮肤组织受热刺激后的自然反应...",
       roles: ["医生", "护士"],
       projects: ["热玛吉"],
@@ -1048,29 +1049,55 @@ function DocumentLibrary({ showUploadDialog, setShowUploadDialog }: any) {
     { id: 4, name: "通用知识库", type: "folder", date: "2025-10-12", fileCount: 8 },
   ]
 
-  // 文件夹内的文档示例
-  const documents = [
+  const [documents, setDocuments] = useState([
     {
       id: 101,
-      name: "AI生成合同_2025-9-17",
+      name: "热玛吉操作手册.pdf",
       type: "document",
       date: "2025-09-28 10:10:59",
-      status: "启用",
+      enabled: true,
       words: 1606,
     },
     {
       id: 102,
-      name: "劳动合同（word范本）",
+      name: "玻尿酸注射指南.docx",
       type: "document",
       date: "2025-09-28 10:10:47",
-      status: "启用",
+      enabled: true,
       words: 1478,
     },
-    { id: 103, name: "合同文档", type: "document", date: "2025-09-28 10:10:47", status: "启用", words: 411 },
-  ]
+    {
+      id: 103,
+      name: "术后护理标准.pdf",
+      type: "document",
+      date: "2025-09-28 10:10:47",
+      enabled: true,
+      words: 411,
+    },
+    {
+      id: 104,
+      name: "光子嫩肤治疗流程.docx",
+      type: "document",
+      date: "2025-09-27 15:30:22",
+      enabled: false,
+      words: 892,
+    },
+    {
+      id: 105,
+      name: "肉毒素注射技术规范.pdf",
+      type: "document",
+      date: "2025-09-26 09:15:33",
+      enabled: true,
+      words: 2134,
+    },
+  ])
 
   // 当前显示的内容
   const currentItems = currentPath.length === 0 ? rootFolders : documents
+
+  const toggleDocumentEnabled = (id: number) => {
+    setDocuments(documents.map((doc) => (doc.id === id ? { ...doc, enabled: !doc.enabled } : doc)))
+  }
 
   // 进入文件夹
   const enterFolder = (folderName: string) => {
@@ -1258,7 +1285,11 @@ function DocumentLibrary({ showUploadDialog, setShowUploadDialog }: any) {
                     ) : (
                       <>
                         <TableCell>
-                          <Badge className="bg-blue-600 hover:bg-blue-700">{(item as any).status}</Badge>
+                          <Switch
+                            checked={(item as any).enabled}
+                            onCheckedChange={() => toggleDocumentEnabled(item.id)}
+                            className="data-[state=checked]:bg-blue-600"
+                          />
                         </TableCell>
                         <TableCell className="text-slate-300">{(item as any).words?.toLocaleString()}</TableCell>
                       </>
@@ -1285,11 +1316,8 @@ function DocumentLibrary({ showUploadDialog, setShowUploadDialog }: any) {
                           ) : (
                             <>
                               <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">查看</DropdownMenuItem>
-                              <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">应用</DropdownMenuItem>
-                              <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">收藏</DropdownMenuItem>
                               <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">重命名</DropdownMenuItem>
                               <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">移动</DropdownMenuItem>
-                              <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">复制</DropdownMenuItem>
                               <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">导出</DropdownMenuItem>
                               <DropdownMenuItem className="text-red-400 hover:bg-slate-700">删除</DropdownMenuItem>
                             </>
