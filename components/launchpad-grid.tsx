@@ -23,6 +23,7 @@ import {
   BarChart3,
   MessageSquare,
   ShieldCheck,
+  Users,
 } from "lucide-react"
 
 interface LaunchpadGridProps {
@@ -31,6 +32,16 @@ interface LaunchpadGridProps {
 }
 
 const apps = [
+  {
+    id: "collaborative-service",
+    name: "智能协同服务工作台",
+    description: "多角色协同服务",
+    icon: Users,
+    gradient: "from-blue-500 to-indigo-600",
+    bgColor: "bg-blue-500",
+    action: "进入",
+    size: "regular",
+  },
   {
     id: "enterprise-kb",
     name: "企业知识库",

@@ -11,6 +11,7 @@ import { IndustryKnowledgeBase } from "@/components/industry-knowledge-base"
 import { IndustryInsightsPage } from "@/components/industry-insights-page"
 import { AdComplianceReview } from "@/components/ad-compliance-review"
 import { AISalesAssistant } from "@/components/ai-sales-assistant"
+import { CollaborativeServiceWorkspace } from "@/components/collaborative-service-workspace"
 
 export function WorkspaceLayout() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -25,6 +26,7 @@ export function WorkspaceLayout() {
   })
   const [showAdCompliance, setShowAdCompliance] = useState(false)
   const [showSalesAssistant, setShowSalesAssistant] = useState(false)
+  const [showCollaborativeService, setShowCollaborativeService] = useState(false)
 
   const handleAppClick = (appId: string) => {
     if (appId === "ad-compliance") {
@@ -33,6 +35,13 @@ export function WorkspaceLayout() {
     if (appId === "sales-assistant") {
       setShowSalesAssistant(true)
     }
+    if (appId === "collaborative-service") {
+      setShowCollaborativeService(true)
+    }
+  }
+
+  if (showCollaborativeService) {
+    return <CollaborativeServiceWorkspace onBack={() => setShowCollaborativeService(false)} />
   }
 
   if (showSalesAssistant) {
