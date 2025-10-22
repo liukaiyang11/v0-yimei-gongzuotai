@@ -27,7 +27,6 @@ interface App {
 
 // 所有应用数据
 const allApps: App[] = [
-  // 精选 - 医美相关应用
   {
     id: "collaborative-service",
     name: "智能协同服务工作台",
@@ -58,24 +57,157 @@ const allApps: App[] = [
     category: "featured",
   },
   { id: "marketing-system", name: "精准营销系统", description: "智能营销管理", icon: "Target", category: "featured" },
+  {
+    id: "xinyang-featured",
+    name: "新氧医美",
+    description: "医美消费平台",
+    icon: "Sparkles",
+    category: "featured",
+  },
+  {
+    id: "gengmei-featured",
+    name: "更美",
+    description: "医美社区平台",
+    icon: "Heart",
+    category: "featured",
+  },
+  {
+    id: "yuemei-featured",
+    name: "悦美",
+    description: "医美服务平台",
+    icon: "Smile",
+    category: "featured",
+  },
+  {
+    id: "meibei-featured",
+    name: "美呗医美",
+    description: "医美消费社区",
+    icon: "Star",
+    category: "featured",
+  },
+  {
+    id: "meibei-course-featured",
+    name: "美呗课",
+    description: "医美在线学习",
+    icon: "GraduationCap",
+    category: "featured",
+  },
+  {
+    id: "zhihui-circle-featured",
+    name: "智慧医美圈",
+    description: "医美知识社区",
+    icon: "Users",
+    category: "featured",
+  },
+  {
+    id: "haozhixue-featured",
+    name: "好智学",
+    description: "医美培训平台",
+    icon: "BookOpen",
+    category: "featured",
+  },
+  {
+    id: "perfect-training-featured",
+    name: "完美培训",
+    description: "医美专业培训",
+    icon: "Award",
+    category: "featured",
+  },
+  {
+    id: "capa-featured",
+    name: "中国整形美容协会",
+    description: "行业权威组织",
+    icon: "Shield",
+    category: "featured",
+  },
 
-  // 办公通用
-  { id: "ai-ppt", name: "AI PPT", description: "AI一键生成PPT", icon: "FileText", category: "office" },
-  { id: "ppt-outline", name: "PPT大纲助手", description: "快速生成PPT大纲", icon: "List", category: "office" },
-  { id: "doc-reader", name: "文档阅读器", description: "高效阅读文档", icon: "BookOpen", category: "office" },
-  { id: "pdf-tools", name: "PDF工具箱", description: "在线转换编辑", icon: "FileImage", category: "office" },
-  { id: "ai-writing", name: "AI写作", description: "启发创意灵感", icon: "PenTool", category: "office" },
-  { id: "doc-process", name: "文档处理", description: "高效文档管理", icon: "FolderOpen", category: "office" },
-  { id: "text-optimize", name: "文本优化", description: "智能优化文本", icon: "Sparkles", category: "office" },
-  { id: "text-translate", name: "文本翻译", description: "多语言翻译", icon: "Languages", category: "office" },
-  { id: "text-convert", name: "文本转换", description: "格式转换工具", icon: "RefreshCw", category: "office" },
-  { id: "paper-generator", name: "论文生成器", description: "AI辅助写论文", icon: "GraduationCap", category: "office" },
+  {
+    id: "ai-ppt",
+    name: "AI PPT",
+    description: "AI一键生成PPT",
+    icon: "FileText",
+    category: "office",
+    subcategory: "document",
+  },
+  {
+    id: "ppt-outline",
+    name: "PPT大纲助手",
+    description: "快速生成PPT大纲",
+    icon: "List",
+    category: "office",
+    subcategory: "document",
+  },
+  {
+    id: "doc-reader",
+    name: "文档阅读器",
+    description: "高效阅读文档",
+    icon: "BookOpen",
+    category: "office",
+    subcategory: "document",
+  },
+  {
+    id: "pdf-tools",
+    name: "PDF工具箱",
+    description: "在线转换编辑",
+    icon: "FileImage",
+    category: "office",
+    subcategory: "document",
+  },
+  {
+    id: "ai-writing",
+    name: "AI写作",
+    description: "启发创意灵感",
+    icon: "PenTool",
+    category: "office",
+    subcategory: "document",
+  },
+  {
+    id: "doc-process",
+    name: "文档处理",
+    description: "高效文档管理",
+    icon: "FolderOpen",
+    category: "office",
+    subcategory: "document",
+  },
+  {
+    id: "text-optimize",
+    name: "文本优化",
+    description: "智能优化文本",
+    icon: "Sparkles",
+    category: "office",
+    subcategory: "document",
+  },
+  {
+    id: "text-translate",
+    name: "文本翻译",
+    description: "多语言翻译",
+    icon: "Languages",
+    category: "office",
+    subcategory: "document",
+  },
+  {
+    id: "text-convert",
+    name: "文本转换",
+    description: "格式转换工具",
+    icon: "RefreshCw",
+    category: "office",
+    subcategory: "document",
+  },
+  {
+    id: "paper-generator",
+    name: "论文生成器",
+    description: "AI辅助写论文",
+    icon: "GraduationCap",
+    category: "office",
+    subcategory: "document",
+  },
   {
     id: "wechat-writer",
     name: "公众号写作助手",
     description: "公众号内容创作",
     icon: "MessageCircle",
     category: "office",
+    subcategory: "document",
   },
   {
     id: "collaborative-service-office",
@@ -83,37 +215,145 @@ const allApps: App[] = [
     description: "团队协作平台",
     icon: "Users",
     category: "office",
+    subcategory: "collaboration",
   },
-  { id: "ai-meeting", name: "AI会议秘书", description: "智能会议记录", icon: "MessageSquare", category: "office" },
-  { id: "content-workshop", name: "内容创意工坊", description: "创意内容生成", icon: "Palette", category: "office" },
-  { id: "ai-drawing", name: "AI绘图", description: "智能绘图创作", icon: "Brush", category: "office" },
-  { id: "ai-mindmap", name: "AI思维导图", description: "快速生成导图", icon: "Brain", category: "office" },
-  { id: "smart-image", name: "智能图像处理", description: "本地运行安全高效", icon: "ImageIcon", category: "office" },
-  { id: "video-tools", name: "视频工具", description: "视频编辑处理", icon: "Video", category: "office" },
-  { id: "audio-tools", name: "音频工具", description: "音频编辑处理", icon: "Music", category: "office" },
-  { id: "mock-interview", name: "模拟面试官", description: "AI模拟面试", icon: "UserCheck", category: "office" },
-  { id: "resume-filter", name: "简历筛选", description: "智能筛选简历", icon: "FileCheck", category: "office" },
-  { id: "weekly-report", name: "周报助手", description: "快速生成周报", icon: "Calendar", category: "office" },
-  { id: "leader-speech", name: "领导致辞生成器", description: "生成领导讲话稿", icon: "Mic", category: "office" },
-  { id: "host-script", name: "主持稿生成器", description: "生成主持稿", icon: "Radio", category: "office" },
+  {
+    id: "ai-meeting",
+    name: "AI会议秘书",
+    description: "智能会议记录",
+    icon: "MessageSquare",
+    category: "office",
+    subcategory: "collaboration",
+  },
+  {
+    id: "content-workshop",
+    name: "内容创意工坊",
+    description: "创意内容生成",
+    icon: "Palette",
+    category: "office",
+    subcategory: "presentation",
+  },
+  {
+    id: "ai-drawing",
+    name: "AI绘图",
+    description: "智能绘图创作",
+    icon: "Brush",
+    category: "office",
+    subcategory: "presentation",
+  },
+  {
+    id: "ai-mindmap",
+    name: "AI思维导图",
+    description: "快速生成导图",
+    icon: "Brain",
+    category: "office",
+    subcategory: "presentation",
+  },
+  {
+    id: "smart-image",
+    name: "智能图像处理",
+    description: "本地运行安全高效",
+    icon: "ImageIcon",
+    category: "office",
+    subcategory: "presentation",
+  },
+  {
+    id: "video-tools",
+    name: "视频工具",
+    description: "视频编辑处理",
+    icon: "Video",
+    category: "office",
+    subcategory: "presentation",
+  },
+  {
+    id: "audio-tools",
+    name: "音频工具",
+    description: "音频编辑处理",
+    icon: "Music",
+    category: "office",
+    subcategory: "presentation",
+  },
+  {
+    id: "mock-interview",
+    name: "模拟面试官",
+    description: "AI模拟面试",
+    icon: "UserCheck",
+    category: "office",
+    subcategory: "other",
+  },
+  {
+    id: "resume-filter",
+    name: "简历筛选",
+    description: "智能筛选简历",
+    icon: "FileCheck",
+    category: "office",
+    subcategory: "other",
+  },
+  {
+    id: "weekly-report",
+    name: "周报助手",
+    description: "快速生成周报",
+    icon: "Calendar",
+    category: "office",
+    subcategory: "other",
+  },
+  {
+    id: "leader-speech",
+    name: "领导致辞生成器",
+    description: "生成领导讲话稿",
+    icon: "Mic",
+    category: "office",
+    subcategory: "other",
+  },
+  {
+    id: "host-script",
+    name: "主持稿生成器",
+    description: "生成主持稿",
+    icon: "Radio",
+    category: "office",
+    subcategory: "other",
+  },
   {
     id: "financial-analysis",
     name: "财务报表分析",
     description: "智能分析财务数据",
     icon: "TrendingUp",
     category: "office",
+    subcategory: "other",
   },
-  { id: "enterprise-kb", name: "企业知识库", description: "专业知识管理", icon: "Database", category: "office" },
+  {
+    id: "enterprise-kb",
+    name: "企业知识库",
+    description: "专业知识管理",
+    icon: "Database",
+    category: "office",
+    subcategory: "other",
+  },
   {
     id: "doctor-assistant-office",
     name: "医生专业助手",
     description: "AI医疗助手",
     icon: "Stethoscope",
     category: "office",
+    subcategory: "other",
   },
-  { id: "party-building", name: "智慧党建助手", description: "党建工作助手", icon: "Flag", category: "office" },
-  { id: "folder", name: "文件夹", description: "文件管理", icon: "Folder", category: "office" },
-  { id: "blessing-generator", name: "祝福语生成器", description: "生成祝福语", icon: "Heart", category: "office" },
+  {
+    id: "party-building",
+    name: "智慧党建助手",
+    description: "党建工作助手",
+    icon: "Flag",
+    category: "office",
+    subcategory: "other",
+  },
+  { id: "folder", name: "文件夹", description: "文件管理", icon: "Folder", category: "office", subcategory: "other" },
+  {
+    id: "blessing-generator",
+    name: "祝福语生成器",
+    description: "生成祝福语",
+    icon: "Heart",
+    category: "office",
+    subcategory: "other",
+  },
 
   // 营销工具
   {
@@ -307,12 +547,19 @@ export function AppMarketplace({ onClose, onAddApp, addedApps }: AppMarketplaceP
     }
 
     // 分类过滤
-    if (activeTab === "medical") {
-      return app.category === "medical" && (!activeSubcategory || app.subcategory === activeSubcategory)
+    if (activeTab === "medical" || activeTab === "office") {
+      return app.category === activeTab && (!activeSubcategory || app.subcategory === activeSubcategory)
     }
 
     return app.category === activeTab
   })
+
+  const officeSubcategories = [
+    { id: "document", name: "文档处理" },
+    { id: "presentation", name: "演示工具" },
+    { id: "collaboration", name: "协作工具" },
+    { id: "other", name: "其他工具" },
+  ]
 
   // 医美生态的二级分类
   const medicalSubcategories = [
@@ -322,9 +569,8 @@ export function AppMarketplace({ onClose, onAddApp, addedApps }: AppMarketplaceP
     { id: "association", name: "行业协会" },
   ]
 
-  // 办公通用和营销工具直接显示应用列表
-  const showAppList = activeTab === "office" || activeTab === "marketing"
-  const showSubcategories = activeTab === "medical"
+  const showLeftSidebar = activeTab === "office" || activeTab === "medical"
+  const showSubcategories = activeTab === "office" || activeTab === "medical"
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -372,7 +618,7 @@ export function AppMarketplace({ onClose, onAddApp, addedApps }: AppMarketplaceP
             variant={activeTab === "office" ? "default" : "ghost"}
             onClick={() => {
               setActiveTab("office")
-              setActiveSubcategory(null)
+              setActiveSubcategory("document")
             }}
             className={`rounded-full ${activeTab === "office" ? "bg-blue-600 hover:bg-blue-700" : "text-slate-300 hover:text-white hover:bg-slate-700"}`}
           >
@@ -400,39 +646,14 @@ export function AppMarketplace({ onClose, onAddApp, addedApps }: AppMarketplaceP
           </Button>
         </div>
 
-        {/* 内容区域 - 双栏布局 */}
         <div className="flex-1 flex overflow-hidden">
-          {/* 左侧导航/列表 */}
-          <div className="w-64 border-r border-white/10 bg-slate-900/30">
-            <ScrollArea className="h-full">
-              <div className="p-4 space-y-2">
-                {showAppList && (
-                  <div className="space-y-1">
-                    {allApps
-                      .filter((app) => app.category === activeTab)
-                      .map((app) => {
-                        const IconComponent = LucideIcons[app.icon] as React.ComponentType<{ className?: string }>
-                        const isAdded = addedApps.includes(app.id)
-
-                        return (
-                          <div
-                            key={app.id}
-                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                              <IconComponent className="w-4 h-4 text-white" />
-                            </div>
-                            <span className="text-sm text-slate-200 flex-1 truncate">{app.name}</span>
-                            {isAdded && <Check className="w-4 h-4 text-green-500 flex-shrink-0" />}
-                          </div>
-                        )
-                      })}
-                  </div>
-                )}
-
-                {showSubcategories && (
-                  <div className="space-y-1">
-                    {medicalSubcategories.map((subcategory) => (
+          {/* 左侧导航 - 仅在办公通用和医美生态时显示 */}
+          {showLeftSidebar && (
+            <div className="w-64 border-r border-white/10 bg-slate-900/30">
+              <ScrollArea className="h-full">
+                <div className="p-4 space-y-1">
+                  {activeTab === "office" &&
+                    officeSubcategories.map((subcategory) => (
                       <button
                         key={subcategory.id}
                         onClick={() => setActiveSubcategory(subcategory.id)}
@@ -445,11 +666,25 @@ export function AppMarketplace({ onClose, onAddApp, addedApps }: AppMarketplaceP
                         {subcategory.name}
                       </button>
                     ))}
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
+
+                  {activeTab === "medical" &&
+                    medicalSubcategories.map((subcategory) => (
+                      <button
+                        key={subcategory.id}
+                        onClick={() => setActiveSubcategory(subcategory.id)}
+                        className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                          activeSubcategory === subcategory.id
+                            ? "bg-slate-700 text-white"
+                            : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                        }`}
+                      >
+                        {subcategory.name}
+                      </button>
+                    ))}
+                </div>
+              </ScrollArea>
+            </div>
+          )}
 
           {/* 右侧应用卡片网格 */}
           <div className="flex-1 overflow-hidden">
