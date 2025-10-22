@@ -576,6 +576,10 @@ function KeywordManagement() {
   const [isNewLibraryDialogOpen, setIsNewLibraryDialogOpen] = useState(false)
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
   const [isNewKeywordDialogOpen, setIsNewKeywordDialogOpen] = useState(false)
+  const [isEditKeywordDialogOpen, setIsEditKeywordDialogOpen] = useState(false)
+  const [isDeleteKeywordDialogOpen, setIsDeleteKeywordDialogOpen] = useState(false)
+  const [editingKeyword, setEditingKeyword] = useState<{ word: string; level: string; suggestion: string } | null>(null)
+  const [deletingKeyword, setDeletingKeyword] = useState<string | null>(null)
   const [newLibraryName, setNewLibraryName] = useState("")
   const [newKeyword, setNewKeyword] = useState("")
   const [newKeywordLevel, setNewKeywordLevel] = useState("high")
@@ -583,19 +587,75 @@ function KeywordManagement() {
   const importFileRef = useRef<HTMLInputElement>(null)
 
   const libraries = [
-    { id: "medical-terms", name: "医疗术语违禁词", count: 156 },
-    { id: "effect-claims", name: "功效描述慎用词", count: 89 },
-    { id: "absolute-words", name: "绝对化用语", count: 45 },
-    { id: "comparison-words", name: "比较级用语", count: 67 },
+    { id: "medical-terms", name: "医疗术语违禁词", count: 15 },
+    { id: "effect-claims", name: "功效描述慎用词", count: 12 },
+    { id: "absolute-words", name: "绝对化用语", count: 13 },
+    { id: "comparison-words", name: "比较级用语", count: 11 },
   ]
 
-  const keywords = [
-    { word: "最好", level: "high", suggestion: "优质的、先进的" },
-    { word: "第一", level: "high", suggestion: "领先的、前沿的" },
-    { word: "永久", level: "high", suggestion: "长效的、持久的" },
-    { word: "根治", level: "medium", suggestion: "改善、缓解" },
-    { word: "完美", level: "medium", suggestion: "理想的、满意的" },
-  ]
+  const keywordsByLibrary: Record<string, Array<{ word: string; level: string; suggestion: string }>> = {
+    "medical-terms": [
+      { word: "根治", level: "high", suggestion: "改善、缓解、调理" },
+      { word: "治愈", level: "high", suggestion: "改善、优化、提升" },
+      { word: "药到病除", level: "high", suggestion: "有效改善、显著提升" },
+      { word: "立竿见影", level: "high", suggestion: "快速见效、迅速改善" },
+      { word: "包治百病", level: "high", suggestion: "多方面改善、综合调理" },
+      { word: "无效退款", level: "medium", suggestion: "效果因人而异" },
+      { word: "医学奇迹", level: "high", suggestion: "先进技术、科学方法" },
+      { word: "祖传秘方", level: "high", suggestion: "专业配方、科学配比" },
+      { word: "神医", level: "high", suggestion: "资深医师、专业医生" },
+      { word: "包好", level: "high", suggestion: "专业治疗、科学护理" },
+      { word: "速效", level: "medium", suggestion: "快速见效、及时改善" },
+      { word: "特效药", level: "high", suggestion: "专业产品、科学配方" },
+      { word: "灵丹妙药", level: "high", suggestion: "优质产品、专业方案" },
+      { word: "药物依赖", level: "medium", suggestion: "科学使用、合理搭配" },
+      { word: "无副作用", level: "high", suggestion: "安全性高、温和配方" },
+    ],
+    "effect-claims": [
+      { word: "永久", level: "high", suggestion: "长效的、持久的、长期的" },
+      { word: "一次见效", level: "high", suggestion: "逐步改善、持续优化" },
+      { word: "终身有效", level: "high", suggestion: "长期维持、持续改善" },
+      { word: "完全消除", level: "high", suggestion: "显著改善、明显淡化" },
+      { word: "彻底解决", level: "high", suggestion: "有效改善、持续优化" },
+      { word: "100%有效", level: "high", suggestion: "效果显著、满意度高" },
+      { word: "立即见效", level: "medium", suggestion: "快速改善、及时见效" },
+      { word: "永不反弹", level: "high", suggestion: "长期维持、持续护理" },
+      { word: "一劳永逸", level: "high", suggestion: "长效维持、定期护理" },
+      { word: "返老还童", level: "high", suggestion: "年轻态、焕发活力" },
+      { word: "逆龄", level: "medium", suggestion: "抗衰老、延缓衰老" },
+      { word: "冻龄", level: "medium", suggestion: "保持年轻、延缓衰老" },
+    ],
+    "absolute-words": [
+      { word: "最好", level: "high", suggestion: "优质的、先进的、专业的" },
+      { word: "第一", level: "high", suggestion: "领先的、前沿的、优秀的" },
+      { word: "顶级", level: "high", suggestion: "高端的、优质的、专业的" },
+      { word: "极致", level: "medium", suggestion: "卓越的、优秀的、出色的" },
+      { word: "完美", level: "medium", suggestion: "理想的、满意的、优质的" },
+      { word: "绝对", level: "high", suggestion: "非常、十分、极其" },
+      { word: "唯一", level: "high", suggestion: "独特的、专业的、优质的" },
+      { word: "最强", level: "high", suggestion: "强效的、高效的、专业的" },
+      { word: "最佳", level: "high", suggestion: "优质的、理想的、合适的" },
+      { word: "最优", level: "high", suggestion: "优质的、专业的、先进的" },
+      { word: "最高级", level: "high", suggestion: "高端的、优质的、专业的" },
+      { word: "最先进", level: "high", suggestion: "先进的、前沿的、专业的" },
+      { word: "最权威", level: "high", suggestion: "专业的、资深的、可靠的" },
+    ],
+    "comparison-words": [
+      { word: "更好", level: "medium", suggestion: "优质的、专业的、理想的" },
+      { word: "更强", level: "medium", suggestion: "高效的、专业的、优质的" },
+      { word: "更优", level: "medium", suggestion: "优质的、理想的、合适的" },
+      { word: "更快", level: "medium", suggestion: "快速的、及时的、高效的" },
+      { word: "更安全", level: "medium", suggestion: "安全的、可靠的、专业的" },
+      { word: "更专业", level: "medium", suggestion: "专业的、资深的、经验丰富的" },
+      { word: "更高效", level: "medium", suggestion: "高效的、快速的、专业的" },
+      { word: "更便宜", level: "medium", suggestion: "实惠的、性价比高的" },
+      { word: "更划算", level: "medium", suggestion: "性价比高的、实惠的" },
+      { word: "超越", level: "medium", suggestion: "优质的、专业的、先进的" },
+      { word: "领先", level: "low", suggestion: "前沿的、先进的、专业的" },
+    ],
+  }
+
+  const keywords = keywordsByLibrary[selectedLibrary] || []
 
   const handleCreateLibrary = () => {
     if (newLibraryName.trim()) {
@@ -621,6 +681,39 @@ function KeywordManagement() {
       setNewKeywordSuggestion("")
       setNewKeywordLevel("high")
     }
+  }
+
+  const handleEditKeyword = (keyword: { word: string; level: string; suggestion: string }) => {
+    setEditingKeyword(keyword)
+    setNewKeyword(keyword.word)
+    setNewKeywordLevel(keyword.level)
+    setNewKeywordSuggestion(keyword.suggestion)
+    setIsEditKeywordDialogOpen(true)
+  }
+
+  const handleSaveEdit = () => {
+    if (newKeyword.trim() && newKeywordSuggestion.trim()) {
+      console.log("[v0] 编辑词条:", {
+        old: editingKeyword,
+        new: { word: newKeyword, level: newKeywordLevel, suggestion: newKeywordSuggestion },
+      })
+      setIsEditKeywordDialogOpen(false)
+      setEditingKeyword(null)
+      setNewKeyword("")
+      setNewKeywordSuggestion("")
+      setNewKeywordLevel("high")
+    }
+  }
+
+  const handleDeleteKeyword = (word: string) => {
+    setDeletingKeyword(word)
+    setIsDeleteKeywordDialogOpen(true)
+  }
+
+  const handleConfirmDelete = () => {
+    console.log("[v0] 删除词条:", deletingKeyword)
+    setIsDeleteKeywordDialogOpen(false)
+    setDeletingKeyword(null)
   }
 
   return (
@@ -705,17 +798,33 @@ function KeywordManagement() {
                   <TableCell>
                     <Badge
                       variant={keyword.level === "high" ? "destructive" : "secondary"}
-                      className={keyword.level === "high" ? "bg-red-900 text-red-200" : "bg-slate-700 text-slate-300"}
+                      className={
+                        keyword.level === "high"
+                          ? "bg-red-900 text-red-200"
+                          : keyword.level === "medium"
+                            ? "bg-orange-900 text-orange-200"
+                            : "bg-slate-700 text-slate-300"
+                      }
                     >
-                      {keyword.level === "high" ? "高风险" : "中风险"}
+                      {keyword.level === "high" ? "高风险" : keyword.level === "medium" ? "中风险" : "低风险"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-slate-400">{keyword.suggestion}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" className="mr-2 text-slate-300 hover:text-slate-100">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mr-2 text-slate-300 hover:text-slate-100"
+                      onClick={() => handleEditKeyword(keyword)}
+                    >
                       编辑
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-400 hover:text-red-300"
+                      onClick={() => handleDeleteKeyword(keyword.word)}
+                    >
                       删除
                     </Button>
                   </TableCell>
@@ -859,6 +968,107 @@ function KeywordManagement() {
             </Button>
             <Button onClick={handleAddKeyword} className="bg-blue-600 hover:bg-blue-700 text-white">
               添加
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditKeywordDialogOpen} onOpenChange={setIsEditKeywordDialogOpen}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-slate-100">
+          <DialogHeader>
+            <DialogTitle className="text-slate-100">编辑词条</DialogTitle>
+            <DialogDescription className="text-slate-400">修改敏感词条信息</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-keyword" className="text-slate-300">
+                敏感词
+              </Label>
+              <Input
+                id="edit-keyword"
+                placeholder="请输入敏感词"
+                value={newKeyword}
+                onChange={(e) => setNewKeyword(e.target.value)}
+                className="bg-slate-900 border-slate-700 text-slate-100 placeholder:text-slate-500"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-level" className="text-slate-300">
+                风险等级
+              </Label>
+              <Select value={newKeywordLevel} onValueChange={setNewKeywordLevel}>
+                <SelectTrigger className="bg-slate-900 border-slate-700 text-slate-100">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-700">
+                  <SelectItem value="high" className="text-slate-100">
+                    高风险
+                  </SelectItem>
+                  <SelectItem value="medium" className="text-slate-100">
+                    中风险
+                  </SelectItem>
+                  <SelectItem value="low" className="text-slate-100">
+                    低风险
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-suggestion" className="text-slate-300">
+                修改建议
+              </Label>
+              <Input
+                id="edit-suggestion"
+                placeholder="请输入修改建议"
+                value={newKeywordSuggestion}
+                onChange={(e) => setNewKeywordSuggestion(e.target.value)}
+                className="bg-slate-900 border-slate-700 text-slate-100 placeholder:text-slate-500"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsEditKeywordDialogOpen(false)
+                setEditingKeyword(null)
+                setNewKeyword("")
+                setNewKeywordSuggestion("")
+                setNewKeywordLevel("high")
+              }}
+              className="bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600"
+            >
+              取消
+            </Button>
+            <Button onClick={handleSaveEdit} className="bg-blue-600 hover:bg-blue-700 text-white">
+              保存
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDeleteKeywordDialogOpen} onOpenChange={setIsDeleteKeywordDialogOpen}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-slate-100">
+          <DialogHeader>
+            <DialogTitle className="text-slate-100">确认删除</DialogTitle>
+            <DialogDescription className="text-slate-400">
+              您确定要删除敏感词 <span className="text-red-400 font-semibold">"{deletingKeyword}"</span>{" "}
+              吗？此操作无法撤销。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsDeleteKeywordDialogOpen(false)
+                setDeletingKeyword(null)
+              }}
+              className="bg-slate-700 border-slate-600 text-slate-200 hover:bg-slate-600"
+            >
+              取消
+            </Button>
+            <Button onClick={handleConfirmDelete} className="bg-red-600 hover:bg-red-700 text-white">
+              确认删除
             </Button>
           </DialogFooter>
         </DialogContent>
