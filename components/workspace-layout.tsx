@@ -9,6 +9,9 @@ import { Sidebar } from "@/components/sidebar"
 import { KnowledgeBase } from "@/components/knowledge-base"
 import { IndustryKnowledgeBase } from "@/components/industry-knowledge-base"
 import { IndustryInsightsPage } from "@/components/industry-insights-page"
+import { AdComplianceReview } from "@/components/ad-compliance-review"
+import { AISalesAssistant } from "@/components/ai-sales-assistant"
+import { CollaborativeServicePlatform } from "@/components/collaborative-service-platform"
 
 export function WorkspaceLayout() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -17,18 +20,56 @@ export function WorkspaceLayout() {
     show: false,
     bookTitle: "",
   })
+  const [coursePlayerState, setCoursePlayerState] = useState<{ show: boolean; courseTitle: string }>({
+    show: false,
+    courseTitle: "",
+  })
+  const [showAdCompliance, setShowAdCompliance] = useState(false)
+  const [showSalesAssistant, setShowSalesAssistant] = useState(false)
+  const [showCollaborativeService, setShowCollaborativeService] = useState(false)
+
+  const handleAppClick = (appId: string) => {
+    if (appId === "ad-compliance") {
+      setShowAdCompliance(true)
+    }
+    if (appId === "sales-assistant") {
+      setShowSalesAssistant(true)
+    }
+    if (appId === "collaborative-service") {
+      setShowCollaborativeService(true)
+    }
+  }
+
+  if (showCollaborativeService) {
+    return <CollaborativeServicePlatform onBack={() => setShowCollaborativeService(false)} />
+  }
+
+  if (showSalesAssistant) {
+    return <AISalesAssistant onBack={() => setShowSalesAssistant(false)} />
+  }
+
+  if (showAdCompliance) {
+    return <AdComplianceReview onBack={() => setShowAdCompliance(false)} />
+  }
 
   const renderContent = () => {
     if (activeSection === "知识库") {
       return <KnowledgeBase />
     }
     if (activeSection === "行业知识库") {
-      return <IndustryKnowledgeBase onOpenBookReader={setBookReaderState} bookReaderState={bookReaderState} />
+      return (
+        <IndustryKnowledgeBase
+          onOpenBookReader={setBookReaderState}
+          bookReaderState={bookReaderState}
+          onOpenCoursePlayer={setCoursePlayerState}
+          coursePlayerState={coursePlayerState}
+        />
+      )
     }
     if (activeSection === "行业观察") {
       return <IndustryInsightsPage />
     }
-    return <LaunchpadGrid searchQuery={searchQuery} />
+    return <LaunchpadGrid searchQuery={searchQuery} onAppClick={handleAppClick} />
   }
 
   const showSearchBar = activeSection === "启动台"

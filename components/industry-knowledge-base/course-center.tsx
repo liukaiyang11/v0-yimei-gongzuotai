@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { AIAssistantDialog } from "./ai-assistant-dialog"
 
 interface Course {
   id: string
@@ -21,6 +20,11 @@ interface Course {
   chapters: number
   progress?: number
   price: number
+}
+
+interface CourseCenterProps {
+  searchQuery: string
+  onOpenCoursePlayer: (data: { show: boolean; courseTitle: string }) => void
 }
 
 const mockCourses: Course[] = [
@@ -80,11 +84,7 @@ const mockCourses: Course[] = [
   },
 ]
 
-interface CourseCenterProps {
-  searchQuery: string
-}
-
-export function CourseCenter({ searchQuery }: CourseCenterProps) {
+export function CourseCenter({ searchQuery, onOpenCoursePlayer }: CourseCenterProps) {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
   const [showAIAssistant, setShowAIAssistant] = useState(false)
 
@@ -97,7 +97,7 @@ export function CourseCenter({ searchQuery }: CourseCenterProps) {
 
   const handleAIAssistant = (course: Course) => {
     setSelectedCourse(course)
-    setShowAIAssistant(true)
+    onOpenCoursePlayer({ show: true, courseTitle: course.title })
   }
 
   return (
@@ -186,14 +186,14 @@ export function CourseCenter({ searchQuery }: CourseCenterProps) {
       </div>
 
       {/* AI助教对话框 */}
-      {selectedCourse && (
+      {/* {selectedCourse && (
         <AIAssistantDialog
           open={showAIAssistant}
           onOpenChange={setShowAIAssistant}
           title={selectedCourse.title}
           type="course"
         />
-      )}
+      )} */}
     </>
   )
 }
