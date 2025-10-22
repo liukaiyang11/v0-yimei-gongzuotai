@@ -12,6 +12,7 @@ import { IndustryInsightsPage } from "@/components/industry-insights-page"
 import { AdComplianceReview } from "@/components/ad-compliance-review"
 import { AISalesAssistant } from "@/components/ai-sales-assistant"
 import { CollaborativeServicePlatform } from "@/components/collaborative-service-platform"
+import { CustomerAcquisitionSystem } from "@/components/customer-acquisition-system"
 
 export function WorkspaceLayout() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -27,6 +28,7 @@ export function WorkspaceLayout() {
   const [showAdCompliance, setShowAdCompliance] = useState(false)
   const [showSalesAssistant, setShowSalesAssistant] = useState(false)
   const [showCollaborativeService, setShowCollaborativeService] = useState(false)
+  const [showCustomerAcquisition, setShowCustomerAcquisition] = useState(false)
 
   const handleAppClick = (appId: string) => {
     if (appId === "ad-compliance") {
@@ -38,6 +40,13 @@ export function WorkspaceLayout() {
     if (appId === "collaborative-service") {
       setShowCollaborativeService(true)
     }
+    if (appId === "customer-acquisition") {
+      setShowCustomerAcquisition(true)
+    }
+  }
+
+  if (showCustomerAcquisition) {
+    return <CustomerAcquisitionSystem onBack={() => setShowCustomerAcquisition(false)} />
   }
 
   if (showCollaborativeService) {
