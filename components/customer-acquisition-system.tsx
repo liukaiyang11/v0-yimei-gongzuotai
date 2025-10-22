@@ -221,7 +221,35 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
   }
 
   const handleExportCustomers = () => {
-    console.log("导出客户数据")
+    // 创建CSV内容
+    const headers = ["序号", "昵称", "地区", "时间", "评论内容", "是否已联系"]
+    const csvContent = [
+      headers.join(","),
+      ...customers.map((customer, index) => {
+        return [
+          index + 1,
+          `"${customer.nickname}"`,
+          `"${customer.region}"`,
+          `"${customer.time}"`,
+          `"${customer.comment.replace(/"/g, '""')}"`, // 转义双引号
+          customer.contacted ? "是" : "否",
+        ].join(",")
+      }),
+    ].join("\n")
+
+    // 添加BOM以支持中文
+    const BOM = "\uFEFF"
+    const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" })
+
+    // 创建下载链接
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `客户数据_${new Date().toLocaleDateString()}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   const handleContactCustomer = (customerId: string) => {
@@ -396,6 +424,14 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
             <div className="bg-slate-800/30 p-6 border-b border-slate-700/50">
               <div className="max-w-7xl mx-auto">
                 <div className="flex items-center gap-4 mb-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleBackToVideos}
+                    className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    返回视频列表
+                  </Button>
                   <div className="flex-1 relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
