@@ -30,7 +30,22 @@ import {
 interface LaunchpadGridProps {
   searchQuery: string
   onAppClick?: (appId: string) => void
+  addedApps: string[] // 添加addedApps参数
 }
+
+const defaultAppIds = [
+  "collaborative-service",
+  "ad-compliance",
+  "sales-assistant",
+  "customer-acquisition",
+  "content-workshop",
+  "ai-ppt",
+  "ai-writing",
+  "ai-mindmap",
+  "audio-tools",
+  "video-tools",
+  "ai-drawing",
+]
 
 const apps = [
   {
@@ -269,15 +284,19 @@ const apps = [
   },
 ]
 
-export function LaunchpadGrid({ searchQuery, onAppClick }: LaunchpadGridProps) {
+export function LaunchpadGrid({ searchQuery, onAppClick, addedApps }: LaunchpadGridProps) {
   const [draggedApp, setDraggedApp] = useState<string | null>(null)
   const [dragOverApp, setDragOverApp] = useState<string | null>(null)
 
-  const filteredApps = apps.filter(
-    (app) =>
-      app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.description.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+  const visibleAppIds = [...new Set([...defaultAppIds, ...addedApps])]
+
+  const filteredApps = apps
+    .filter((app) => visibleAppIds.includes(app.id))
+    .filter(
+      (app) =>
+        app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        app.description.toLowerCase().includes(searchQuery.toLowerCase()),
+    )
 
   const handleDragStart = (e: React.DragEvent, appId: string) => {
     setDraggedApp(appId)

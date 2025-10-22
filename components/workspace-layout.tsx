@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,7 +31,20 @@ export function WorkspaceLayout() {
   const [showCollaborativeService, setShowCollaborativeService] = useState(false)
   const [showCustomerAcquisition, setShowCustomerAcquisition] = useState(false)
   const [showAppMarketplace, setShowAppMarketplace] = useState(false)
-  const [addedApps, setAddedApps] = useState<string[]>([])
+
+  const [addedApps, setAddedApps] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("addedApps")
+      return saved ? JSON.parse(saved) : []
+    }
+    return []
+  })
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("addedApps", JSON.stringify(addedApps))
+    }
+  }, [addedApps])
 
   const handleAppClick = (appId: string) => {
     if (appId === "ad-compliance") {
@@ -87,7 +100,7 @@ export function WorkspaceLayout() {
     if (activeSection === "行业观察") {
       return <IndustryInsightsPage />
     }
-    return <LaunchpadGrid searchQuery={searchQuery} onAppClick={handleAppClick} />
+    return <LaunchpadGrid searchQuery={searchQuery} onAppClick={handleAppClick} addedApps={addedApps} />
   }
 
   const showSearchBar = activeSection === "启动台"
