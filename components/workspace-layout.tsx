@@ -13,6 +13,7 @@ import { AdComplianceReview } from "@/components/ad-compliance-review"
 import { AISalesAssistant } from "@/components/ai-sales-assistant"
 import { CollaborativeServicePlatform } from "@/components/collaborative-service-platform"
 import { CustomerAcquisitionSystem } from "@/components/customer-acquisition-system"
+import { AppMarketplace } from "@/components/app-marketplace"
 
 export function WorkspaceLayout() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -29,6 +30,8 @@ export function WorkspaceLayout() {
   const [showSalesAssistant, setShowSalesAssistant] = useState(false)
   const [showCollaborativeService, setShowCollaborativeService] = useState(false)
   const [showCustomerAcquisition, setShowCustomerAcquisition] = useState(false)
+  const [showAppMarketplace, setShowAppMarketplace] = useState(false)
+  const [addedApps, setAddedApps] = useState<string[]>([])
 
   const handleAppClick = (appId: string) => {
     if (appId === "ad-compliance") {
@@ -42,6 +45,12 @@ export function WorkspaceLayout() {
     }
     if (appId === "customer-acquisition") {
       setShowCustomerAcquisition(true)
+    }
+  }
+
+  const handleAddApp = (appId: string) => {
+    if (!addedApps.includes(appId)) {
+      setAddedApps([...addedApps, appId])
     }
   }
 
@@ -113,13 +122,18 @@ export function WorkspaceLayout() {
           <div className="fixed bottom-8 right-8 flex flex-col space-y-3">
             <Button
               size="icon"
-              className="w-12 h-12 rounded-full bg-white/90 hover:bg-white text-gray-600 hover:text-gray-800 shadow-lg backdrop-blur-sm border-0"
+              onClick={() => setShowAppMarketplace(true)}
+              className="w-12 h-12 rounded-full bg-white/90 hover:bg-white text-gray-600 hover:text-gray-800 shadow-lg backdrop-blur-sm border-0 transition-all duration-300 hover:scale-110"
             >
               <Plus className="w-5 h-5" />
             </Button>
           </div>
         )}
       </div>
+
+      {showAppMarketplace && (
+        <AppMarketplace onClose={() => setShowAppMarketplace(false)} onAddApp={handleAddApp} addedApps={addedApps} />
+      )}
     </div>
   )
 }
