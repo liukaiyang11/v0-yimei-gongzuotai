@@ -38,6 +38,7 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
   const [activeTab, setActiveTab] = useState<"search" | "customers">("search")
   const [selectedPlatform, setSelectedPlatform] = useState("全网")
   const [searchKeyword, setSearchKeyword] = useState("")
+  const [hasSearched, setHasSearched] = useState(false)
   const [selectedVideos, setSelectedVideos] = useState<string[]>([])
   const [customerSearchKeyword, setCustomerSearchKeyword] = useState("")
   const [selectedRegion, setSelectedRegion] = useState("不限")
@@ -205,8 +206,18 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
     },
   ]
 
+  const handleSearch = () => {
+    if (searchKeyword.trim()) {
+      setHasSearched(true)
+    }
+  }
+
   const handleAcquireCustomers = (videoId: string) => {
     setActiveTab("customers")
+  }
+
+  const handleBackToVideos = () => {
+    setActiveTab("search")
   }
 
   const handleExportCustomers = () => {
@@ -227,6 +238,16 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
           </Button>
           <h1 className="text-xl font-semibold text-white">精准获客系统</h1>
         </div>
+        {activeTab === "customers" && (
+          <Button
+            variant="outline"
+            onClick={handleBackToVideos}
+            className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            返回视频列表
+          </Button>
+        )}
       </div>
 
       {/* 主内容区域 */}
@@ -251,10 +272,13 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
                       placeholder="输入关键词搜索视频..."
                       value={searchKeyword}
                       onChange={(e) => setSearchKeyword(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       className="pl-12 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
                     />
                   </div>
-                  <Button className="bg-blue-600 hover:bg-blue-700">搜索</Button>
+                  <Button onClick={handleSearch} className="bg-blue-600 hover:bg-blue-700">
+                    搜索
+                  </Button>
                 </div>
 
                 {/* 平台选择 */}
@@ -278,82 +302,93 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
               </div>
             </div>
 
-            {/* 视频列表 */}
-            <div className="flex-1 overflow-hidden bg-slate-900/50">
-              <div className="max-w-6xl mx-auto p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="text-slate-300">
-                    已为您获取 <span className="text-blue-400 font-semibold">{videos.length}</span> 条视频
-                  </div>
-                  <div className="flex items-center gap-4">
+            {hasSearched ? (
+              <div className="flex-1 overflow-hidden bg-slate-900/50">
+                <div className="max-w-6xl mx-auto p-6">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="text-slate-300">
-                      总评论数 <span className="text-blue-400 font-semibold">(999+条)</span>
+                      已为您获取 <span className="text-blue-400 font-semibold">{videos.length}</span> 条视频
                     </div>
-                    <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 bg-transparent">
-                      筛选
-                    </Button>
+                    <div className="flex items-center gap-4">
+                      <div className="text-slate-300">
+                        总评论数 <span className="text-blue-400 font-semibold">(999+条)</span>
+                      </div>
+                      <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 bg-transparent">
+                        筛选
+                      </Button>
+                    </div>
                   </div>
-                </div>
 
-                <ScrollArea className="h-[calc(100vh-400px)]">
-                  <div className="bg-slate-800/50 rounded-lg overflow-hidden">
-                    <table className="w-full">
-                      <thead className="bg-slate-700/50">
-                        <tr>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-slate-300">视频</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-slate-300">达人</th>
-                          <th className="px-4 py-3 text-center text-sm font-medium text-slate-300">评论数</th>
-                          <th className="px-4 py-3 text-center text-sm font-medium text-slate-300">操作</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-700/50">
-                        {videos.map((video) => (
-                          <tr key={video.id} className="hover:bg-slate-700/30">
-                            <td className="px-4 py-4">
-                              <div>
-                                <div className="text-white text-sm mb-1">{video.title}</div>
-                                <div className="text-slate-400 text-xs">{video.publishTime}</div>
-                              </div>
-                            </td>
-                            <td className="px-4 py-4">
-                              <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center text-white text-sm">
-                                  {video.author.name.charAt(0)}
-                                </div>
-                                <div>
-                                  <div className="text-white text-sm">{video.author.name}</div>
-                                  <div className="text-slate-400 text-xs">粉丝数：{video.author.followers}</div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-4 py-4 text-center">
-                              <span className="text-white">{video.commentCount}</span>
-                            </td>
-                            <td className="px-4 py-4">
-                              <div className="flex items-center justify-center gap-2">
-                                <Button variant="link" size="sm" className="text-blue-400 hover:text-blue-300">
-                                  去水印
-                                </Button>
-                                <Button variant="link" size="sm" className="text-blue-400 hover:text-blue-300">
-                                  提取文案
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleAcquireCustomers(video.id)}
-                                  className="bg-blue-600 hover:bg-blue-700"
-                                >
-                                  精准获客
-                                </Button>
-                              </div>
-                            </td>
+                  <ScrollArea className="h-[calc(100vh-400px)]">
+                    <div className="bg-slate-800/50 rounded-lg overflow-hidden">
+                      <table className="w-full">
+                        <thead className="bg-slate-700/50">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-slate-300">视频</th>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-slate-300">达人</th>
+                            <th className="px-4 py-3 text-center text-sm font-medium text-slate-300">评论数</th>
+                            <th className="px-4 py-3 text-center text-sm font-medium text-slate-300">操作</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </ScrollArea>
+                        </thead>
+                        <tbody className="divide-y divide-slate-700/50">
+                          {videos.map((video) => (
+                            <tr key={video.id} className="hover:bg-slate-700/30">
+                              <td className="px-4 py-4">
+                                <div>
+                                  <div className="text-white text-sm mb-1">{video.title}</div>
+                                  <div className="text-slate-400 text-xs">{video.publishTime}</div>
+                                </div>
+                              </td>
+                              <td className="px-4 py-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-slate-600 flex items-center justify-center text-white text-sm">
+                                    {video.author.name.charAt(0)}
+                                  </div>
+                                  <div>
+                                    <div className="text-white text-sm">{video.author.name}</div>
+                                    <div className="text-slate-400 text-xs">粉丝数：{video.author.followers}</div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <span className="text-white">{video.commentCount}</span>
+                              </td>
+                              <td className="px-4 py-4">
+                                <div className="flex items-center justify-center gap-2">
+                                  <Button variant="link" size="sm" className="text-blue-400 hover:text-blue-300">
+                                    去水印
+                                  </Button>
+                                  <Button variant="link" size="sm" className="text-blue-400 hover:text-blue-300">
+                                    提取文案
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleAcquireCustomers(video.id)}
+                                    className="bg-blue-600 hover:bg-blue-700"
+                                  >
+                                    精准获客
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </ScrollArea>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex-1 flex items-center justify-center bg-slate-900/50">
+                <div className="text-center">
+                  <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-slate-800/50 flex items-center justify-center">
+                    <Search className="w-12 h-12 text-slate-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-300 mb-2">开始搜索视频</h3>
+                  <p className="text-slate-400">输入关键词并选择平台，点击搜索按钮开始获客</p>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="h-full flex flex-col">
