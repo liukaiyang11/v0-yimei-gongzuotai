@@ -24,6 +24,7 @@ import {
   MessageSquare,
   ShieldCheck,
   Users,
+  UserSearch,
 } from "lucide-react"
 
 interface LaunchpadGridProps {
@@ -60,6 +61,16 @@ const apps = [
     gradient: "from-blue-500 to-blue-600",
     bgColor: "bg-blue-500",
     action: "使用",
+    size: "regular",
+  },
+  {
+    id: "customer-acquisition",
+    name: "精准获客系统",
+    description: "视频评论获客",
+    icon: UserSearch,
+    gradient: "from-violet-500 to-purple-600",
+    bgColor: "bg-violet-500",
+    action: "启动",
     size: "regular",
   },
   {
