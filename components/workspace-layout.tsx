@@ -8,12 +8,12 @@ import { LaunchpadGrid } from "@/components/launchpad-grid"
 import { Sidebar } from "@/components/sidebar"
 import { KnowledgeBase } from "@/components/knowledge-base"
 import { IndustryKnowledgeBase } from "@/components/industry-knowledge-base"
-import { IndustryInsightsPage } from "@/components/industry-insights-page"
 import { AdComplianceReview } from "@/components/ad-compliance-review"
 import { AISalesAssistant } from "@/components/ai-sales-assistant"
 import { CollaborativeServicePlatform } from "@/components/collaborative-service-platform"
 import { CustomerAcquisitionSystem } from "@/components/customer-acquisition-system"
 import { AppMarketplace } from "@/components/app-marketplace"
+import { MedicalBeautyThinkTank } from "@/components/medical-beauty-think-tank"
 
 export function WorkspaceLayout() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -97,8 +97,8 @@ export function WorkspaceLayout() {
         />
       )
     }
-    if (activeSection === "行业观察") {
-      return <IndustryInsightsPage />
+    if (activeSection === "医美智库") {
+      return <MedicalBeautyThinkTank />
     }
     return <LaunchpadGrid searchQuery={searchQuery} onAppClick={handleAppClick} addedApps={addedApps} />
   }

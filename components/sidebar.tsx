@@ -13,7 +13,7 @@ const menuItems = [
   { id: "启动台", label: "启动台", icon: Home },
   { id: "知识库", label: "知识库", icon: BookOpen },
   { id: "行业知识库", label: "行业知识库", icon: Database },
-  { id: "行业观察", label: "行业观察", icon: TrendingUp },
+  { id: "医美智库", label: "医美智库", icon: TrendingUp },
 ]
 
 export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
