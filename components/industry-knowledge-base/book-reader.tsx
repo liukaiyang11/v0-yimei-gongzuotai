@@ -1,13 +1,42 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Home, Menu, ZoomIn, ZoomOut, HelpCircle, Sparkles, Network, FileText } from "lucide-react"
+import {
+  Home,
+  Menu,
+  ZoomIn,
+  ZoomOut,
+  HelpCircle,
+  Send,
+  Bold,
+  Italic,
+  Underline,
+  List,
+  ListOrdered,
+  Link,
+  ImageIcon,
+  Table,
+  Code,
+  AlignLeft,
+  Undo,
+  Redo,
+  Smile,
+  MoreVertical,
+  FileText,
+  Download,
+  Maximize2,
+  Network,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
 
 interface BookReaderProps {
   bookTitle: string
@@ -16,12 +45,25 @@ interface BookReaderProps {
 
 export function BookReader({ bookTitle, onBack }: BookReaderProps) {
   const [zoom, setZoom] = useState(100)
-  const [activeTab, setActiveTab] = useState("guide")
+  const [activeTab, setActiveTab] = useState("chat")
   const [aiQuestion, setAiQuestion] = useState("")
   const [deepThinking, setDeepThinking] = useState(false)
-  const [leftWidth, setLeftWidth] = useState(60) // 左侧占60%
+  const [leftWidth, setLeftWidth] = useState(60)
   const [isDragging, setIsDragging] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const [noteTitle, setNoteTitle] = useState("")
+  const [noteContent, setNoteContent] = useState("")
+  const [rewriteTab, setRewriteTab] = useState("settings")
+  const [rewriteMethod, setRewriteMethod] = useState("summary")
+  const [rewriteSources, setRewriteSources] = useState<string[]>(["document"])
+  const [rewriteDescription, setRewriteDescription] = useState("")
+  const [targetAudience, setTargetAudience] = useState("customer")
+  const [writingStyle, setWritingStyle] = useState("wechat")
+  const [mindmapTab, setMindmapTab] = useState("generate")
+  const [mindmapView, setMindmapView] = useState("map")
+  const [mindmapRequirement, setMindmapRequirement] = useState("")
+  const [mindmapLanguage, setMindmapLanguage] = useState("chinese")
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -30,7 +72,6 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
       const containerRect = containerRef.current.getBoundingClientRect()
       const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100
 
-      // 限制宽度在30%到80%之间
       if (newLeftWidth >= 30 && newLeftWidth <= 80) {
         setLeftWidth(newLeftWidth)
       }
@@ -52,29 +93,29 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
   }, [isDragging])
 
   return (
-    <div className="bg-slate-900 flex flex-col">
+    <div className="fixed left-20 top-0 right-0 bottom-0 bg-slate-900 flex flex-col">
       {/* 顶部导航栏 */}
-      <div className="h-14 border-b border-white/10 bg-slate-800/50 backdrop-blur-sm flex items-center justify-between px-4 flex-shrink-0">
-        <div className="flex items-center gap-3">
+      <div className="h-14 border-b border-slate-700 bg-slate-800/50 backdrop-blur-sm flex items-center justify-between px-6 flex-shrink-0">
+        <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
-            className="text-gray-300 hover:text-white hover:bg-white/10"
+            className="text-gray-300 hover:text-white hover:bg-slate-700"
             onClick={onBack}
           >
             <Home className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white hover:bg-white/10">
+          <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white hover:bg-slate-700">
             <Menu className="w-5 h-5" />
           </Button>
-          <span className="text-white font-medium text-sm max-w-md truncate">{bookTitle}</span>
+          <span className="text-white font-medium text-sm">{bookTitle}</span>
         </div>
 
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
-            className="text-gray-300 hover:text-white hover:bg-white/10"
+            className="text-gray-300 hover:text-white hover:bg-slate-700"
             onClick={() => setZoom(Math.max(50, zoom - 10))}
           >
             <ZoomOut className="w-4 h-4" />
@@ -83,12 +124,12 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="text-gray-300 hover:text-white hover:bg-white/10"
+            className="text-gray-300 hover:text-white hover:bg-slate-700"
             onClick={() => setZoom(Math.min(200, zoom + 10))}
           >
             <ZoomIn className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white hover:bg-white/10">
+          <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white hover:bg-slate-700">
             <HelpCircle className="w-5 h-5" />
           </Button>
         </div>
@@ -97,7 +138,7 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
       <div ref={containerRef} className="flex-1 flex overflow-hidden relative">
         {/* 左侧文档内容 */}
         <div style={{ width: `${leftWidth}%` }} className="flex flex-col overflow-hidden">
-          <div className="flex-1 bg-white overflow-y-auto">
+          <ScrollArea className="flex-1 bg-white">
             <div className="max-w-4xl mx-auto p-12" style={{ fontSize: `${zoom}%` }}>
               <h1 className="text-3xl font-bold text-gray-900 mb-6">医美咨询师快速打消顾客怕受骗心理的5大招2页</h1>
 
@@ -172,11 +213,11 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
                 </div>
               </div>
             </div>
-          </div>
+          </ScrollArea>
         </div>
 
         <div
-          className="w-1 bg-white/10 hover:bg-blue-500 cursor-col-resize transition-colors relative group flex-shrink-0"
+          className="w-1 bg-slate-700 hover:bg-blue-500 cursor-col-resize transition-colors relative group flex-shrink-0"
           onMouseDown={() => setIsDragging(true)}
         >
           <div className="absolute inset-y-0 -left-1 -right-1 group-hover:bg-blue-500/20" />
@@ -185,259 +226,499 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
         {/* 右侧AI功能面板 */}
         <div
           style={{ width: `${100 - leftWidth}%` }}
-          className="flex flex-col overflow-hidden bg-slate-800/30 backdrop-blur-sm"
+          className="flex flex-col overflow-hidden bg-slate-800/50 backdrop-blur-sm"
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-            <TabsList className="w-full bg-transparent border-b border-white/10 rounded-none h-12 p-0 flex-shrink-0">
-              <TabsTrigger
-                value="guide"
-                className="flex-1 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none text-gray-300 data-[state=active]:text-white"
-              >
-                导读
-              </TabsTrigger>
+            <TabsList className="bg-transparent border-b border-slate-700 rounded-none h-12 px-4 flex-shrink-0">
               <TabsTrigger
                 value="chat"
-                className="flex-1 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none text-gray-300 data-[state=active]:text-white"
+                className="data-[state=active]:bg-slate-700 text-gray-300 data-[state=active]:text-white"
               >
                 对话
               </TabsTrigger>
               <TabsTrigger
                 value="mindmap"
-                className="flex-1 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none text-gray-300 data-[state=active]:text-white"
+                className="data-[state=active]:bg-slate-700 text-gray-300 data-[state=active]:text-white"
               >
                 思维导图
               </TabsTrigger>
               <TabsTrigger
                 value="notes"
-                className="flex-1 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none text-gray-300 data-[state=active]:text-white"
+                className="data-[state=active]:bg-slate-700 text-gray-300 data-[state=active]:text-white"
               >
                 笔记
               </TabsTrigger>
               <TabsTrigger
                 value="rewrite"
-                className="flex-1 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none text-gray-300 data-[state=active]:text-white"
+                className="data-[state=active]:bg-slate-700 text-gray-300 data-[state=active]:text-white"
               >
                 改写
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="guide" className="flex-1 flex flex-col mt-0 p-4 overflow-hidden">
-              <div className="flex gap-2 mb-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                >
-                  <Sparkles className="w-4 h-4 mr-1" />
-                  全文速读
-                </Button>
-                <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-white">
-                  <FileText className="w-4 h-4 mr-1" />
-                  文章摘要
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                >
-                  <Network className="w-4 h-4 mr-1" />
-                  思维导图
-                </Button>
-              </div>
-
-              <div className="text-sm text-gray-400 mb-3">摘抄要点</div>
-
-              <ScrollArea className="flex-1">
-                <div className="space-y-4 pr-2">
-                  {[
-                    "1.用90%的时间去获取顾客的信任，10%的时间来谈项目。其中咨询师的形象就是第一位重要的信任点，咨询师需先让顾客建立安全感",
-                    "2.咨询师千万要注意自己的补充在形象...包装到位就是领先一步。第一印象决定了你在顾客心中的地位，专业度的形象是建立信赖感的第一步",
-                    "3.专业与不专业，你一开口...就会赢得顾客的信赖。包装到位就是不一样",
-                    "4.要坦诚而坦诚地告诉顾客...让她知道你不是一只想赚钱的人。风险透明化能够反而增强信任，体现职业道德和专业关怀的双重内涵技巧",
-                    "5.给出适合本人实际需求和能力的合理方案...很快让客户为中心的服务理念。个性化方案设计能力比推销能力更重要，体现以客户为中心的服务理念",
-                    "6.让顾客因熟悉而安得来吧，打消顾客怕来求的不安。环境熟悉化能够通过降低场景陌生感，属于心理铺垫技巧立于手段",
-                  ].map((point, index) => (
-                    <div key={index} className="text-gray-300 text-sm leading-relaxed">
-                      {point}
+            <TabsContent value="chat" className="flex-1 flex flex-col mt-0 overflow-hidden">
+              <ScrollArea className="flex-1 p-4">
+                <div className="space-y-6">
+                  {/* 全文概述 */}
+                  <div className="space-y-3">
+                    <h3 className="text-white font-medium flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-blue-500" />
+                      全文概述
+                    </h3>
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <span>已深度思考</span>
+                      <span>原文共计3200字，读完预计5分钟。</span>
+                      <a href="#" className="text-blue-400 hover:underline">
+                        AI在5s内完成阅读并生成总结
+                      </a>
                     </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </TabsContent>
+                    <div className="bg-slate-700/50 rounded-lg p-4 space-y-3 text-gray-300 text-sm leading-relaxed">
+                      <p>
+                        本文主要讲述医美咨询师如何快速打消顾客的受骗心理，建立信任关系。文章指出顾客因为追求美丽、便宜、权威而来，但又因为害怕上当、失败、疼痛而犹豫不决。
+                      </p>
+                      <p>
+                        文章提出了5大核心策略：1. 通过专业形象建立安全感；2. 展示专业度赢得信任；3.
+                        坦诚告知风险体现诚信；4. 提供合理方案而非盲目推销；5. 建立长期关系而非一次性交易。
+                      </p>
+                      <p>
+                        这些策略的核心思想是：用90%的时间获取信任，10%的时间谈项目。咨询师需要从形象、专业、诚信、方案等多个维度入手，真正站在顾客角度思考问题，才能赢得顾客的信任和认可。
+                      </p>
+                    </div>
+                  </div>
 
-            <TabsContent value="chat" className="flex-1 flex flex-col mt-0 p-4 overflow-hidden">
-              <ScrollArea className="flex-1 mb-4">
-                <div className="space-y-4">
-                  <div className="bg-white/10 rounded-lg p-3">
-                    <p className="text-gray-300 text-sm">
-                      预置问题决策共赢决策决策的心理作用是什么？为什么推荐高利润项目可能得其反?
-                    </p>
+                  {/* 您可以提问我这些 */}
+                  <div className="space-y-3">
+                    <h3 className="text-white font-medium flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-blue-500" />
+                      您可以提问我这些
+                    </h3>
+                    <div className="space-y-2">
+                      <button className="w-full text-left p-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm text-gray-300 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                        帮我总结文档中的核心要点，包括不限于关键策略、实施方法、注意事项等。
+                        <span className="ml-auto text-blue-400">→</span>
+                      </button>
+                      <button className="w-full text-left p-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm text-gray-300 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                        为什么说用90%的时间获取信任比谈项目更重要？
+                        <span className="ml-auto text-blue-400">→</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </ScrollArea>
 
-              <div className="space-y-3">
+              {/* 底部输入框 */}
+              <div className="p-4 border-t border-slate-700 flex-shrink-0">
                 <div className="relative">
                   <Textarea
                     placeholder="请输入您的问题，点击发送按钮进行对话"
                     value={aiQuestion}
                     onChange={(e) => setAiQuestion(e.target.value)}
-                    className="min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-gray-400 pr-12 resize-none"
+                    className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 pr-12 resize-none"
+                    rows={3}
                   />
-                  <Button
-                    size="icon"
-                    className="absolute bottom-2 right-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full w-10 h-10"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="w-5 h-5"
-                    >
-                      <line x1="22" y1="2" x2="11" y2="13"></line>
-                      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
+                  <Button size="icon" className="absolute bottom-2 right-2 bg-blue-600 hover:bg-blue-700">
+                    <Send className="w-4 h-4" />
                   </Button>
                 </div>
-
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mt-2">
+                  <Button size="sm" variant="ghost" className="text-gray-400 hover:text-white">
+                    <FileText className="w-4 h-4 mr-1" />
+                    包网通用
+                  </Button>
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-400 text-sm">图书长文</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="w-4 h-4 text-gray-400"
-                    >
-                      <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-400 text-sm">深度思考R1</span>
+                    <span className="text-sm text-gray-400">深度思考R1</span>
                     <Switch checked={deepThinking} onCheckedChange={setDeepThinking} />
                   </div>
                 </div>
               </div>
             </TabsContent>
 
-            <TabsContent value="mindmap" className="flex-1 flex flex-col mt-0 p-4 overflow-hidden">
-              <div className="flex gap-2 mb-4">
-                <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-white">
-                  <Network className="w-4 h-4 mr-1" />
-                  生成思维导图
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                >
-                  导出图片
-                </Button>
-              </div>
-
-              <div className="flex-1 bg-white/5 rounded-lg border border-white/10 flex items-center justify-center">
-                <div className="text-center">
-                  <Network className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                  <p className="text-gray-400">点击"生成思维导图"按钮</p>
-                  <p className="text-gray-500 text-sm mt-2">AI将自动分析文档内容并生成思维导图</p>
+            <TabsContent value="mindmap" className="flex-1 flex flex-col mt-0 overflow-hidden">
+              <div className="border-b border-slate-700 flex-shrink-0">
+                <div className="flex items-center px-4">
+                  <button
+                    className={`px-4 py-3 text-sm ${mindmapTab === "generate" ? "text-blue-400 border-b-2 border-blue-400" : "text-gray-400"}`}
+                    onClick={() => setMindmapTab("generate")}
+                  >
+                    生成思维导图
+                  </button>
+                  <button
+                    className={`px-4 py-3 text-sm ${mindmapTab === "history" ? "text-blue-400 border-b-2 border-blue-400" : "text-gray-400"}`}
+                    onClick={() => setMindmapTab("history")}
+                  >
+                    导图生成记录
+                  </button>
                 </div>
               </div>
+
+              {mindmapTab === "generate" && (
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  <ScrollArea className="flex-1 p-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-white font-medium">生成结果</h3>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant={mindmapView === "outline" ? "default" : "ghost"}
+                            onClick={() => setMindmapView("outline")}
+                            className={mindmapView === "outline" ? "bg-blue-600" : "text-gray-300"}
+                          >
+                            大纲
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={mindmapView === "map" ? "default" : "ghost"}
+                            onClick={() => setMindmapView("map")}
+                            className={mindmapView === "map" ? "bg-blue-600" : "text-gray-300"}
+                          >
+                            导图
+                          </Button>
+                          <Button size="sm" variant="ghost" className="text-gray-300">
+                            <Download className="w-4 h-4 mr-1" />
+                            下载
+                          </Button>
+                          <Button size="sm" variant="ghost" className="text-gray-300">
+                            <Maximize2 className="w-4 h-4 mr-1" />
+                            全屏
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* 思维导图展示 */}
+                      <div className="bg-slate-700/30 rounded-lg p-6 min-h-[400px] flex items-center justify-center">
+                        <div className="text-center">
+                          <Network className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+                          <p className="text-gray-400">点击"立即生成"按钮</p>
+                          <p className="text-gray-500 text-sm mt-2">AI将自动分析文档内容并生成思维导图</p>
+                        </div>
+                      </div>
+
+                      {/* 生成要求 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">
+                          生成要求<span className="text-red-400">（必填）</span>
+                        </h3>
+                        <Textarea
+                          placeholder="请输入生成思维导图的需求。例如，分析文档的核心要点、关键信息、核心术语，用300字来总结全文的主要内容，要求逻辑严谨和逻辑构清晰。"
+                          value={mindmapRequirement}
+                          onChange={(e) => setMindmapRequirement(e.target.value)}
+                          className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 min-h-[100px]"
+                        />
+                      </div>
+
+                      {/* 输出语言 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">输出语言：</h3>
+                        <div className="flex items-center gap-4">
+                          <button
+                            className={`px-4 py-2 rounded-lg ${mindmapLanguage === "chinese" ? "bg-blue-600 text-white" : "bg-slate-700 text-gray-300"}`}
+                            onClick={() => setMindmapLanguage("chinese")}
+                          >
+                            中文
+                          </button>
+                          <button
+                            className={`px-4 py-2 rounded-lg ${mindmapLanguage === "english" ? "bg-blue-600 text-white" : "bg-slate-700 text-gray-300"}`}
+                            onClick={() => setMindmapLanguage("english")}
+                          >
+                            英文
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollArea>
+
+                  <div className="p-4 border-t border-slate-700 flex-shrink-0">
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                      <FileText className="w-4 h-4 mr-2" />
+                      立即生成
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {mindmapTab === "history" && (
+                <div className="flex-1 p-4">
+                  <div className="text-gray-400 text-center py-8">暂无生成记录</div>
+                </div>
+              )}
             </TabsContent>
 
-            <TabsContent value="notes" className="flex-1 flex flex-col mt-0 p-4 overflow-hidden">
-              <div className="mb-3">
-                <div className="flex items-center gap-2 mb-3 pb-3 border-b border-white/10">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-300 hover:text-white">
-                    <span className="font-bold">B</span>
+            <TabsContent value="notes" className="flex-1 flex flex-col mt-0 overflow-hidden">
+              {/* 富文本编辑器工具栏 */}
+              <div className="border-b border-slate-700 p-2 space-y-2 flex-shrink-0">
+                {/* 第一行工具栏 */}
+                <div className="flex items-center gap-1 flex-wrap">
+                  <Select defaultValue="normal">
+                    <SelectTrigger className="w-20 h-8 bg-slate-700 border-slate-600 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="normal">正文</SelectItem>
+                      <SelectItem value="h1">标题1</SelectItem>
+                      <SelectItem value="h2">标题2</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="w-px h-6 bg-slate-600 mx-1" />
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Smile className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-300 hover:text-white">
-                    <span className="italic">I</span>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Bold className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-300 hover:text-white">
-                    <span className="underline">U</span>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Underline className="w-4 h-4" />
                   </Button>
-                  <div className="w-px h-6 bg-white/10" />
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-300 hover:text-white">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Italic className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-300 hover:text-white">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                      />
-                    </svg>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                  <div className="w-px h-6 bg-slate-600 mx-1" />
+                  <Button size="sm" variant="ghost" className="h-8 px-2 text-gray-300 text-xs">
+                    默认字号
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 px-2 text-gray-300 text-xs">
+                    默认字体
+                  </Button>
+                </div>
+
+                {/* 第二行工具栏 */}
+                <div className="flex items-center gap-1 flex-wrap">
+                  <Button size="sm" variant="ghost" className="h-8 px-2 text-gray-300 text-xs">
+                    默认行高
+                  </Button>
+                  <div className="w-px h-6 bg-slate-600 mx-1" />
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <List className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <ListOrdered className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Smile className="w-4 h-4" />
+                  </Button>
+                  <div className="w-px h-6 bg-slate-600 mx-1" />
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Smile className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Link className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <ImageIcon className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Table className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Code className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <AlignLeft className="w-4 h-4" />
+                  </Button>
+                  <div className="w-px h-6 bg-slate-600 mx-1" />
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Undo className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Redo className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
 
-              <Input
-                placeholder="请输入标题"
-                className="mb-3 bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-              />
-
-              <ScrollArea className="flex-1">
-                <div className="space-y-2 text-white">
-                  <p className="font-medium">如何做一个好的销售</p>
-                  <p className="text-sm text-gray-300">1.好的形象给顾客以安全感</p>
-                  <p className="text-sm text-gray-300">2.专业知识理解给获得用户信任感</p>
-                  <p className="text-sm text-gray-300">3.坦诚告诉顾客，存在的风险。</p>
+              {/* 笔记内容区域 */}
+              <ScrollArea className="flex-1 p-4">
+                <div className="space-y-4">
+                  <Input
+                    placeholder="请输入标题"
+                    value={noteTitle}
+                    onChange={(e) => setNoteTitle(e.target.value)}
+                    className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 text-lg font-medium"
+                  />
+                  <Textarea
+                    placeholder="请输入内容..."
+                    value={noteContent}
+                    onChange={(e) => setNoteContent(e.target.value)}
+                    className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 min-h-[400px] resize-none"
+                  />
                 </div>
               </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="rewrite" className="flex-1 flex flex-col mt-0 p-4 overflow-hidden">
-              <div className="flex gap-2 mb-4">
-                <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-white">
-                  润色优化
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                >
-                  扩写
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                >
-                  缩写
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                >
-                  翻译
-                </Button>
+            <TabsContent value="rewrite" className="flex-1 flex flex-col mt-0 overflow-hidden">
+              <div className="border-b border-slate-700 flex-shrink-0">
+                <div className="flex items-center px-4">
+                  <button
+                    className={`px-4 py-3 text-sm ${rewriteTab === "settings" ? "text-blue-400 border-b-2 border-blue-400" : "text-gray-400"}`}
+                    onClick={() => setRewriteTab("settings")}
+                  >
+                    改写设置
+                  </button>
+                  <button
+                    className={`px-4 py-3 text-sm ${rewriteTab === "result" ? "text-blue-400 border-b-2 border-blue-400" : "text-gray-400"}`}
+                    onClick={() => setRewriteTab("result")}
+                  >
+                    改写结果
+                  </button>
+                </div>
               </div>
 
-              <div className="mb-3">
-                <label className="text-sm text-gray-400 mb-2 block">选择要改写的文本</label>
-                <Textarea
-                  placeholder="粘贴或输入需要改写的内容..."
-                  className="min-h-[120px] bg-white/10 border-white/20 text-white placeholder:text-gray-400 resize-none"
-                />
-              </div>
+              {rewriteTab === "settings" && (
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  <ScrollArea className="flex-1 p-4">
+                    <div className="space-y-6">
+                      {/* 改写方式 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">
+                          改写方式<span className="text-red-400">（必填）</span>
+                        </h3>
+                        <RadioGroup value={rewriteMethod} onValueChange={setRewriteMethod}>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="summary" id="summary" />
+                            <Label htmlFor="summary" className="text-gray-300">
+                              全文总结
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="polish" id="polish" />
+                            <Label htmlFor="polish" className="text-gray-300">
+                              逐段润色
+                            </Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
 
-              <div className="flex-1 bg-white/5 rounded-lg border border-white/10 p-4">
-                <div className="text-sm text-gray-400 mb-2">改写结果</div>
-                <div className="text-gray-300 text-sm">选择改写方式后，AI将在此处显示改写结果</div>
-              </div>
+                      {/* 信息来源 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">信息来源</h3>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="document"
+                              checked={rewriteSources.includes("document")}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setRewriteSources([...rewriteSources, "document"])
+                                } else {
+                                  setRewriteSources(rewriteSources.filter((s) => s !== "document"))
+                                }
+                              }}
+                            />
+                            <Label htmlFor="document" className="text-gray-300">
+                              当前文档内容
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="chat"
+                              checked={rewriteSources.includes("chat")}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setRewriteSources([...rewriteSources, "chat"])
+                                } else {
+                                  setRewriteSources(rewriteSources.filter((s) => s !== "chat"))
+                                }
+                              }}
+                            />
+                            <Label htmlFor="chat" className="text-gray-300">
+                              当前AI对话
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="notes"
+                              checked={rewriteSources.includes("notes")}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setRewriteSources([...rewriteSources, "notes"])
+                                } else {
+                                  setRewriteSources(rewriteSources.filter((s) => s !== "notes"))
+                                }
+                              }}
+                            />
+                            <Label htmlFor="notes" className="text-gray-300">
+                              笔记内容
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox id="knowledge" disabled />
+                            <Label htmlFor="knowledge" className="text-gray-500">
+                              知识库（敬请期待）
+                            </Label>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 优化描述 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">
+                          优化描述<span className="text-red-400">（必填）</span>
+                        </h3>
+                        <Textarea
+                          placeholder="请输入全文总结的需求。例如，分析文档的核心要点、关键信息、核心术语，用300字来总结全文的主要内容，要求逻辑严谨和逻辑构清晰。"
+                          value={rewriteDescription}
+                          onChange={(e) => setRewriteDescription(e.target.value)}
+                          className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 min-h-[100px]"
+                        />
+                      </div>
+
+                      {/* 目标读者是 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">目标读者是</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {["customer", "staff", "doctor", "nurse"].map((audience) => (
+                            <button
+                              key={audience}
+                              className={`px-4 py-2 rounded-lg ${targetAudience === audience ? "bg-blue-600 text-white" : "bg-slate-700 text-gray-300"}`}
+                              onClick={() => setTargetAudience(audience)}
+                            >
+                              {audience === "customer" && "医美客户"}
+                              {audience === "staff" && "医护人员"}
+                              {audience === "doctor" && "医美师"}
+                              {audience === "nurse" && "护士"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 预期写作风格 */}
+                      <div className="space-y-3">
+                        <h3 className="text-white font-medium">预期写作风格</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {["wechat", "xiaohongshu", "douyin"].map((style) => (
+                            <button
+                              key={style}
+                              className={`px-4 py-2 rounded-lg ${writingStyle === style ? "bg-blue-600 text-white" : "bg-slate-700 text-gray-300"}`}
+                              onClick={() => setWritingStyle(style)}
+                            >
+                              {style === "wechat" && "公众号"}
+                              {style === "xiaohongshu" && "小红书"}
+                              {style === "douyin" && "抖音"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollArea>
+
+                  <div className="p-4 border-t border-slate-700 flex-shrink-0">
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                      <FileText className="w-4 h-4 mr-2" />
+                      立即生成
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {rewriteTab === "result" && (
+                <div className="flex-1 p-4">
+                  <div className="text-gray-400 text-center py-8">请先在改写设置中配置并生成内容</div>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
