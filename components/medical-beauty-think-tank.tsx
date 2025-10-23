@@ -29,9 +29,10 @@ export function MedicalBeautyThinkTank() {
   }
 
   return (
-    <div className="flex h-full flex-col bg-background">
-      <div className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="flex h-14 items-center px-6">
+    <div className="flex h-full flex-col">
+      <div className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <div className="px-6 py-4">
+          <h1 className="text-2xl font-bold text-foreground mb-4">医美智库</h1>
           <nav className="flex gap-6">
             <button
               onClick={() => {

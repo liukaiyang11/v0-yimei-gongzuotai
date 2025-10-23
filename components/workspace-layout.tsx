@@ -98,7 +98,11 @@ export function WorkspaceLayout() {
       )
     }
     if (activeSection === "医美智库") {
-      return <MedicalBeautyThinkTank />
+      return (
+        <div className="fixed inset-0 left-20 flex flex-col">
+          <MedicalBeautyThinkTank />
+        </div>
+      )
     }
     return <LaunchpadGrid searchQuery={searchQuery} onAppClick={handleAppClick} addedApps={addedApps} />
   }
@@ -111,7 +115,7 @@ export function WorkspaceLayout() {
       <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
 
       {/* 主内容区域 */}
-      <div className="ml-20 min-h-screen relative z-10">
+      <div className={`ml-20 min-h-screen relative z-10 ${activeSection === "医美智库" ? "" : "px-8"}`}>
         {showSearchBar && (
           <div className="flex justify-center pt-16 pb-8">
             <div className="relative w-full max-w-2xl">
@@ -129,7 +133,9 @@ export function WorkspaceLayout() {
         )}
 
         {/* 内容区域 */}
-        <div className={`px-8 pb-8 ${!showSearchBar ? "pt-8" : ""}`}>{renderContent()}</div>
+        <div className={activeSection === "医美智库" ? "" : `pb-8 ${!showSearchBar ? "pt-8" : ""}`}>
+          {renderContent()}
+        </div>
 
         {activeSection === "启动台" && (
           <div className="fixed bottom-8 right-8 flex flex-col space-y-3">
