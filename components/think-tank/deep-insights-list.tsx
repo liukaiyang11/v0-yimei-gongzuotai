@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, ArrowLeft, Calendar, Clock } from "lucide-react"
+import { Search, Calendar, Clock } from "lucide-react"
 
 interface DeepInsightsListProps {
   selectedCategory: string
@@ -124,18 +124,10 @@ export function DeepInsightsList({ selectedCategory, onArticleClick, onBack }: D
   const allTags = Array.from(new Set(articles.flatMap((a) => a.tags)))
 
   return (
-    <div className="space-y-6">
-      {/* 顶部导航 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" onClick={onBack} className="text-white hover:text-blue-400">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-white">深度观察</h1>
-            <p className="text-gray-400 mt-1">专业视角，深度解读医美行业</p>
-          </div>
-        </div>
+    <div className="space-y-6 p-8">
+      <div>
+        <h1 className="text-3xl font-bold text-white">深度洞察</h1>
+        <p className="text-gray-400 mt-1">专业视角,深度解读医美行业</p>
       </div>
 
       {/* 搜索栏 */}

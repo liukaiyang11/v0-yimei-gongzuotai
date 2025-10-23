@@ -6,15 +6,15 @@ import { DeepInsightsList } from "@/components/think-tank/deep-insights-list"
 import { DeepInsightsDetail } from "@/components/think-tank/deep-insights-detail"
 import { DataCenter } from "@/components/think-tank/data-center"
 
-type ViewType = "homepage" | "insights-list" | "insights-detail" | "data-center"
+type TabType = "homepage" | "insights" | "data-center"
 
 export function MedicalBeautyThinkTank() {
-  const [currentView, setCurrentView] = useState<ViewType>("homepage")
+  const [activeTab, setActiveTab] = useState<TabType>("homepage")
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
 
   const handleNavigateToInsightsList = (category?: string) => {
-    setCurrentView("insights-list")
+    setActiveTab("insights")
     if (category) {
       setSelectedCategory(category)
     }
@@ -22,46 +22,82 @@ export function MedicalBeautyThinkTank() {
 
   const handleNavigateToInsightsDetail = (articleId: string) => {
     setSelectedArticleId(articleId)
-    setCurrentView("insights-detail")
-  }
-
-  const handleNavigateToDataCenter = () => {
-    setCurrentView("data-center")
-  }
-
-  const handleBackToHomepage = () => {
-    setCurrentView("homepage")
-    setSelectedCategory("all")
   }
 
   const handleBackToList = () => {
-    setCurrentView("insights-list")
     setSelectedArticleId(null)
   }
 
-  if (currentView === "insights-detail" && selectedArticleId) {
-    return <DeepInsightsDetail articleId={selectedArticleId} onBack={handleBackToList} />
-  }
-
-  if (currentView === "insights-list") {
-    return (
-      <DeepInsightsList
-        selectedCategory={selectedCategory}
-        onArticleClick={handleNavigateToInsightsDetail}
-        onBack={handleBackToHomepage}
-      />
-    )
-  }
-
-  if (currentView === "data-center") {
-    return <DataCenter onBack={handleBackToHomepage} />
-  }
-
   return (
-    <ThinkTankHomepage
-      onNavigateToInsights={handleNavigateToInsightsList}
-      onNavigateToDataCenter={handleNavigateToDataCenter}
-      onArticleClick={handleNavigateToInsightsDetail}
-    />
+    <div className="flex h-full flex-col bg-background">
+      <div className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-14 items-center px-6">
+          <nav className="flex gap-6">
+            <button
+              onClick={() => {
+                setActiveTab("homepage")
+                setSelectedArticleId(null)
+              }}
+              className={`relative px-1 py-2 text-sm font-medium transition-colors hover:text-foreground ${
+                activeTab === "homepage" ? "text-foreground" : "text-muted-foreground"
+              }`}
+            >
+              首页
+              {activeTab === "homepage" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab("insights")
+                setSelectedArticleId(null)
+              }}
+              className={`relative px-1 py-2 text-sm font-medium transition-colors hover:text-foreground ${
+                activeTab === "insights" ? "text-foreground" : "text-muted-foreground"
+              }`}
+            >
+              深度洞察
+              {activeTab === "insights" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab("data-center")
+                setSelectedArticleId(null)
+              }}
+              className={`relative px-1 py-2 text-sm font-medium transition-colors hover:text-foreground ${
+                activeTab === "data-center" ? "text-foreground" : "text-muted-foreground"
+              }`}
+            >
+              数据中心
+              {activeTab === "data-center" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        {activeTab === "homepage" && (
+          <ThinkTankHomepage
+            onNavigateToInsights={handleNavigateToInsightsList}
+            onNavigateToDataCenter={() => setActiveTab("data-center")}
+            onArticleClick={handleNavigateToInsightsDetail}
+          />
+        )}
+
+        {activeTab === "insights" && (
+          <>
+            {selectedArticleId ? (
+              <DeepInsightsDetail articleId={selectedArticleId} onBack={handleBackToList} />
+            ) : (
+              <DeepInsightsList
+                selectedCategory={selectedCategory}
+                onArticleClick={handleNavigateToInsightsDetail}
+                onBack={() => setActiveTab("homepage")}
+              />
+            )}
+          </>
+        )}
+
+        {activeTab === "data-center" && <DataCenter onBack={() => setActiveTab("homepage")} />}
+      </div>
+    </div>
   )
 }

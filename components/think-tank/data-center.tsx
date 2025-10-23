@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Search, TrendingUp, TrendingDown, ArrowUpDown, Building2 } from "lucide-react"
+import { Search, TrendingUp, TrendingDown, ArrowUpDown, Building2 } from "lucide-react"
 
 interface DataCenterProps {
   onBack: () => void
@@ -177,18 +177,10 @@ export function DataCenter({ onBack }: DataCenterProps) {
   const [searchQuery, setSearchQuery] = useState("")
 
   return (
-    <div className="space-y-6">
-      {/* 顶部导航 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" onClick={onBack} className="text-white hover:text-blue-400">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-white">数据中心</h1>
-            <p className="text-gray-400 mt-1">医美行业全景数据库，助力精准决策</p>
-          </div>
-        </div>
+    <div className="space-y-6 p-8">
+      <div>
+        <h1 className="text-3xl font-bold text-white">数据中心</h1>
+        <p className="text-gray-400 mt-1">医美行业全景数据库，助力精准决策</p>
       </div>
 
       {/* 标签页导航 */}

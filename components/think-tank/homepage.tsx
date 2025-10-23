@@ -127,27 +127,7 @@ const popularReports = [
 
 export function ThinkTankHomepage({ onNavigateToInsights, onNavigateToDataCenter, onArticleClick }: HomepageProps) {
   return (
-    <div className="space-y-8">
-      {/* 顶部导航栏 */}
-      <div className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-sm border-b border-white/10 -mx-8 px-8 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold text-white">医美智库</h1>
-          </div>
-          <nav className="flex items-center space-x-6">
-            <Button variant="ghost" className="text-white hover:text-blue-400">
-              首页
-            </Button>
-            <Button variant="ghost" className="text-gray-400 hover:text-white" onClick={() => onNavigateToInsights()}>
-              深度观察
-            </Button>
-            <Button variant="ghost" className="text-gray-400 hover:text-white" onClick={onNavigateToDataCenter}>
-              数据中心
-            </Button>
-          </nav>
-        </div>
-      </div>
-
+    <div className="space-y-8 p-8">
       {/* 首屏区域 - 封面文章 */}
       <Card
         className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-white/10 overflow-hidden cursor-pointer hover:border-white/30 transition-all"
