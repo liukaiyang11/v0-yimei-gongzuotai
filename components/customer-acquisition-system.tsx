@@ -1,11 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Search, Download } from "lucide-react"
+import { ArrowLeft, Search, Download, Copy, Check, Sparkles, FileText, Wand2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 
 interface CustomerAcquisitionSystemProps {
   onBack: () => void
@@ -43,6 +51,14 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
   const [customerSearchKeyword, setCustomerSearchKeyword] = useState("")
   const [selectedRegion, setSelectedRegion] = useState("不限")
   const [onlyUncontacted, setOnlyUncontacted] = useState(false)
+
+  const [summaryDialogOpen, setSummaryDialogOpen] = useState(false)
+  const [extractDialogOpen, setExtractDialogOpen] = useState(false)
+  const [recreateDialogOpen, setRecreateDialogOpen] = useState(false)
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
+  const [copiedSummary, setCopiedSummary] = useState(false)
+  const [copiedExtract, setCopiedExtract] = useState(false)
+  const [copiedRecreate, setCopiedRecreate] = useState(false)
 
   const platforms = ["全网", "抖音", "小红书", "哔哩哔哩", "快手", "视频号"]
 
@@ -221,7 +237,6 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
   }
 
   const handleExportCustomers = () => {
-    // 创建CSV内容
     const headers = ["序号", "昵称", "地区", "时间", "评论内容", "是否已联系"]
     const csvContent = [
       headers.join(","),
@@ -231,17 +246,15 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
           `"${customer.nickname}"`,
           `"${customer.region}"`,
           `"${customer.time}"`,
-          `"${customer.comment.replace(/"/g, '""')}"`, // 转义双引号
+          `"${customer.comment.replace(/"/g, '""')}"`,
           customer.contacted ? "是" : "否",
         ].join(",")
       }),
     ].join("\n")
 
-    // 添加BOM以支持中文
     const BOM = "\uFEFF"
     const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" })
 
-    // 创建下载链接
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.href = url
@@ -256,9 +269,38 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
     console.log("前往联系客户:", customerId)
   }
 
+  const handleShowSummary = (video: Video) => {
+    setSelectedVideo(video)
+    setSummaryDialogOpen(true)
+    setCopiedSummary(false)
+  }
+
+  const handleShowExtract = (video: Video) => {
+    setSelectedVideo(video)
+    setExtractDialogOpen(true)
+    setCopiedExtract(false)
+  }
+
+  const handleShowRecreate = (video: Video) => {
+    setSelectedVideo(video)
+    setRecreateDialogOpen(true)
+    setCopiedRecreate(false)
+  }
+
+  const copyToClipboard = (text: string, type: "summary" | "extract" | "recreate") => {
+    navigator.clipboard.writeText(text)
+    if (type === "summary") setCopiedSummary(true)
+    if (type === "extract") setCopiedExtract(true)
+    if (type === "recreate") setCopiedRecreate(true)
+    setTimeout(() => {
+      if (type === "summary") setCopiedSummary(false)
+      if (type === "extract") setCopiedExtract(false)
+      if (type === "recreate") setCopiedRecreate(false)
+    }, 2000)
+  }
+
   return (
     <div className="fixed left-20 top-0 right-0 bottom-0 bg-slate-900 flex flex-col">
-      {/* 顶部导航栏 */}
       <div className="h-16 bg-slate-800/50 backdrop-blur-sm border-b border-slate-700/50 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack} className="hover:bg-slate-700 text-slate-200">
@@ -278,11 +320,9 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
         )}
       </div>
 
-      {/* 主内容区域 */}
       <div className="flex-1 overflow-hidden">
         {activeTab === "search" ? (
           <div className="h-full flex flex-col">
-            {/* 顶部横幅 */}
             <div className="bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 p-8">
               <div className="max-w-6xl mx-auto text-center">
                 <h2 className="text-3xl font-bold text-white mb-2">医美获客神器</h2>
@@ -290,7 +330,6 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
               </div>
             </div>
 
-            {/* 搜索栏 */}
             <div className="bg-slate-800/30 p-6">
               <div className="max-w-6xl mx-auto">
                 <div className="flex gap-4">
@@ -309,7 +348,6 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
                   </Button>
                 </div>
 
-                {/* 平台选择 */}
                 <div className="flex gap-2 mt-4">
                   {platforms.map((platform) => (
                     <Button
@@ -383,11 +421,32 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
                               </td>
                               <td className="px-4 py-4">
                                 <div className="flex items-center justify-center gap-2">
-                                  <Button variant="link" size="sm" className="text-blue-400 hover:text-blue-300">
-                                    去水印
+                                  <Button
+                                    variant="link"
+                                    size="sm"
+                                    className="text-blue-400 hover:text-blue-300"
+                                    onClick={() => handleShowSummary(video)}
+                                  >
+                                    <Sparkles className="w-3 h-3 mr-1" />
+                                    总结摘要
                                   </Button>
-                                  <Button variant="link" size="sm" className="text-blue-400 hover:text-blue-300">
+                                  <Button
+                                    variant="link"
+                                    size="sm"
+                                    className="text-blue-400 hover:text-blue-300"
+                                    onClick={() => handleShowExtract(video)}
+                                  >
+                                    <FileText className="w-3 h-3 mr-1" />
                                     提取文案
+                                  </Button>
+                                  <Button
+                                    variant="link"
+                                    size="sm"
+                                    className="text-purple-400 hover:text-purple-300"
+                                    onClick={() => handleShowRecreate(video)}
+                                  >
+                                    <Wand2 className="w-3 h-3 mr-1" />
+                                    进行二创
                                   </Button>
                                   <Button
                                     size="sm"
@@ -420,7 +479,6 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
           </div>
         ) : (
           <div className="h-full flex flex-col">
-            {/* 筛选栏 */}
             <div className="bg-slate-800/30 p-6 border-b border-slate-700/50">
               <div className="max-w-7xl mx-auto">
                 <div className="flex items-center gap-4 mb-4">
@@ -467,7 +525,6 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
               </div>
             </div>
 
-            {/* 客户列表 */}
             <div className="flex-1 overflow-hidden bg-slate-900/50">
               <div className="max-w-7xl mx-auto p-6">
                 <ScrollArea className="h-[calc(100vh-250px)]">
@@ -520,6 +577,275 @@ export function CustomerAcquisitionSystem({ onBack }: CustomerAcquisitionSystemP
           </div>
         )}
       </div>
+
+      <Dialog open={summaryDialogOpen} onOpenChange={setSummaryDialogOpen}>
+        <DialogContent className="max-w-2xl bg-slate-800 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Sparkles className="w-5 h-5 text-blue-400" />
+              视频总结摘要
+            </DialogTitle>
+            <DialogDescription className="text-slate-400">AI智能分析视频内容，提取核心要点</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+              <h4 className="text-sm font-medium text-slate-300 mb-2">视频信息</h4>
+              <p className="text-white text-sm">{selectedVideo?.title}</p>
+              <p className="text-slate-400 text-xs mt-1">
+                作者：{selectedVideo?.author.name} | 发布时间：{selectedVideo?.publishTime}
+              </p>
+            </div>
+
+            <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+              <h4 className="text-sm font-medium text-slate-300 mb-3">核心内容摘要</h4>
+              <div className="space-y-3 text-sm text-slate-200">
+                <div className="flex gap-2">
+                  <span className="text-blue-400 font-semibold">•</span>
+                  <p>魔脂针是一种新型溶脂注射产品，主要成分为去氧胆酸，能够有效分解脂肪细胞</p>
+                </div>
+                <div className="flex gap-2">
+                  <span className="text-blue-400 font-semibold">•</span>
+                  <p>适用于局部脂肪堆积部位，如双下巴、腰腹部等，效果因人而异</p>
+                </div>
+                <div className="flex gap-2">
+                  <span className="text-blue-400 font-semibold">•</span>
+                  <p>注射后可能出现轻微肿胀、发红等正常反应，通常3-7天消退</p>
+                </div>
+                <div className="flex gap-2">
+                  <span className="text-blue-400 font-semibold">•</span>
+                  <p>建议选择正规医疗机构和有资质的医生进行操作，确保安全性</p>
+                </div>
+                <div className="flex gap-2">
+                  <span className="text-blue-400 font-semibold">•</span>
+                  <p>一般需要2-4次治疗才能达到理想效果，间隔4-6周</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+              <h4 className="text-sm font-medium text-slate-300 mb-2">用户关注点</h4>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">安全性</span>
+                <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">价格</span>
+                <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">效果持久性</span>
+                <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">副作用</span>
+                <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">恢复期</span>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() =>
+                copyToClipboard(
+                  `视频总结：${selectedVideo?.title}\n\n核心内容：\n• 魔脂针是一种新型溶脂注射产品...\n• 适用于局部脂肪堆积部位...\n• 注射后可能出现轻微肿胀...\n• 建议选择正规医疗机构...\n• 一般需要2-4次治疗...`,
+                  "summary",
+                )
+              }
+              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+            >
+              {copiedSummary ? (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  已复制
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4 mr-2" />
+                  复制摘要
+                </>
+              )}
+            </Button>
+            <Button onClick={() => setSummaryDialogOpen(false)} className="bg-blue-600 hover:bg-blue-700">
+              关闭
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={extractDialogOpen} onOpenChange={setExtractDialogOpen}>
+        <DialogContent className="max-w-2xl bg-slate-800 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <FileText className="w-5 h-5 text-green-400" />
+              提取视频文案
+            </DialogTitle>
+            <DialogDescription className="text-slate-400">智能识别并提取视频中的文字内容</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+              <h4 className="text-sm font-medium text-slate-300 mb-2">视频标题</h4>
+              <p className="text-white text-sm">{selectedVideo?.title}</p>
+            </div>
+
+            <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+              <h4 className="text-sm font-medium text-slate-300 mb-3">提取的文案内容</h4>
+              <div className="space-y-2 text-sm text-slate-200 leading-relaxed">
+                <p className="text-blue-300 font-medium">【开场】</p>
+                <p>姐妹们！今天来跟大家聊聊最近超火的魔脂针💉</p>
+
+                <p className="text-blue-300 font-medium mt-3">【核心内容】</p>
+                <p>很多人问我魔脂针到底能不能溶脂？安全吗？作为从业多年的医美医生，我必须告诉大家真相！</p>
+                <p>
+                  魔脂针的主要成分是去氧胆酸，这是一种能够破坏脂肪细胞膜的物质。简单来说，它确实可以溶解脂肪，但是！重点来了⚠️
+                </p>
+
+                <p className="text-blue-300 font-medium mt-3">【注意事项】</p>
+                <p>1️⃣ 一定要去正规医疗机构</p>
+                <p>2️⃣ 选择有资质的医生操作</p>
+                <p>3️⃣ 不是所有人都适合打魔脂针</p>
+                <p>4️⃣ 术后护理很重要</p>
+
+                <p className="text-blue-300 font-medium mt-3">【结尾】</p>
+                <p>想了解更多医美知识，记得关注我哦～有问题随时私信💌</p>
+
+                <p className="text-slate-400 text-xs mt-3">#魔脂针 #医美科普 #溶脂针 #医美医生</p>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() =>
+                copyToClipboard(
+                  `【开场】\n姐妹们！今天来跟大家聊聊最近超火的魔脂针💉\n\n【核心内容】\n很多人问我魔脂针到底能不能溶脂？安全吗？...\n\n【注意事项】\n1️⃣ 一定要去正规医疗机构\n2️⃣ 选择有资质的医生操作...\n\n#魔脂针 #医美科普 #溶脂针 #医美医生`,
+                  "extract",
+                )
+              }
+              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+            >
+              {copiedExtract ? (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  已复制
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4 mr-2" />
+                  复制文案
+                </>
+              )}
+            </Button>
+            <Button onClick={() => setExtractDialogOpen(false)} className="bg-green-600 hover:bg-green-700">
+              关闭
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={recreateDialogOpen} onOpenChange={setRecreateDialogOpen}>
+        <DialogContent className="max-w-3xl bg-slate-800 border-slate-700 text-white max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Wand2 className="w-5 h-5 text-purple-400" />
+              AI二次创作建议
+            </DialogTitle>
+            <DialogDescription className="text-slate-400">
+              基于原视频内容，为您生成多种创作方向和文案模板
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+              <h4 className="text-sm font-medium text-slate-300 mb-2">原视频</h4>
+              <p className="text-white text-sm">{selectedVideo?.title}</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-lg p-4 border border-purple-500/30">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-base font-semibold text-purple-300">方向一：对比测评类</h4>
+                <span className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-xs">推荐</span>
+              </div>
+              <p className="text-sm text-slate-300 mb-3">将魔脂针与其他溶脂方式进行对比，突出优劣势</p>
+              <div className="bg-slate-900/50 rounded p-3 text-sm text-slate-200 leading-relaxed">
+                <p className="text-purple-300 font-medium mb-2">📝 参考文案：</p>
+                <p>魔脂针 VS 吸脂手术 VS 冷冻溶脂，哪个更适合你？</p>
+                <p className="mt-2">今天用一张表格告诉你三种溶脂方式的区别👇</p>
+                <p className="mt-2">💰价格对比：魔脂针2000-5000/次，吸脂手术8000-20000，冷冻溶脂3000-8000</p>
+                <p className="mt-2">⏰恢复期：魔脂针3-7天，吸脂1-3个月，冷冻溶脂1-2周</p>
+                <p className="mt-2">✨效果：魔脂针渐进式，吸脂立竿见影，冷冻溶脂温和持久</p>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-lg p-4 border border-blue-500/30">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-base font-semibold text-blue-300">方向二：避坑指南类</h4>
+                <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs">高互动</span>
+              </div>
+              <p className="text-sm text-slate-300 mb-3">分享打魔脂针的注意事项和常见误区</p>
+              <div className="bg-slate-900/50 rounded p-3 text-sm text-slate-200 leading-relaxed">
+                <p className="text-blue-300 font-medium mb-2">📝 参考文案：</p>
+                <p>打魔脂针前必看！这5个坑千万别踩❌</p>
+                <p className="mt-2">1️⃣ 不要贪便宜选择非正规机构</p>
+                <p>2️⃣ 不要一次打太多剂量</p>
+                <p>3️⃣ 不要忽视术后护理</p>
+                <p>4️⃣ 不要期望一次见效</p>
+                <p>5️⃣ 不要在生理期或孕期注射</p>
+                <p className="mt-2">姐妹们记得收藏保存！💾</p>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-lg p-4 border border-green-500/30">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-base font-semibold text-green-300">方向三：真实体验类</h4>
+                <span className="px-2 py-1 bg-green-500/20 text-green-300 rounded text-xs">高转化</span>
+              </div>
+              <p className="text-sm text-slate-300 mb-3">记录完整的治疗过程和效果变化</p>
+              <div className="bg-slate-900/50 rounded p-3 text-sm text-slate-200 leading-relaxed">
+                <p className="text-green-300 font-medium mb-2">📝 参考文案：</p>
+                <p>打魔脂针30天全记录📹 真实效果大公开</p>
+                <p className="mt-2">Day 1: 刚打完，有点肿胀但不疼</p>
+                <p>Day 7: 肿胀消退，开始看到轮廓变化</p>
+                <p>Day 15: 效果越来越明显了！</p>
+                <p>Day 30: 对比图来了，姐妹们看看变化👀</p>
+                <p className="mt-2">全程无滤镜无美颜，真实记录分享给你们～</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+              <h4 className="text-sm font-medium text-slate-300 mb-2">💡 创作小贴士</h4>
+              <ul className="text-sm text-slate-400 space-y-1">
+                <li>• 使用真实对比图增加可信度</li>
+                <li>• 添加相关话题标签提高曝光</li>
+                <li>• 在评论区积极互动回复问题</li>
+                <li>• 可以制作系列内容持续输出</li>
+              </ul>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() =>
+                copyToClipboard(
+                  `二创方向1：对比测评类\n魔脂针 VS 吸脂手术 VS 冷冻溶脂...\n\n二创方向2：避坑指南类\n打魔脂针前必看！这5个坑千万别踩...\n\n二创方向3：真实体验类\n打魔脂针30天全记录...`,
+                  "recreate",
+                )
+              }
+              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+            >
+              {copiedRecreate ? (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  已复制
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4 mr-2" />
+                  复制全部
+                </>
+              )}
+            </Button>
+            <Button onClick={() => setRecreateDialogOpen(false)} className="bg-purple-600 hover:bg-purple-700">
+              关闭
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
