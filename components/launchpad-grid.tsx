@@ -34,10 +34,10 @@ interface LaunchpadGridProps {
 }
 
 const defaultAppIds = [
-  "collaborative-service",
+  "customer-acquisition",
   "ad-compliance",
   "sales-assistant",
-  "customer-acquisition",
+  "collaborative-service",
   "content-workshop",
   "ai-ppt",
   "ai-writing",
@@ -50,7 +50,7 @@ const defaultAppIds = [
 const apps = [
   {
     id: "collaborative-service",
-    name: "智能协同服务工作台",
+    name: "智能群聊服务工作台", // Renamed from 智能协同服务工作台
     description: "群聊协同·AI辅助",
     icon: Users,
     gradient: "from-blue-500 to-indigo-600",
