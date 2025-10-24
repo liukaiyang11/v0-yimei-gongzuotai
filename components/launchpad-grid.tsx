@@ -70,8 +70,8 @@ const apps = [
   },
   {
     id: "sales-assistant",
-    name: "AI销售助理",
-    description: "销售智能助手",
+    name: "AI协作助理",
+    description: "AI协作智能助手",
     icon: DollarSign,
     gradient: "from-blue-500 to-blue-600",
     bgColor: "bg-blue-500",

@@ -9,7 +9,7 @@ import { Sidebar } from "@/components/sidebar"
 import { KnowledgeBase } from "@/components/knowledge-base"
 import { IndustryKnowledgeBase } from "@/components/industry-knowledge-base"
 import { AdComplianceReview } from "@/components/ad-compliance-review"
-import { AISalesAssistant } from "@/components/ai-sales-assistant"
+import { AICollaborationAssistant } from "@/components/ai-collaboration-assistant"
 import { CollaborativeServicePlatform } from "@/components/collaborative-service-platform"
 import { CustomerAcquisitionSystem } from "@/components/customer-acquisition-system"
 import { AppMarketplace } from "@/components/app-marketplace"
@@ -27,7 +27,7 @@ export function WorkspaceLayout() {
     courseTitle: "",
   })
   const [showAdCompliance, setShowAdCompliance] = useState(false)
-  const [showSalesAssistant, setShowSalesAssistant] = useState(false)
+  const [showCollaborationAssistant, setShowCollaborationAssistant] = useState(false)
   const [showCollaborativeService, setShowCollaborativeService] = useState(false)
   const [showCustomerAcquisition, setShowCustomerAcquisition] = useState(false)
   const [showAppMarketplace, setShowAppMarketplace] = useState(false)
@@ -51,7 +51,7 @@ export function WorkspaceLayout() {
       setShowAdCompliance(true)
     }
     if (appId === "sales-assistant") {
-      setShowSalesAssistant(true)
+      setShowCollaborationAssistant(true)
     }
     if (appId === "collaborative-service") {
       setShowCollaborativeService(true)
@@ -75,8 +75,8 @@ export function WorkspaceLayout() {
     return <CollaborativeServicePlatform onBack={() => setShowCollaborativeService(false)} />
   }
 
-  if (showSalesAssistant) {
-    return <AISalesAssistant onBack={() => setShowSalesAssistant(false)} />
+  if (showCollaborationAssistant) {
+    return <AICollaborationAssistant onBack={() => setShowCollaborationAssistant(false)} />
   }
 
   if (showAdCompliance) {

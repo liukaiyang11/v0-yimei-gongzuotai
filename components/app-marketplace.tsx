@@ -48,7 +48,13 @@ const allApps: App[] = [
     icon: "UserSearch",
     category: "featured",
   },
-  { id: "sales-assistant", name: "AI销售助理", description: "销售智能助手", icon: "DollarSign", category: "featured" },
+  {
+    id: "sales-assistant",
+    name: "AI协作助理",
+    description: "AI协作智能助手",
+    icon: "DollarSign",
+    category: "featured",
+  },
   {
     id: "doctor-assistant",
     name: "医生专业助手",
@@ -366,8 +372,8 @@ const allApps: App[] = [
   { id: "decision-cockpit", name: "决策驾驶舱", description: "数据分析决策", icon: "Gauge", category: "marketing" },
   {
     id: "sales-assistant-marketing",
-    name: "AI销售助理",
-    description: "销售智能助手",
+    name: "AI协作助理",
+    description: "AI协作智能助手",
     icon: "DollarSign",
     category: "marketing",
   },
