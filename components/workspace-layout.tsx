@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Search, Plus } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Search, Plus, Leaf } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { LaunchpadGrid } from "@/components/launchpad-grid"
@@ -14,6 +14,9 @@ import { CollaborativeServicePlatform } from "@/components/collaborative-service
 import { CustomerAcquisitionSystem } from "@/components/customer-acquisition-system"
 import { AppMarketplace } from "@/components/app-marketplace"
 import { MedicalBeautyThinkTank } from "@/components/medical-beauty-think-tank"
+import { Screensaver } from "@/components/screensaver"
+
+const IDLE_TIMEOUT = 5 * 60 * 1000 // 5 minutes in milliseconds
 
 export function WorkspaceLayout() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -31,6 +34,9 @@ export function WorkspaceLayout() {
   const [showCollaborativeService, setShowCollaborativeService] = useState(false)
   const [showCustomerAcquisition, setShowCustomerAcquisition] = useState(false)
   const [showAppMarketplace, setShowAppMarketplace] = useState(false)
+  const [showScreensaver, setShowScreensaver] = useState(false)
+
+  const idleTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const [addedApps, setAddedApps] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
@@ -45,6 +51,45 @@ export function WorkspaceLayout() {
       localStorage.setItem("addedApps", JSON.stringify(addedApps))
     }
   }, [addedApps])
+
+  useEffect(() => {
+    if (activeSection !== "启动台") {
+      // Clear timer if not on launchpad
+      if (idleTimerRef.current) {
+        clearTimeout(idleTimerRef.current)
+        idleTimerRef.current = null
+      }
+      return
+    }
+
+    const resetIdleTimer = () => {
+      if (idleTimerRef.current) {
+        clearTimeout(idleTimerRef.current)
+      }
+      idleTimerRef.current = setTimeout(() => {
+        setShowScreensaver(true)
+      }, IDLE_TIMEOUT)
+    }
+
+    // Events that reset the idle timer
+    const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart", "click"]
+
+    events.forEach((event) => {
+      document.addEventListener(event, resetIdleTimer)
+    })
+
+    // Start the timer
+    resetIdleTimer()
+
+    return () => {
+      events.forEach((event) => {
+        document.removeEventListener(event, resetIdleTimer)
+      })
+      if (idleTimerRef.current) {
+        clearTimeout(idleTimerRef.current)
+      }
+    }
+  }, [activeSection])
 
   const handleAppClick = (appId: string) => {
     if (appId === "ad-compliance") {
@@ -65,6 +110,10 @@ export function WorkspaceLayout() {
     if (!addedApps.includes(appId)) {
       setAddedApps([...addedApps, appId])
     }
+  }
+
+  if (showScreensaver) {
+    return <Screensaver onExit={() => setShowScreensaver(false)} />
   }
 
   if (showCustomerAcquisition) {
@@ -139,6 +188,14 @@ export function WorkspaceLayout() {
 
         {activeSection === "启动台" && (
           <div className="fixed bottom-8 right-8 flex flex-col space-y-3">
+            <Button
+              size="icon"
+              onClick={() => setShowScreensaver(true)}
+              className="w-12 h-12 rounded-full bg-white/90 hover:bg-white text-gray-600 hover:text-gray-800 shadow-lg backdrop-blur-sm border-0 transition-all duration-300 hover:scale-110"
+              title="进入屏保模式"
+            >
+              <Leaf className="w-5 h-5" />
+            </Button>
             <Button
               size="icon"
               onClick={() => setShowAppMarketplace(true)}
