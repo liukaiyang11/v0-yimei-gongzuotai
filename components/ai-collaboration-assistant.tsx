@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useRef, useEffect } from "react"
 import {
   ArrowLeft,
@@ -27,8 +25,7 @@ import {
   ChevronUp,
   X,
   GripVertical,
-  CheckCircle2,
-  AlertCircle,
+  Check,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -114,98 +111,66 @@ const mockProducts = [
   },
 ]
 
-const mockChatHistory = [
-  { role: "customer", name: "张女士", time: "14:23", message: "你好，我想咨询一下抗衰老的项目" },
+const mockASRTranscript = [
+  { timestamp: "00:00:23", speaker: "客户-张女士", text: "你好，我想咨询一下抗衰老的项目" },
   {
-    role: "consultant",
-    name: "李顾问",
-    time: "14:24",
-    message: "您好张女士！很高兴为您服务。请问您主要关注面部哪个部位的抗衰老呢？",
+    timestamp: "00:00:34",
+    speaker: "咨询师-李顾问",
+    text: "您好张女士！很高兴为您服务。请问您主要关注面部哪个部位的抗衰老呢？",
   },
   {
-    role: "customer",
-    name: "张女士",
-    time: "14:25",
-    message: "主要是法令纹比较明显，还有一些细纹。我今年28岁，感觉皮肤状态下降得比较快",
+    timestamp: "00:00:55",
+    speaker: "客户-张女士",
+    text: "主要是法令纹比较明显，还有一些细纹。我今年28岁，感觉皮肤状态下降得比较快",
   },
   {
-    role: "consultant",
-    name: "李顾问",
-    time: "14:26",
-    message:
-      "理解您的担忧。28岁开始抗衰是很好的时机。针对法令纹，我们有几种方案：热玛吉、超声刀、水光针等。您之前有了解过这些项目吗？",
+    timestamp: "00:01:16",
+    speaker: "咨询师-李顾问",
+    text: "理解您的担忧。28岁开始抗衰是很好的时机。针对法令纹，我们有几种方案：热玛吉、超声刀、水光针等。您之前有了解过这些项目吗？",
   },
   {
-    role: "customer",
-    name: "张女士",
-    time: "14:27",
-    message: "听说过热玛吉和超声刀，但是不太了解具体效果。我比较担心恢复期的问题，因为工作比较忙",
+    timestamp: "00:01:37",
+    speaker: "客户-张女士",
+    text: "听说过热玛吉和超声刀，但是不太了解具体效果。我比较担心恢复期的问题，因为工作比较忙",
   },
   {
-    role: "consultant",
-    name: "李顾问",
-    time: "14:28",
-    message:
-      "完全理解。热玛吉和超声刀都是无创项目，基本没有恢复期，做完就可以正常工作生活。热玛吉主要通过射频能量刺激胶原蛋白再生，效果可以维持1-2年",
+    timestamp: "00:01:58",
+    speaker: "咨询师-李顾问",
+    text: "完全理解。热玛吉和超声刀都是无创项目，基本没有恢复期，做完就可以正常工作生活。热玛吉主要通过射频能量刺激胶原蛋白再生，效果可以维持1-2年",
   },
-  { role: "customer", name: "张女士", time: "14:29", message: "听起来不错。那会不会很疼？我比较怕疼" },
+  { timestamp: "00:02:19", speaker: "客户-张女士", text: "听起来不错。那会不会很疼？我比较怕疼" },
   {
-    role: "consultant",
-    name: "李顾问",
-    time: "14:30",
-    message:
-      "热玛吉治疗过程中会有一定的热感，但我们会根据您的耐受度调整能量。大部分客户都能接受，如果特别敏感也可以敷麻药",
+    timestamp: "00:02:30",
+    speaker: "咨询师-李顾问",
+    text: "热玛吉治疗过程中会有一定的热感，但我们会根据您的耐受度调整能量。大部分客户都能接受，如果特别敏感也可以敷麻药",
   },
+  { timestamp: "00:02:51", speaker: "客户-张女士", text: "那价格大概是多少呢？我预算在5000左右" },
   {
-    role: "customer",
-    name: "张女士",
-    time: "14:31",
-    message: "那价格大概是多少呢？我预算在5000左右",
+    timestamp: "00:03:13",
+    speaker: "咨询师-李顾问",
+    text: "热玛吉全脸的价格一般在8000-15000之间。如果预算在5000左右，我建议您可以考虑水光针+肉毒素的组合方案，效果也很好",
   },
+  { timestamp: "00:03:34", speaker: "客户-张女士", text: "水光针和肉毒素有什么区别？会不会有副作用？" },
   {
-    role: "consultant",
-    name: "李顾问",
-    time: "14:33",
-    message:
-      "热玛吉全脸的价格一般在8000-15000之间。如果预算在5000元左右，我建议您可以考虑水光针+肉毒素的组合方案，效果也很好",
+    timestamp: "00:03:55",
+    speaker: "咨询师-李顾问",
+    text: "水光针主要是补水保湿，改善肤质；肉毒素是放松肌肉，减少动态纹。两者结合效果更好。副作用方面，只要选择正规产品和专业医生操作，是非常安全的",
   },
   {
-    role: "customer",
-    name: "张女士",
-    time: "14:34",
-    message: "水光针和肉毒素有什么区别？会不会有副作用？",
+    timestamp: "00:04:17",
+    speaker: "客户-张女士",
+    text: "好的，我再考虑一下。对了，我皮肤比较敏感，经常会泛红，这种情况能做吗？",
   },
   {
-    role: "consultant",
-    name: "李顾问",
-    time: "14:35",
-    message:
-      "水光针主要是补水保湿，改善肤质；肉毒素是放松肌肉，减少动态纹。两者结合效果更好。副作用方面，只要选择正规产品和专业医生操作，是非常安全的",
+    timestamp: "00:04:38",
+    speaker: "咨询师-李顾问",
+    text: "敏感肌是可以做的，但需要先做皮肤测试。我们会根据您的皮肤状况调整方案。另外，建议您先做好基础的皮肤屏障修复",
   },
+  { timestamp: "00:05:00", speaker: "客户-张女士", text: "明白了。那我想先预约一个面诊，详细了解一下" },
   {
-    role: "customer",
-    name: "张女士",
-    time: "14:37",
-    message: "好的，我再考虑一下。对了，我皮肤比较敏感，经常会泛红，这种情况能做吗？",
-  },
-  {
-    role: "consultant",
-    name: "李顾问",
-    time: "14:38",
-    message:
-      "敏感肌是可以做的，但需要先做皮肤测试。我们会根据您的皮肤状况调整方案。另外，建议您先做好基础的皮肤屏障修复",
-  },
-  {
-    role: "customer",
-    name: "张女士",
-    time: "14:40",
-    message: "明白了。那我想先预约一个面诊，详细了解一下",
-  },
-  {
-    role: "consultant",
-    name: "李顾问",
-    time: "14:41",
-    message: "好的！我这边帮您安排本周五下午3点的面诊，届时我们的专业医生会为您做详细的皮肤检测和方案设计",
+    timestamp: "00:05:11",
+    speaker: "咨询师-李顾问",
+    text: "好的！我这边帮您安排本周五下午3点的面诊，届时我们的专业医生会为您做详细的皮肤检测和方案设计",
   },
 ]
 
@@ -221,27 +186,24 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
   const [expandedHabits, setExpandedHabits] = useState(false)
 
   const [showChatHistory, setShowChatHistory] = useState(false)
-  const [showSavePlanDialog, setShowSavePlanDialog] = useState(false)
-  const [showReportDialog, setShowReportDialog] = useState(false)
+  const [showAddFromRecommendation, setShowAddFromRecommendation] = useState(false)
+  const [showPlanReport, setShowPlanReport] = useState(false)
+  const [selectedRecommendations, setSelectedRecommendations] = useState<number[]>([])
+  const [selectedPhase, setSelectedPhase] = useState("第一阶段")
 
-  const [leftWidth, setLeftWidth] = useState(320) // 初始宽度 320px (w-80)
+  const [leftWidth, setLeftWidth] = useState(320)
   const [isResizing, setIsResizing] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsResizing(true)
-  }
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizing || !containerRef.current) return
 
       const containerRect = containerRef.current.getBoundingClientRect()
-      const newWidth = e.clientX - containerRect.left - 80 // 减去左侧sidebar的80px
+      const newWidth = e.clientX - containerRect.left - 80 // 80 is sidebar width
 
-      // 限制最小和最大宽度
-      if (newWidth >= 240 && newWidth <= 600) {
+      // Constrain width between 280px and 600px
+      if (newWidth >= 280 && newWidth <= 600) {
         setLeftWidth(newWidth)
       }
     }
@@ -277,13 +239,26 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
       frequency: "每日1次",
       notes: "",
       phase: "第一阶段",
-      reasoning:
-        "根据客户28岁年龄段和敏感肌特点，此产品能够温和修复皮肤屏障，改善法令纹问题。客户偏好高端护肤品，此产品匹配度高。",
-      customerNeed: "改善法令纹、敏感肌修复",
-      expectedEffect: "2-4周内改善肤质，减淡细纹",
-      precautions: "敏感肌需先做皮肤测试，建议从小剂量开始使用",
     }
     setPlanItems([...planItems, newItem])
+  }
+
+  const addSelectedToPlan = () => {
+    const newItems = mockProducts
+      .filter((product) => selectedRecommendations.includes(product.id))
+      .map((product) => ({
+        id: Date.now() + product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        frequency: "每日1次",
+        notes: "",
+        phase: selectedPhase,
+      }))
+
+    setPlanItems([...planItems, ...newItems])
+    setSelectedRecommendations([])
+    setShowAddFromRecommendation(false)
   }
 
   const removeFromPlan = (id: number) => {
@@ -297,16 +272,13 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
     }, 0)
   }
 
-  const handleSavePlan = () => {
-    setShowSavePlanDialog(true)
-    // 模拟保存操作
-    setTimeout(() => {
-      setShowSavePlanDialog(false)
-    }, 2000)
+  const toggleRecommendation = (id: number) => {
+    setSelectedRecommendations((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]))
   }
 
-  const handleGenerateReport = () => {
-    setShowReportDialog(true)
+  const openAddModal = (phase: string) => {
+    setSelectedPhase(phase)
+    setShowAddFromRecommendation(true)
   }
 
   return (
@@ -323,9 +295,9 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
       </div>
 
       <div ref={containerRef} className="flex h-[calc(100vh-4rem)]">
-        {/* 左侧栏 - 客户信息中心 (可调整宽度) */}
+        {/* 左侧栏 - 客户信息中心 (可调整大小) */}
         <div
-          style={{ width: `${leftWidth}px` }}
+          style={{ width: leftWidth }}
           className="border-r border-slate-700/50 bg-slate-900/50 backdrop-blur-sm flex-shrink-0"
         >
           <ScrollArea className="h-full">
@@ -417,11 +389,12 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
         </div>
 
         <div
-          className="w-1 bg-slate-700/50 hover:bg-blue-500/50 cursor-col-resize flex items-center justify-center group transition-colors relative"
-          onMouseDown={handleMouseDown}
+          className="w-1 bg-slate-700/50 hover:bg-blue-500/50 cursor-col-resize flex items-center justify-center group transition-colors"
+          onMouseDown={() => setIsResizing(true)}
         >
-          <div className="absolute inset-y-0 -left-1 -right-1" />
-          <GripVertical className="w-4 h-4 text-slate-600 group-hover:text-blue-400 transition-colors" />
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+            <GripVertical className="w-4 h-4 text-slate-400" />
+          </div>
         </div>
 
         {/* 右侧主区域 - 核心功能工作台 (Tab切换) */}
@@ -483,13 +456,13 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                       <div className="bg-slate-900/50 rounded-lg p-4">
                         <h4 className="text-xs font-semibold text-blue-300 mb-2">客户基本情况</h4>
                         <p className="text-sm text-slate-300 leading-relaxed">
-                          客户张女士，28岁，主要关注面部抗衰老问题，特别是法令纹的改善。她表示皮肤较为敏感，经常出现泛红现象，需要特别注意产品和项目的温和性。
+                          客户张女士，28岁，主要关注面部抗衰老问题，特别是法令纹的改善。她表示皮肤较为敏感，需要特别注意产品和项目的温和性。
                         </p>
                       </div>
                       <div className="bg-slate-900/50 rounded-lg p-4">
                         <h4 className="text-xs font-semibold text-green-300 mb-2">核心需求分析</h4>
                         <p className="text-sm text-slate-300 leading-relaxed">
-                          客户希望选择温和且有效的治疗方案，预算控制在5000元以内。倾向于无创或微创项目，特别强调不希望有明显的恢复期，因为工作较忙。对疼痛比较敏感，需要在治疗过程中特别关注舒适度。
+                          客户希望选择温和且有效的治疗方案，预算控制在5000元以内。倾向于无创或微创项目，特别强调不希望有明显的恢复期，因为工作较忙。对疼痛比较敏感，需要在咨询时详细说明麻醉方案和舒适度保障措施。
                         </p>
                       </div>
                       <div className="bg-slate-900/50 rounded-lg p-4">
@@ -738,7 +711,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
             <TabsContent value="recommendation" className="flex-1 m-0 overflow-hidden">
               <div className="flex h-full">
                 {/* 产品推荐列表 */}
-                <div className="flex-1 bg-slate-900/30 overflow-hidden">
+                <div className="flex-1 bg-slate-900/30">
                   <ScrollArea className="h-full">
                     <div className="p-6 space-y-6">
                       {/* 排序按钮 */}
@@ -850,7 +823,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                 </div>
 
                 {/* 产品详情侧边栏 */}
-                <div className="w-96 border-l border-slate-700/50 bg-slate-900/50 backdrop-blur-sm overflow-hidden">
+                <div className="w-96 border-l border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
                   <ScrollArea className="h-full">
                     <div className="p-6 space-y-6">
                       {/* 产品大图 */}
@@ -867,15 +840,6 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                         <h2 className="text-xl font-bold text-white">{selectedProduct.name}</h2>
                         <p className="text-3xl font-bold text-blue-400 mt-2">{selectedProduct.price}</p>
                       </div>
-
-                      {/* 添加到方案按钮 */}
-                      <Button
-                        onClick={() => addToPlan(selectedProduct)}
-                        className="w-full bg-green-500 hover:bg-green-600"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        添加到定制方案
-                      </Button>
 
                       {/* 标签页 */}
                       <Tabs defaultValue="sales" className="w-full">
@@ -932,35 +896,10 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
               </div>
             </TabsContent>
 
+            {/* Tab 3: 医生定制方案 */}
             <TabsContent value="plan" className="flex-1 m-0 overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
-                  {/* 客户需求概览 */}
-                  <Card className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/30 p-5">
-                    <h3 className="text-sm font-semibold text-white mb-3 flex items-center">
-                      <AlertCircle className="w-4 h-4 mr-2 text-blue-400" />
-                      客户核心需求
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-slate-400">主要诉求：</span>
-                        <span className="text-white ml-2">改善法令纹、抗衰老</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400">皮肤类型：</span>
-                        <span className="text-white ml-2">干性敏感肌</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400">预算范围：</span>
-                        <span className="text-white ml-2">¥5,000以内</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400">特殊要求：</span>
-                        <span className="text-white ml-2">无恢复期、温和</span>
-                      </div>
-                    </div>
-                  </Card>
-
                   {/* 方案构建区 */}
                   <Card className="bg-slate-800/50 border-slate-700 p-5">
                     <div className="flex items-center justify-between mb-4">
@@ -974,21 +913,32 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                     <div className="space-y-4">
                       {/* 第一阶段 */}
                       <div className="border border-slate-700 rounded-lg p-4 bg-slate-900/50">
-                        <h4 className="text-sm font-semibold text-white mb-3 flex items-center">
-                          <div className="w-6 h-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center mr-2">
-                            1
-                          </div>
-                          第一阶段：基础皮肤调理（1-2周）
-                        </h4>
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-semibold text-white flex items-center">
+                            <div className="w-6 h-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center mr-2">
+                              1
+                            </div>
+                            第一阶段：家居皮肤调理
+                          </h4>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-blue-500/50 text-blue-300 hover:bg-blue-500/20 bg-transparent"
+                            onClick={() => openAddModal("第一阶段")}
+                          >
+                            <Plus className="w-3 h-3 mr-1" />
+                            添加项目
+                          </Button>
+                        </div>
 
                         {planItems.filter((item) => item.phase === "第一阶段").length === 0 ? (
-                          <p className="text-sm text-slate-400 text-center py-4">暂无项目，请从智能推荐中添加</p>
+                          <p className="text-sm text-slate-400 text-center py-4">暂无项目，点击上方按钮添加</p>
                         ) : (
                           <div className="space-y-3">
                             {planItems
                               .filter((item) => item.phase === "第一阶段")
                               .map((item) => (
-                                <div key={item.id} className="bg-slate-800/50 rounded-lg p-4 space-y-3">
+                                <div key={item.id} className="bg-slate-800/50 rounded-lg p-3 space-y-2">
                                   <div className="flex items-center justify-between">
                                     <span className="text-sm font-semibold text-white">{item.name}</span>
                                     <Button
@@ -1000,27 +950,9 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                                       <Trash2 className="w-3 h-3" />
                                     </Button>
                                   </div>
-
-                                  <div className="bg-blue-500/10 border border-blue-500/30 rounded p-3">
-                                    <p className="text-xs text-blue-300 font-semibold mb-1">AI推荐理由</p>
-                                    <p className="text-xs text-slate-300 leading-relaxed">{item.reasoning}</p>
-                                  </div>
-
-                                  <div className="grid grid-cols-2 gap-3 text-xs">
-                                    <div className="bg-slate-900/50 rounded p-2">
-                                      <p className="text-slate-400 mb-1">针对需求</p>
-                                      <p className="text-slate-200">{item.customerNeed}</p>
-                                    </div>
-                                    <div className="bg-slate-900/50 rounded p-2">
-                                      <p className="text-slate-400 mb-1">预期效果</p>
-                                      <p className="text-slate-200">{item.expectedEffect}</p>
-                                    </div>
-                                  </div>
-
-                                  {/* 使用详情 */}
                                   <div className="grid grid-cols-4 gap-2 text-xs">
                                     <div>
-                                      <label className="text-slate-400">使用频次</label>
+                                      <label className="text-slate-400">频次</label>
                                       <Input
                                         defaultValue={item.frequency}
                                         className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
@@ -1048,17 +980,8 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                                       </div>
                                     </div>
                                   </div>
-
-                                  <div>
-                                    <label className="text-xs text-slate-400 mb-1 block">注意事项</label>
-                                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-2">
-                                      <p className="text-xs text-yellow-200">{item.precautions}</p>
-                                    </div>
-                                  </div>
-
-                                  {/* 操作备注 */}
                                   <Textarea
-                                    placeholder="添加操作备注和个性化建议..."
+                                    placeholder="操作备注和注意事项..."
                                     className="text-xs bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[60px]"
                                     defaultValue={item.notes}
                                   />
@@ -1070,26 +993,161 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
 
                       {/* 第二阶段 */}
                       <div className="border border-slate-700 rounded-lg p-4 bg-slate-900/50">
-                        <h4 className="text-sm font-semibold text-white mb-3 flex items-center">
-                          <div className="w-6 h-6 rounded-full bg-purple-500 text-white text-xs flex items-center justify-center mr-2">
-                            2
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-semibold text-white flex items-center">
+                            <div className="w-6 h-6 rounded-full bg-purple-500 text-white text-xs flex items-center justify-center mr-2">
+                              2
+                            </div>
+                            第二阶段：院线光电治疗
+                          </h4>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-purple-500/50 text-purple-300 hover:bg-purple-500/20 bg-transparent"
+                            onClick={() => openAddModal("第二阶段")}
+                          >
+                            <Plus className="w-3 h-3 mr-1" />
+                            添加项目
+                          </Button>
+                        </div>
+
+                        {planItems.filter((item) => item.phase === "第二阶段").length === 0 ? (
+                          <p className="text-sm text-slate-400 text-center py-4">暂无项目，点击上方按钮添加</p>
+                        ) : (
+                          <div className="space-y-3">
+                            {planItems
+                              .filter((item) => item.phase === "第二阶段")
+                              .map((item) => (
+                                <div key={item.id} className="bg-slate-800/50 rounded-lg p-3 space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm font-semibold text-white">{item.name}</span>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      onClick={() => removeFromPlan(item.id)}
+                                      className="h-6 w-6 text-red-400 hover:text-red-300 hover:bg-red-500/20"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                  <div className="grid grid-cols-4 gap-2 text-xs">
+                                    <div>
+                                      <label className="text-slate-400">频次</label>
+                                      <Input
+                                        defaultValue={item.frequency}
+                                        className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-slate-400">单价</label>
+                                      <Input
+                                        defaultValue={item.price}
+                                        className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-slate-400">数量</label>
+                                      <Input
+                                        type="number"
+                                        defaultValue={item.quantity}
+                                        className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-slate-400">小计</label>
+                                      <div className="h-7 flex items-center text-blue-400 font-semibold mt-1">
+                                        {item.price}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <Textarea
+                                    placeholder="操作备注和注意事项..."
+                                    className="text-xs bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[60px]"
+                                    defaultValue={item.notes}
+                                  />
+                                </div>
+                              ))}
                           </div>
-                          第二阶段：深度治疗（3-4周）
-                        </h4>
-                        <p className="text-sm text-slate-400 text-center py-4">
-                          暂无项目。建议添加水光针、肉毒素等进阶治疗项目
-                        </p>
+                        )}
                       </div>
 
-                      {/* 第三阶段 */}
                       <div className="border border-slate-700 rounded-lg p-4 bg-slate-900/50">
-                        <h4 className="text-sm font-semibold text-white mb-3 flex items-center">
-                          <div className="w-6 h-6 rounded-full bg-green-500 text-white text-xs flex items-center justify-center mr-2">
-                            3
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-semibold text-white flex items-center">
+                            <div className="w-6 h-6 rounded-full bg-green-500 text-white text-xs flex items-center justify-center mr-2">
+                              3
+                            </div>
+                            第三阶段：巩固维护
+                          </h4>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-green-500/50 text-green-300 hover:bg-green-500/20 bg-transparent"
+                            onClick={() => openAddModal("第三阶段")}
+                          >
+                            <Plus className="w-3 h-3 mr-1" />
+                            添加项目
+                          </Button>
+                        </div>
+
+                        {planItems.filter((item) => item.phase === "第三阶段").length === 0 ? (
+                          <p className="text-sm text-slate-400 text-center py-4">暂无项目，点击上方按钮添加</p>
+                        ) : (
+                          <div className="space-y-3">
+                            {planItems
+                              .filter((item) => item.phase === "第三阶段")
+                              .map((item) => (
+                                <div key={item.id} className="bg-slate-800/50 rounded-lg p-3 space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm font-semibold text-white">{item.name}</span>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      onClick={() => removeFromPlan(item.id)}
+                                      className="h-6 w-6 text-red-400 hover:text-red-300 hover:bg-red-500/20"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                  <div className="grid grid-cols-4 gap-2 text-xs">
+                                    <div>
+                                      <label className="text-slate-400">频次</label>
+                                      <Input
+                                        defaultValue={item.frequency}
+                                        className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-slate-400">单价</label>
+                                      <Input
+                                        defaultValue={item.price}
+                                        className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-slate-400">数量</label>
+                                      <Input
+                                        type="number"
+                                        defaultValue={item.quantity}
+                                        className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-slate-400">小计</label>
+                                      <div className="h-7 flex items-center text-blue-400 font-semibold mt-1">
+                                        {item.price}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <Textarea
+                                    placeholder="操作备注和注意事项..."
+                                    className="text-xs bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[60px]"
+                                    defaultValue={item.notes}
+                                  />
+                                </div>
+                              ))}
                           </div>
-                          第三阶段：维护巩固（长期）
-                        </h4>
-                        <p className="text-sm text-slate-400 text-center py-4">暂无项目。建议添加日常护理和维护项目</p>
+                        )}
                       </div>
                     </div>
                   </Card>
@@ -1098,37 +1156,20 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                   <Card className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/30 p-5">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-slate-400 mb-1">当前方案总费用</p>
+                        <p className="text-sm text-slate-400 mb-1">预计总费用</p>
                         <p className="text-3xl font-bold text-white">¥{calculateTotal().toLocaleString()}</p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          预算剩余: ¥{(5000 - calculateTotal()).toLocaleString()}
-                        </p>
                       </div>
-                      <div className="text-right">
-                        <DollarSign className="w-12 h-12 text-blue-400 opacity-50 mb-2" />
-                        <Badge
-                          className={
-                            calculateTotal() <= 5000
-                              ? "bg-green-500/20 text-green-300 border-green-500/30"
-                              : "bg-red-500/20 text-red-300 border-red-500/30"
-                          }
-                        >
-                          {calculateTotal() <= 5000 ? "预算内" : "超出预算"}
-                        </Badge>
-                      </div>
+                      <DollarSign className="w-12 h-12 text-blue-400 opacity-50" />
                     </div>
                   </Card>
 
+                  {/* 操作按钮组 */}
                   <div className="flex items-center space-x-3">
-                    <Button onClick={handleSavePlan} className="flex-1 bg-blue-500 hover:bg-blue-600">
+                    <Button className="flex-1 bg-blue-500 hover:bg-blue-600">
                       <Save className="w-4 h-4 mr-2" />
                       保存方案
                     </Button>
-                    <Button
-                      onClick={handleGenerateReport}
-                      className="flex-1 bg-green-500 hover:bg-green-600"
-                      disabled={planItems.length === 0}
-                    >
+                    <Button className="flex-1 bg-green-500 hover:bg-green-600" onClick={() => setShowPlanReport(true)}>
                       <Download className="w-4 h-4 mr-2" />
                       生成方案报告
                     </Button>
@@ -1152,12 +1193,12 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
       </div>
 
       <Dialog open={showChatHistory} onOpenChange={setShowChatHistory}>
-        <DialogContent className="max-w-3xl max-h-[80vh] bg-slate-900 border-slate-700 text-white">
+        <DialogContent className="max-w-4xl max-h-[80vh] bg-slate-900 border-slate-700 text-white">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span className="flex items-center">
                 <MessageSquare className="w-5 h-5 mr-2 text-blue-400" />
-                完整聊天记录
+                完整聊天记录 (ASR转写)
               </span>
               <Button
                 variant="ghost"
@@ -1170,28 +1211,21 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="h-[60vh] pr-4">
-            <div className="space-y-4">
-              {mockChatHistory.map((message, index) => (
-                <div key={index} className={`flex ${message.role === "customer" ? "justify-start" : "justify-end"}`}>
-                  <div
-                    className={`max-w-[70%] ${
-                      message.role === "customer"
-                        ? "bg-slate-800/50 border border-slate-700"
-                        : "bg-blue-500/20 border border-blue-500/30"
-                    } rounded-lg p-4`}
+            <div className="space-y-1">
+              {mockASRTranscript.map((entry, index) => (
+                <div
+                  key={index}
+                  className="flex items-start space-x-4 py-3 px-4 hover:bg-slate-800/30 rounded transition-colors font-mono text-sm"
+                >
+                  <span className="text-blue-400 font-semibold w-20 flex-shrink-0">{entry.timestamp}</span>
+                  <span
+                    className={`font-semibold w-32 flex-shrink-0 ${
+                      entry.speaker.startsWith("客户") ? "text-pink-300" : "text-green-300"
+                    }`}
                   >
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span
-                        className={`text-xs font-semibold ${
-                          message.role === "customer" ? "text-pink-300" : "text-blue-300"
-                        }`}
-                      >
-                        {message.name}
-                      </span>
-                      <span className="text-xs text-slate-500">{message.time}</span>
-                    </div>
-                    <p className="text-sm text-slate-200 leading-relaxed">{message.message}</p>
-                  </div>
+                    {entry.speaker}
+                  </span>
+                  <p className="text-slate-200 leading-relaxed flex-1">{entry.text}</p>
                 </div>
               ))}
             </div>
@@ -1199,191 +1233,320 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showSavePlanDialog} onOpenChange={setShowSavePlanDialog}>
-        <DialogContent className="max-w-md bg-slate-900 border-slate-700 text-white">
-          <DialogHeader>
-            <DialogTitle className="flex items-center">
-              <CheckCircle2 className="w-5 h-5 mr-2 text-green-400" />
-              方案保存成功
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-sm text-slate-300">治疗方案已成功保存到客户档案中。您可以随时查看和修改方案内容。</p>
-            <div className="bg-slate-800/50 rounded-lg p-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-slate-400">保存时间：</span>
-                <span className="text-white">{new Date().toLocaleString("zh-CN")}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">方案状态：</span>
-                <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">{planStatus}</Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">项目数量：</span>
-                <span className="text-white">{planItems.length}项</span>
-              </div>
-            </div>
-            <Button onClick={() => setShowSavePlanDialog(false)} className="w-full bg-blue-500 hover:bg-blue-600">
-              确定
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-        <DialogContent className="max-w-4xl max-h-[85vh] bg-slate-900 border-slate-700 text-white">
+      <Dialog open={showAddFromRecommendation} onOpenChange={setShowAddFromRecommendation}>
+        <DialogContent className="max-w-3xl max-h-[80vh] bg-slate-900 border-slate-700 text-white">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span className="flex items-center">
-                <FileText className="w-5 h-5 mr-2 text-green-400" />
-                治疗方案报告
+                <Star className="w-5 h-5 mr-2 text-blue-400" />
+                从智能推荐中选择产品
+                <Badge className="ml-3 bg-blue-500/20 text-blue-300 border-blue-500/30">{selectedPhase}</Badge>
               </span>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setShowReportDialog(false)}
+                onClick={() => setShowAddFromRecommendation(false)}
                 className="hover:bg-slate-800"
               >
                 <X className="w-4 h-4" />
               </Button>
             </DialogTitle>
           </DialogHeader>
-          <ScrollArea className="h-[65vh] pr-4">
+          <ScrollArea className="h-[50vh] pr-4">
+            <div className="space-y-3">
+              {mockProducts.map((product) => (
+                <Card
+                  key={product.id}
+                  className={`bg-slate-800/50 border-slate-700 p-4 cursor-pointer transition-all hover:bg-slate-800/70 ${
+                    selectedRecommendations.includes(product.id) ? "ring-2 ring-blue-500" : ""
+                  }`}
+                  onClick={() => toggleRecommendation(product.id)}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center justify-center w-6 h-6 rounded border-2 border-slate-600 flex-shrink-0">
+                      {selectedRecommendations.includes(product.id) && <Check className="w-4 h-4 text-blue-400" />}
+                    </div>
+                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-slate-700/50 flex-shrink-0">
+                      <img
+                        src={product.image || "/placeholder.svg"}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-white">{product.name}</h3>
+                      <p className="text-lg font-bold text-blue-400 mt-1">{product.price}</p>
+                      <p className="text-xs text-slate-400 mt-1">{product.reason}</p>
+                    </div>
+                    <Badge className="bg-red-500/20 text-red-300 border-red-500/30">{product.recommendLevel}</Badge>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </ScrollArea>
+          <div className="flex justify-end space-x-3 pt-4 border-t border-slate-700">
+            <Button
+              variant="outline"
+              onClick={() => setShowAddFromRecommendation(false)}
+              className="border-slate-700 text-slate-300 hover:bg-slate-800"
+            >
+              取消
+            </Button>
+            <Button
+              onClick={addSelectedToPlan}
+              disabled={selectedRecommendations.length === 0}
+              className="bg-blue-500 hover:bg-blue-600"
+            >
+              添加到{selectedPhase} {selectedRecommendations.length > 0 && `(${selectedRecommendations.length})`}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showPlanReport} onOpenChange={setShowPlanReport}>
+        <DialogContent className="max-w-5xl max-h-[85vh] bg-slate-900 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span className="flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-blue-400" />
+                定制化治疗方案报告
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowPlanReport(false)}
+                className="hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-[70vh] pr-4">
             <div className="space-y-6">
-              {/* 报告头部 */}
-              <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg p-6">
-                <h2 className="text-2xl font-bold text-white mb-2">个性化医美治疗方案</h2>
-                <div className="grid grid-cols-2 gap-4 text-sm mt-4">
-                  <div>
-                    <span className="text-slate-400">客户姓名：</span>
-                    <span className="text-white ml-2">张女士</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400">年龄：</span>
-                    <span className="text-white ml-2">28岁</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400">皮肤类型：</span>
-                    <span className="text-white ml-2">干性敏感肌</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400">生成日期：</span>
-                    <span className="text-white ml-2">{new Date().toLocaleDateString("zh-CN")}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 客户需求分析 */}
+              {/* 1. 审成日期 */}
               <Card className="bg-slate-800/50 border-slate-700 p-5">
-                <h3 className="text-lg font-semibold text-white mb-3">客户需求分析</h3>
-                <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-blue-300 font-semibold">核心诉求：</span>
-                    <span className="text-slate-300 ml-2">改善法令纹、面部抗衰老</span>
+                    <h3 className="text-sm font-semibold text-slate-400 mb-1">方案生成日期</h3>
+                    <p className="text-lg font-semibold text-white">{new Date().toLocaleDateString("zh-CN")}</p>
+                  </div>
+                  <Calendar className="w-8 h-8 text-blue-400 opacity-50" />
+                </div>
+              </Card>
+
+              {/* 2. 主旨医生 */}
+              <Card className="bg-slate-800/50 border-slate-700 p-5">
+                <h3 className="text-sm font-semibold text-white mb-3 flex items-center">
+                  <Stethoscope className="w-4 h-4 mr-2 text-blue-400" />
+                  主旨医生
+                </h3>
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xl font-bold">
+                    王
                   </div>
                   <div>
-                    <span className="text-blue-300 font-semibold">预算范围：</span>
-                    <span className="text-slate-300 ml-2">¥5,000以内</span>
-                  </div>
-                  <div>
-                    <span className="text-blue-300 font-semibold">特殊要求：</span>
-                    <span className="text-slate-300 ml-2">无恢复期、温和治疗、对疼痛敏感</span>
+                    <p className="text-lg font-semibold text-white">王美丽 主任医师</p>
+                    <p className="text-sm text-slate-400">皮肤美容科 · 15年临床经验</p>
+                    <p className="text-xs text-slate-500 mt-1">擅长：抗衰老治疗、敏感肌修复、光电美容</p>
                   </div>
                 </div>
               </Card>
 
-              {/* 治疗方案详情 */}
+              {/* 3. 客户情况诊断与诉求分析 */}
               <Card className="bg-slate-800/50 border-slate-700 p-5">
-                <h3 className="text-lg font-semibold text-white mb-4">治疗方案详情</h3>
+                <h3 className="text-sm font-semibold text-white mb-4 flex items-center">
+                  <Lightbulb className="w-4 h-4 mr-2 text-yellow-400" />
+                  客户情况诊断与诉求分析
+                </h3>
                 <div className="space-y-4">
-                  {planItems.map((item, index) => (
-                    <div key={item.id} className="bg-slate-900/50 rounded-lg p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-semibold text-white">
-                          {index + 1}. {item.name}
-                        </h4>
-                        <span className="text-blue-400 font-semibold">{item.price}</span>
-                      </div>
-                      <div className="text-sm space-y-2">
-                        <div>
-                          <span className="text-slate-400">推荐理由：</span>
-                          <p className="text-slate-300 mt-1">{item.reasoning}</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <span className="text-slate-400">针对需求：</span>
-                            <p className="text-slate-300">{item.customerNeed}</p>
-                          </div>
-                          <div>
-                            <span className="text-slate-400">预期效果：</span>
-                            <p className="text-slate-300">{item.expectedEffect}</p>
-                          </div>
-                        </div>
-                        <div>
-                          <span className="text-slate-400">使用方法：</span>
-                          <p className="text-slate-300">{item.frequency}</p>
-                        </div>
-                        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-2">
-                          <span className="text-yellow-300 text-xs font-semibold">注意事项：</span>
-                          <p className="text-yellow-200 text-xs mt-1">{item.precautions}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              {/* 费用汇总 */}
-              <Card className="bg-gradient-to-br from-green-500/10 to-blue-500/10 border-green-500/30 p-5">
-                <h3 className="text-lg font-semibold text-white mb-3">费用汇总</h3>
-                <div className="space-y-2 text-sm">
-                  {planItems.map((item) => (
-                    <div key={item.id} className="flex justify-between text-slate-300">
-                      <span>{item.name}</span>
-                      <span>{item.price}</span>
-                    </div>
-                  ))}
-                  <div className="border-t border-slate-700 pt-2 mt-2">
-                    <div className="flex justify-between text-lg font-bold text-white">
-                      <span>总计</span>
-                      <span className="text-green-400">¥{calculateTotal().toLocaleString()}</span>
-                    </div>
+                  <div className="bg-slate-900/50 rounded-lg p-4">
+                    <h4 className="text-xs font-semibold text-blue-300 mb-2">基本信息</h4>
+                    <p className="text-sm text-slate-300 leading-relaxed">
+                      客户张女士，28岁，干性敏感肌肤。主要诉求为改善法令纹和细纹，延缓面部衰老。客户皮肤较为敏感，经常出现泛红现象，需要特别注意产品和项目的温和性。
+                    </p>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-lg p-4">
+                    <h4 className="text-xs font-semibold text-green-300 mb-2">皮肤诊断</h4>
+                    <p className="text-sm text-slate-300 leading-relaxed">
+                      经专业皮肤检测，客户面部法令纹明显，鼻翼两侧及眼周有细纹。皮肤屏障功能较弱，角质层薄，易受外界刺激。胶原蛋白流失速度较快，需要及时进行抗衰老干预。
+                    </p>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-lg p-4">
+                    <h4 className="text-xs font-semibold text-purple-300 mb-2">核心诉求</h4>
+                    <ul className="space-y-2 text-sm text-slate-300">
+                      <li className="flex items-start space-x-2">
+                        <ChevronRight className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                        <span>改善法令纹，提升面部轮廓</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <ChevronRight className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                        <span>修复皮肤屏障，改善敏感状态</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <ChevronRight className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                        <span>预算控制在5000元左右</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <ChevronRight className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                        <span>无恢复期，不影响正常工作</span>
+                      </li>
+                    </ul>
                   </div>
                 </div>
               </Card>
 
-              {/* 专业建议 */}
+              {/* 4. 定制化治疗方案详情 */}
               <Card className="bg-slate-800/50 border-slate-700 p-5">
-                <h3 className="text-lg font-semibold text-white mb-3">专业建议</h3>
-                <ul className="space-y-2 text-sm text-slate-300">
-                  <li className="flex items-start space-x-2">
-                    <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                    <span>建议先进行皮肤测试，确保产品适合您的敏感肌肤</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                    <span>治疗期间注意防晒，避免紫外线对皮肤造成额外伤害</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                    <span>保持良好作息和饮食习惯，有助于提升治疗效果</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                    <span>定期复诊，根据皮肤状况调整治疗方案</span>
-                  </li>
-                </ul>
+                <h3 className="text-sm font-semibold text-white mb-4 flex items-center">
+                  <FileText className="w-4 h-4 mr-2 text-blue-400" />
+                  定制化治疗方案详情
+                </h3>
+                <div className="space-y-4">
+                  {planItems.length === 0 ? (
+                    <p className="text-sm text-slate-400 text-center py-8">暂无方案项目</p>
+                  ) : (
+                    planItems.map((item, index) => (
+                      <div key={item.id} className="bg-slate-900/50 rounded-lg p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-500 text-white text-sm flex items-center justify-center font-semibold">
+                              {index + 1}
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-semibold text-white">{item.name}</h4>
+                              <p className="text-xs text-slate-400 mt-1">{item.phase}</p>
+                            </div>
+                          </div>
+                          <p className="text-lg font-bold text-blue-400">{item.price}</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 text-xs">
+                          <div>
+                            <span className="text-slate-400">使用频次：</span>
+                            <span className="text-slate-300">{item.frequency}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400">数量：</span>
+                            <span className="text-slate-300">{item.quantity}</span>
+                          </div>
+                        </div>
+                        {item.notes && (
+                          <div className="mt-3 pt-3 border-t border-slate-700">
+                            <p className="text-xs text-slate-400">备注：{item.notes}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </Card>
+
+              {/* 5. 方案执行与注意事项 */}
+              <Card className="bg-slate-800/50 border-slate-700 p-5">
+                <h3 className="text-sm font-semibold text-white mb-4 flex items-center">
+                  <Clock className="w-4 h-4 mr-2 text-orange-400" />
+                  方案执行与注意事项
+                </h3>
+                <div className="space-y-3">
+                  <div className="bg-slate-900/50 rounded-lg p-4">
+                    <h4 className="text-xs font-semibold text-orange-300 mb-2">执行时间安排</h4>
+                    <ul className="space-y-2 text-sm text-slate-300">
+                      <li className="flex items-start space-x-2">
+                        <ChevronRight className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
+                        <span>第一阶段（1-2周）：家居基础护理，修复皮肤屏障</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <ChevronRight className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
+                        <span>第二阶段（3-4周）：院线光电治疗，深层抗衰</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <ChevronRight className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
+                        <span>第三阶段（5-8周）：巩固维护，定期复查</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-lg p-4">
+                    <h4 className="text-xs font-semibold text-red-300 mb-2">重要注意事项</h4>
+                    <ul className="space-y-2 text-sm text-slate-300">
+                      <li className="flex items-start space-x-2">
+                        <ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                        <span>治疗期间避免使用刺激性护肤品，选择温和保湿产品</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                        <span>做好防晒工作，建议使用SPF50+的物理防晒</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                        <span>保持规律作息，避免熬夜，多喝水促进代谢</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                        <span>如出现不适反应，及时联系医生调整方案</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </Card>
+
+              {/* 6. 费用预算与方案确认 */}
+              <Card className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/30 p-5">
+                <h3 className="text-sm font-semibold text-white mb-4 flex items-center">
+                  <DollarSign className="w-4 h-4 mr-2 text-green-400" />
+                  费用预算与方案确认
+                </h3>
+                <div className="space-y-4">
+                  <div className="bg-slate-900/50 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-sm text-slate-400">方案总费用</span>
+                      <span className="text-3xl font-bold text-white">¥{calculateTotal().toLocaleString()}</span>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between text-slate-300">
+                        <span>产品/项目费用</span>
+                        <span>¥{calculateTotal().toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-300">
+                        <span>会员优惠</span>
+                        <span className="text-green-400">-¥0</span>
+                      </div>
+                      <div className="pt-2 border-t border-slate-700 flex justify-between font-semibold">
+                        <span className="text-white">实付金额</span>
+                        <span className="text-blue-400 text-lg">¥{calculateTotal().toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-lg p-4">
+                    <h4 className="text-xs font-semibold text-blue-300 mb-3">方案确认</h4>
+                    <div className="space-y-2 text-sm text-slate-300">
+                      <p>□ 我已充分了解本治疗方案的内容和预期效果</p>
+                      <p>□ 我已知晓治疗过程中的注意事项和可能的风险</p>
+                      <p>□ 我同意按照医生建议执行本治疗方案</p>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-slate-700 grid grid-cols-2 gap-4 text-xs">
+                      <div>
+                        <p className="text-slate-400 mb-1">客户签名：</p>
+                        <div className="h-12 border border-slate-700 rounded bg-slate-800/30"></div>
+                      </div>
+                      <div>
+                        <p className="text-slate-400 mb-1">日期：</p>
+                        <div className="h-12 border border-slate-700 rounded bg-slate-800/30 flex items-center px-3 text-slate-300">
+                          {new Date().toLocaleDateString("zh-CN")}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </Card>
             </div>
           </ScrollArea>
-          <div className="flex space-x-3 pt-4 border-t border-slate-700">
-            <Button className="flex-1 bg-blue-500 hover:bg-blue-600">
+          <div className="flex justify-end space-x-3 pt-4 border-t border-slate-700">
+            <Button variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800 bg-transparent">
               <Download className="w-4 h-4 mr-2" />
-              下载PDF报告
+              导出PDF
             </Button>
-            <Button className="flex-1 bg-green-500 hover:bg-green-600">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              发送给客户
+            <Button className="bg-blue-500 hover:bg-blue-600">
+              <Save className="w-4 h-4 mr-2" />
+              保存报告
             </Button>
           </div>
         </DialogContent>
