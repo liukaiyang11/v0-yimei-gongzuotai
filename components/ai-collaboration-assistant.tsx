@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import type React from "react"
+
+import { useState, useRef, useEffect } from "react"
 import {
   ArrowLeft,
   Search,
@@ -24,6 +26,9 @@ import {
   ChevronDown,
   ChevronUp,
   X,
+  GripVertical,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -162,7 +167,7 @@ const mockChatHistory = [
     name: "李顾问",
     time: "14:33",
     message:
-      "热玛吉全脸的价格一般在8000-15000之间。如果预算在5000左右，我建议您可以考虑水光针+肉毒素的组合方案，效果也很好",
+      "热玛吉全脸的价格一般在8000-15000之间。如果预算在5000元左右，我建议您可以考虑水光针+肉毒素的组合方案，效果也很好",
   },
   {
     role: "customer",
@@ -216,6 +221,45 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
   const [expandedHabits, setExpandedHabits] = useState(false)
 
   const [showChatHistory, setShowChatHistory] = useState(false)
+  const [showSavePlanDialog, setShowSavePlanDialog] = useState(false)
+  const [showReportDialog, setShowReportDialog] = useState(false)
+
+  const [leftWidth, setLeftWidth] = useState(320) // 初始宽度 320px (w-80)
+  const [isResizing, setIsResizing] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsResizing(true)
+  }
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing || !containerRef.current) return
+
+      const containerRect = containerRef.current.getBoundingClientRect()
+      const newWidth = e.clientX - containerRect.left - 80 // 减去左侧sidebar的80px
+
+      // 限制最小和最大宽度
+      if (newWidth >= 240 && newWidth <= 600) {
+        setLeftWidth(newWidth)
+      }
+    }
+
+    const handleMouseUp = () => {
+      setIsResizing(false)
+    }
+
+    if (isResizing) {
+      document.addEventListener("mousemove", handleMouseMove)
+      document.addEventListener("mouseup", handleMouseUp)
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove)
+      document.removeEventListener("mouseup", handleMouseUp)
+    }
+  }, [isResizing])
 
   const sortedProducts = [...mockProducts].sort((a, b) => {
     if (sortBy === "profit") {
@@ -233,6 +277,11 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
       frequency: "每日1次",
       notes: "",
       phase: "第一阶段",
+      reasoning:
+        "根据客户28岁年龄段和敏感肌特点，此产品能够温和修复皮肤屏障，改善法令纹问题。客户偏好高端护肤品，此产品匹配度高。",
+      customerNeed: "改善法令纹、敏感肌修复",
+      expectedEffect: "2-4周内改善肤质，减淡细纹",
+      precautions: "敏感肌需先做皮肤测试，建议从小剂量开始使用",
     }
     setPlanItems([...planItems, newItem])
   }
@@ -248,6 +297,18 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
     }, 0)
   }
 
+  const handleSavePlan = () => {
+    setShowSavePlanDialog(true)
+    // 模拟保存操作
+    setTimeout(() => {
+      setShowSavePlanDialog(false)
+    }, 2000)
+  }
+
+  const handleGenerateReport = () => {
+    setShowReportDialog(true)
+  }
+
   return (
     <div className="fixed inset-0 left-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 z-50">
       {/* 顶部导航栏 */}
@@ -261,10 +322,12 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
         </div>
       </div>
 
-      {/* 两栏布局 */}
-      <div className="flex h-[calc(100vh-4rem)]">
-        {/* 左侧栏 - 客户信息中心 (固定) */}
-        <div className="w-80 border-r border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
+      <div ref={containerRef} className="flex h-[calc(100vh-4rem)]">
+        {/* 左侧栏 - 客户信息中心 (可调整宽度) */}
+        <div
+          style={{ width: `${leftWidth}px` }}
+          className="border-r border-slate-700/50 bg-slate-900/50 backdrop-blur-sm flex-shrink-0"
+        >
           <ScrollArea className="h-full">
             <div className="p-6 space-y-6">
               {/* 搜索框 */}
@@ -353,10 +416,18 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
           </ScrollArea>
         </div>
 
+        <div
+          className="w-1 bg-slate-700/50 hover:bg-blue-500/50 cursor-col-resize flex items-center justify-center group transition-colors relative"
+          onMouseDown={handleMouseDown}
+        >
+          <div className="absolute inset-y-0 -left-1 -right-1" />
+          <GripVertical className="w-4 h-4 text-slate-600 group-hover:text-blue-400 transition-colors" />
+        </div>
+
         {/* 右侧主区域 - 核心功能工作台 (Tab切换) */}
-        <div className="flex-1 bg-slate-900/30">
+        <div className="flex-1 bg-slate-900/30 overflow-hidden">
           <Tabs defaultValue="consultation" className="h-full flex flex-col">
-            <div className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm px-6">
+            <div className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm px-6 flex-shrink-0">
               <TabsList className="bg-transparent h-14">
                 <TabsTrigger
                   value="consultation"
@@ -383,7 +454,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
             </div>
 
             {/* Tab 1: 咨询沟通纪要 */}
-            <TabsContent value="consultation" className="flex-1 m-0">
+            <TabsContent value="consultation" className="flex-1 m-0 overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
                   {/* AI核心诉求标签 */}
@@ -664,10 +735,10 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
             </TabsContent>
 
             {/* Tab 2: 智能推荐 (保持原有设计) */}
-            <TabsContent value="recommendation" className="flex-1 m-0">
+            <TabsContent value="recommendation" className="flex-1 m-0 overflow-hidden">
               <div className="flex h-full">
                 {/* 产品推荐列表 */}
-                <div className="flex-1 bg-slate-900/30">
+                <div className="flex-1 bg-slate-900/30 overflow-hidden">
                   <ScrollArea className="h-full">
                     <div className="p-6 space-y-6">
                       {/* 排序按钮 */}
@@ -779,7 +850,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                 </div>
 
                 {/* 产品详情侧边栏 */}
-                <div className="w-96 border-l border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
+                <div className="w-96 border-l border-slate-700/50 bg-slate-900/50 backdrop-blur-sm overflow-hidden">
                   <ScrollArea className="h-full">
                     <div className="p-6 space-y-6">
                       {/* 产品大图 */}
@@ -861,10 +932,35 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
               </div>
             </TabsContent>
 
-            {/* Tab 3: 医生定制方案 */}
-            <TabsContent value="plan" className="flex-1 m-0">
+            <TabsContent value="plan" className="flex-1 m-0 overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
+                  {/* 客户需求概览 */}
+                  <Card className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/30 p-5">
+                    <h3 className="text-sm font-semibold text-white mb-3 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-2 text-blue-400" />
+                      客户核心需求
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-slate-400">主要诉求：</span>
+                        <span className="text-white ml-2">改善法令纹、抗衰老</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400">皮肤类型：</span>
+                        <span className="text-white ml-2">干性敏感肌</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400">预算范围：</span>
+                        <span className="text-white ml-2">¥5,000以内</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400">特殊要求：</span>
+                        <span className="text-white ml-2">无恢复期、温和</span>
+                      </div>
+                    </div>
+                  </Card>
+
                   {/* 方案构建区 */}
                   <Card className="bg-slate-800/50 border-slate-700 p-5">
                     <div className="flex items-center justify-between mb-4">
@@ -872,10 +968,6 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                         <Calendar className="w-5 h-5 mr-2 text-blue-400" />
                         治疗方案构建
                       </h3>
-                      <Button size="sm" className="bg-blue-500 hover:bg-blue-600">
-                        <Plus className="w-4 h-4 mr-2" />
-                        从推荐中添加
-                      </Button>
                     </div>
 
                     {/* 方案时间轴/阶段视图 */}
@@ -886,7 +978,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                           <div className="w-6 h-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center mr-2">
                             1
                           </div>
-                          第一阶段：家居皮肤调理
+                          第一阶段：基础皮肤调理（1-2周）
                         </h4>
 
                         {planItems.filter((item) => item.phase === "第一阶段").length === 0 ? (
@@ -896,7 +988,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                             {planItems
                               .filter((item) => item.phase === "第一阶段")
                               .map((item) => (
-                                <div key={item.id} className="bg-slate-800/50 rounded-lg p-3 space-y-2">
+                                <div key={item.id} className="bg-slate-800/50 rounded-lg p-4 space-y-3">
                                   <div className="flex items-center justify-between">
                                     <span className="text-sm font-semibold text-white">{item.name}</span>
                                     <Button
@@ -908,9 +1000,27 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                                       <Trash2 className="w-3 h-3" />
                                     </Button>
                                   </div>
+
+                                  <div className="bg-blue-500/10 border border-blue-500/30 rounded p-3">
+                                    <p className="text-xs text-blue-300 font-semibold mb-1">AI推荐理由</p>
+                                    <p className="text-xs text-slate-300 leading-relaxed">{item.reasoning}</p>
+                                  </div>
+
+                                  <div className="grid grid-cols-2 gap-3 text-xs">
+                                    <div className="bg-slate-900/50 rounded p-2">
+                                      <p className="text-slate-400 mb-1">针对需求</p>
+                                      <p className="text-slate-200">{item.customerNeed}</p>
+                                    </div>
+                                    <div className="bg-slate-900/50 rounded p-2">
+                                      <p className="text-slate-400 mb-1">预期效果</p>
+                                      <p className="text-slate-200">{item.expectedEffect}</p>
+                                    </div>
+                                  </div>
+
+                                  {/* 使用详情 */}
                                   <div className="grid grid-cols-4 gap-2 text-xs">
                                     <div>
-                                      <label className="text-slate-400">频次</label>
+                                      <label className="text-slate-400">使用频次</label>
                                       <Input
                                         defaultValue={item.frequency}
                                         className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
@@ -938,8 +1048,17 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                                       </div>
                                     </div>
                                   </div>
+
+                                  <div>
+                                    <label className="text-xs text-slate-400 mb-1 block">注意事项</label>
+                                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-2">
+                                      <p className="text-xs text-yellow-200">{item.precautions}</p>
+                                    </div>
+                                  </div>
+
+                                  {/* 操作备注 */}
                                   <Textarea
-                                    placeholder="操作备注和注意事项..."
+                                    placeholder="添加操作备注和个性化建议..."
                                     className="text-xs bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[60px]"
                                     defaultValue={item.notes}
                                   />
@@ -955,9 +1074,22 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                           <div className="w-6 h-6 rounded-full bg-purple-500 text-white text-xs flex items-center justify-center mr-2">
                             2
                           </div>
-                          第二阶段：院线光电治疗
+                          第二阶段：深度治疗（3-4周）
                         </h4>
-                        <p className="text-sm text-slate-400 text-center py-4">暂无项目，请从智能推荐中添加</p>
+                        <p className="text-sm text-slate-400 text-center py-4">
+                          暂无项目。建议添加水光针、肉毒素等进阶治疗项目
+                        </p>
+                      </div>
+
+                      {/* 第三阶段 */}
+                      <div className="border border-slate-700 rounded-lg p-4 bg-slate-900/50">
+                        <h4 className="text-sm font-semibold text-white mb-3 flex items-center">
+                          <div className="w-6 h-6 rounded-full bg-green-500 text-white text-xs flex items-center justify-center mr-2">
+                            3
+                          </div>
+                          第三阶段：维护巩固（长期）
+                        </h4>
+                        <p className="text-sm text-slate-400 text-center py-4">暂无项目。建议添加日常护理和维护项目</p>
                       </div>
                     </div>
                   </Card>
@@ -966,20 +1098,37 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                   <Card className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/30 p-5">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-slate-400 mb-1">预计总费用</p>
+                        <p className="text-sm text-slate-400 mb-1">当前方案总费用</p>
                         <p className="text-3xl font-bold text-white">¥{calculateTotal().toLocaleString()}</p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          预算剩余: ¥{(5000 - calculateTotal()).toLocaleString()}
+                        </p>
                       </div>
-                      <DollarSign className="w-12 h-12 text-blue-400 opacity-50" />
+                      <div className="text-right">
+                        <DollarSign className="w-12 h-12 text-blue-400 opacity-50 mb-2" />
+                        <Badge
+                          className={
+                            calculateTotal() <= 5000
+                              ? "bg-green-500/20 text-green-300 border-green-500/30"
+                              : "bg-red-500/20 text-red-300 border-red-500/30"
+                          }
+                        >
+                          {calculateTotal() <= 5000 ? "预算内" : "超出预算"}
+                        </Badge>
+                      </div>
                     </div>
                   </Card>
 
-                  {/* 操作按钮组 */}
                   <div className="flex items-center space-x-3">
-                    <Button className="flex-1 bg-blue-500 hover:bg-blue-600">
+                    <Button onClick={handleSavePlan} className="flex-1 bg-blue-500 hover:bg-blue-600">
                       <Save className="w-4 h-4 mr-2" />
                       保存方案
                     </Button>
-                    <Button className="flex-1 bg-green-500 hover:bg-green-600">
+                    <Button
+                      onClick={handleGenerateReport}
+                      className="flex-1 bg-green-500 hover:bg-green-600"
+                      disabled={planItems.length === 0}
+                    >
                       <Download className="w-4 h-4 mr-2" />
                       生成方案报告
                     </Button>
@@ -1047,6 +1196,196 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
               ))}
             </div>
           </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showSavePlanDialog} onOpenChange={setShowSavePlanDialog}>
+        <DialogContent className="max-w-md bg-slate-900 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <CheckCircle2 className="w-5 h-5 mr-2 text-green-400" />
+              方案保存成功
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-slate-300">治疗方案已成功保存到客户档案中。您可以随时查看和修改方案内容。</p>
+            <div className="bg-slate-800/50 rounded-lg p-4 space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-400">保存时间：</span>
+                <span className="text-white">{new Date().toLocaleString("zh-CN")}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">方案状态：</span>
+                <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">{planStatus}</Badge>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">项目数量：</span>
+                <span className="text-white">{planItems.length}项</span>
+              </div>
+            </div>
+            <Button onClick={() => setShowSavePlanDialog(false)} className="w-full bg-blue-500 hover:bg-blue-600">
+              确定
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
+        <DialogContent className="max-w-4xl max-h-[85vh] bg-slate-900 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span className="flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-green-400" />
+                治疗方案报告
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowReportDialog(false)}
+                className="hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-[65vh] pr-4">
+            <div className="space-y-6">
+              {/* 报告头部 */}
+              <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg p-6">
+                <h2 className="text-2xl font-bold text-white mb-2">个性化医美治疗方案</h2>
+                <div className="grid grid-cols-2 gap-4 text-sm mt-4">
+                  <div>
+                    <span className="text-slate-400">客户姓名：</span>
+                    <span className="text-white ml-2">张女士</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">年龄：</span>
+                    <span className="text-white ml-2">28岁</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">皮肤类型：</span>
+                    <span className="text-white ml-2">干性敏感肌</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">生成日期：</span>
+                    <span className="text-white ml-2">{new Date().toLocaleDateString("zh-CN")}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 客户需求分析 */}
+              <Card className="bg-slate-800/50 border-slate-700 p-5">
+                <h3 className="text-lg font-semibold text-white mb-3">客户需求分析</h3>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <span className="text-blue-300 font-semibold">核心诉求：</span>
+                    <span className="text-slate-300 ml-2">改善法令纹、面部抗衰老</span>
+                  </div>
+                  <div>
+                    <span className="text-blue-300 font-semibold">预算范围：</span>
+                    <span className="text-slate-300 ml-2">¥5,000以内</span>
+                  </div>
+                  <div>
+                    <span className="text-blue-300 font-semibold">特殊要求：</span>
+                    <span className="text-slate-300 ml-2">无恢复期、温和治疗、对疼痛敏感</span>
+                  </div>
+                </div>
+              </Card>
+
+              {/* 治疗方案详情 */}
+              <Card className="bg-slate-800/50 border-slate-700 p-5">
+                <h3 className="text-lg font-semibold text-white mb-4">治疗方案详情</h3>
+                <div className="space-y-4">
+                  {planItems.map((item, index) => (
+                    <div key={item.id} className="bg-slate-900/50 rounded-lg p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold text-white">
+                          {index + 1}. {item.name}
+                        </h4>
+                        <span className="text-blue-400 font-semibold">{item.price}</span>
+                      </div>
+                      <div className="text-sm space-y-2">
+                        <div>
+                          <span className="text-slate-400">推荐理由：</span>
+                          <p className="text-slate-300 mt-1">{item.reasoning}</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <span className="text-slate-400">针对需求：</span>
+                            <p className="text-slate-300">{item.customerNeed}</p>
+                          </div>
+                          <div>
+                            <span className="text-slate-400">预期效果：</span>
+                            <p className="text-slate-300">{item.expectedEffect}</p>
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-slate-400">使用方法：</span>
+                          <p className="text-slate-300">{item.frequency}</p>
+                        </div>
+                        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-2">
+                          <span className="text-yellow-300 text-xs font-semibold">注意事项：</span>
+                          <p className="text-yellow-200 text-xs mt-1">{item.precautions}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              {/* 费用汇总 */}
+              <Card className="bg-gradient-to-br from-green-500/10 to-blue-500/10 border-green-500/30 p-5">
+                <h3 className="text-lg font-semibold text-white mb-3">费用汇总</h3>
+                <div className="space-y-2 text-sm">
+                  {planItems.map((item) => (
+                    <div key={item.id} className="flex justify-between text-slate-300">
+                      <span>{item.name}</span>
+                      <span>{item.price}</span>
+                    </div>
+                  ))}
+                  <div className="border-t border-slate-700 pt-2 mt-2">
+                    <div className="flex justify-between text-lg font-bold text-white">
+                      <span>总计</span>
+                      <span className="text-green-400">¥{calculateTotal().toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* 专业建议 */}
+              <Card className="bg-slate-800/50 border-slate-700 p-5">
+                <h3 className="text-lg font-semibold text-white mb-3">专业建议</h3>
+                <ul className="space-y-2 text-sm text-slate-300">
+                  <li className="flex items-start space-x-2">
+                    <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                    <span>建议先进行皮肤测试，确保产品适合您的敏感肌肤</span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                    <span>治疗期间注意防晒，避免紫外线对皮肤造成额外伤害</span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                    <span>保持良好作息和饮食习惯，有助于提升治疗效果</span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                    <span>定期复诊，根据皮肤状况调整治疗方案</span>
+                  </li>
+                </ul>
+              </Card>
+            </div>
+          </ScrollArea>
+          <div className="flex space-x-3 pt-4 border-t border-slate-700">
+            <Button className="flex-1 bg-blue-500 hover:bg-blue-600">
+              <Download className="w-4 h-4 mr-2" />
+              下载PDF报告
+            </Button>
+            <Button className="flex-1 bg-green-500 hover:bg-green-600">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              发送给客户
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
