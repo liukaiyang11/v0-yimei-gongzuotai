@@ -21,6 +21,9 @@ import {
   Eye,
   Calendar,
   Trash2,
+  ChevronDown,
+  ChevronUp,
+  X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,6 +34,7 @@ import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 interface AICollaborationAssistantProps {
   onBack: () => void
@@ -105,12 +109,113 @@ const mockProducts = [
   },
 ]
 
+const mockChatHistory = [
+  { role: "customer", name: "张女士", time: "14:23", message: "你好，我想咨询一下抗衰老的项目" },
+  {
+    role: "consultant",
+    name: "李顾问",
+    time: "14:24",
+    message: "您好张女士！很高兴为您服务。请问您主要关注面部哪个部位的抗衰老呢？",
+  },
+  {
+    role: "customer",
+    name: "张女士",
+    time: "14:25",
+    message: "主要是法令纹比较明显，还有一些细纹。我今年28岁，感觉皮肤状态下降得比较快",
+  },
+  {
+    role: "consultant",
+    name: "李顾问",
+    time: "14:26",
+    message:
+      "理解您的担忧。28岁开始抗衰是很好的时机。针对法令纹，我们有几种方案：热玛吉、超声刀、水光针等。您之前有了解过这些项目吗？",
+  },
+  {
+    role: "customer",
+    name: "张女士",
+    time: "14:27",
+    message: "听说过热玛吉和超声刀，但是不太了解具体效果。我比较担心恢复期的问题，因为工作比较忙",
+  },
+  {
+    role: "consultant",
+    name: "李顾问",
+    time: "14:28",
+    message:
+      "完全理解。热玛吉和超声刀都是无创项目，基本没有恢复期，做完就可以正常工作生活。热玛吉主要通过射频能量刺激胶原蛋白再生，效果可以维持1-2年",
+  },
+  { role: "customer", name: "张女士", time: "14:29", message: "听起来不错。那会不会很疼？我比较怕疼" },
+  {
+    role: "consultant",
+    name: "李顾问",
+    time: "14:30",
+    message:
+      "热玛吉治疗过程中会有一定的热感，但我们会根据您的耐受度调整能量。大部分客户都能接受，如果特别敏感也可以敷麻药",
+  },
+  {
+    role: "customer",
+    name: "张女士",
+    time: "14:31",
+    message: "那价格大概是多少呢？我预算在5000左右",
+  },
+  {
+    role: "consultant",
+    name: "李顾问",
+    time: "14:33",
+    message:
+      "热玛吉全脸的价格一般在8000-15000之间。如果预算在5000左右，我建议您可以考虑水光针+肉毒素的组合方案，效果也很好",
+  },
+  {
+    role: "customer",
+    name: "张女士",
+    time: "14:34",
+    message: "水光针和肉毒素有什么区别？会不会有副作用？",
+  },
+  {
+    role: "consultant",
+    name: "李顾问",
+    time: "14:35",
+    message:
+      "水光针主要是补水保湿，改善肤质；肉毒素是放松肌肉，减少动态纹。两者结合效果更好。副作用方面，只要选择正规产品和专业医生操作，是非常安全的",
+  },
+  {
+    role: "customer",
+    name: "张女士",
+    time: "14:37",
+    message: "好的，我再考虑一下。对了，我皮肤比较敏感，经常会泛红，这种情况能做吗？",
+  },
+  {
+    role: "consultant",
+    name: "李顾问",
+    time: "14:38",
+    message:
+      "敏感肌是可以做的，但需要先做皮肤测试。我们会根据您的皮肤状况调整方案。另外，建议您先做好基础的皮肤屏障修复",
+  },
+  {
+    role: "customer",
+    name: "张女士",
+    time: "14:40",
+    message: "明白了。那我想先预约一个面诊，详细了解一下",
+  },
+  {
+    role: "consultant",
+    name: "李顾问",
+    time: "14:41",
+    message: "好的！我这边帮您安排本周五下午3点的面诊，届时我们的专业医生会为您做详细的皮肤检测和方案设计",
+  },
+]
+
 export function AICollaborationAssistant({ onBack }: AICollaborationAssistantProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedProduct, setSelectedProduct] = useState(mockProducts[0])
   const [sortBy, setSortBy] = useState("profit")
   const [planItems, setPlanItems] = useState<any[]>([])
   const [planStatus, setPlanStatus] = useState("待沟通")
+
+  const [expandedConcerns, setExpandedConcerns] = useState(false)
+  const [expandedProducts, setExpandedProducts] = useState(false)
+  const [expandedHabits, setExpandedHabits] = useState(false)
+
+  const [showChatHistory, setShowChatHistory] = useState(false)
 
   const sortedProducts = [...mockProducts].sort((a, b) => {
     if (sortBy === "profit") {
@@ -298,62 +403,258 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                     </div>
                   </Card>
 
-                  {/* AI聊天摘要 */}
                   <Card className="bg-slate-800/50 border-slate-700 p-5">
-                    <h3 className="text-sm font-semibold text-white mb-3 flex items-center">
+                    <h3 className="text-sm font-semibold text-white mb-4 flex items-center">
                       <Lightbulb className="w-4 h-4 mr-2 text-yellow-400" />
                       AI聊天摘要
                     </h3>
-                    <div className="bg-slate-900/50 rounded-lg p-4 text-sm text-slate-300 leading-relaxed">
-                      客户张女士，28岁，主要关注面部抗衰老问题，特别是法令纹的改善。她表示皮肤较为敏感，希望选择温和且有效的治疗方案。预算控制在5000元以内，倾向于无创或微创项目，希望能在短期内看到明显效果。客户对光电类项目表现出浓厚兴趣，但担心恢复期和疼痛问题。
+                    <div className="space-y-4">
+                      <div className="bg-slate-900/50 rounded-lg p-4">
+                        <h4 className="text-xs font-semibold text-blue-300 mb-2">客户基本情况</h4>
+                        <p className="text-sm text-slate-300 leading-relaxed">
+                          客户张女士，28岁，主要关注面部抗衰老问题，特别是法令纹的改善。她表示皮肤较为敏感，经常出现泛红现象，需要特别注意产品和项目的温和性。
+                        </p>
+                      </div>
+                      <div className="bg-slate-900/50 rounded-lg p-4">
+                        <h4 className="text-xs font-semibold text-green-300 mb-2">核心需求分析</h4>
+                        <p className="text-sm text-slate-300 leading-relaxed">
+                          客户希望选择温和且有效的治疗方案，预算控制在5000元以内。倾向于无创或微创项目，特别强调不希望有明显的恢复期，因为工作较忙。对疼痛比较敏感，需要在治疗过程中特别关注舒适度。
+                        </p>
+                      </div>
+                      <div className="bg-slate-900/50 rounded-lg p-4">
+                        <h4 className="text-xs font-semibold text-purple-300 mb-2">项目兴趣点</h4>
+                        <p className="text-sm text-slate-300 leading-relaxed">
+                          客户对光电类项目（热玛吉、超声刀）表现出浓厚兴趣，但因预算限制更倾向于水光针+肉毒素的组合方案。对项目的安全性和副作用较为关注，需要详细的专业解答来建立信任。
+                        </p>
+                      </div>
+                      <div className="bg-slate-900/50 rounded-lg p-4">
+                        <h4 className="text-xs font-semibold text-orange-300 mb-2">跟进建议</h4>
+                        <p className="text-sm text-slate-300 leading-relaxed">
+                          建议先安排面诊，进行详细的皮肤检测。针对敏感肌特点，优先推荐温和的基础护理方案，建立皮肤屏障后再考虑进阶治疗。可以准备水光针+肉毒素的详细方案和案例，同时准备敏感肌专用的术后护理产品推荐。
+                        </p>
+                      </div>
                     </div>
                   </Card>
 
-                  {/* 关键信息列表 */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* 客户疑虑点 */}
+                    {/* 客户疑虑点 - Expandable */}
                     <Card className="bg-slate-800/50 border-slate-700 p-5">
-                      <h4 className="text-sm font-semibold text-white mb-3">客户疑虑点</h4>
-                      <ul className="space-y-2">
-                        {["恢复期太长", "害怕疼痛", "担心副作用", "价格是否合理"].map((concern, index) => (
-                          <li key={index} className="flex items-start space-x-2 text-sm text-slate-300">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-semibold text-white">客户疑虑点</h4>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => setExpandedConcerns(!expandedConcerns)}
+                        >
+                          {expandedConcerns ? (
+                            <ChevronUp className="w-4 h-4 text-slate-400" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 text-slate-400" />
+                          )}
+                        </Button>
+                      </div>
+                      <ul className="space-y-3">
+                        <li className="space-y-2">
+                          <div className="flex items-start space-x-2 text-sm text-slate-300">
                             <ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
-                            <span>{concern}</span>
-                          </li>
-                        ))}
+                            <span>恢复期太长</span>
+                          </div>
+                          {expandedConcerns && (
+                            <div className="ml-6 p-3 bg-slate-900/50 rounded text-xs text-slate-400 leading-relaxed">
+                              <span className="text-blue-300 font-semibold">AI分析：</span>
+                              客户对恢复期非常敏感，工作繁忙无法请假。建议重点推荐无创项目，强调"即做即走"的优势。接受度：
+                              <span className="text-green-400 font-semibold">高</span>（如果能保证无恢复期）
+                            </div>
+                          )}
+                        </li>
+                        <li className="space-y-2">
+                          <div className="flex items-start space-x-2 text-sm text-slate-300">
+                            <ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                            <span>害怕疼痛</span>
+                          </div>
+                          {expandedConcerns && (
+                            <div className="ml-6 p-3 bg-slate-900/50 rounded text-xs text-slate-400 leading-relaxed">
+                              <span className="text-blue-300 font-semibold">AI分析：</span>
+                              疼痛敏感度较高，需要在咨询时详细说明麻醉方案和舒适度保障措施。接受度：
+                              <span className="text-yellow-400 font-semibold">中等</span>（需要充分沟通）
+                            </div>
+                          )}
+                        </li>
+                        <li className="space-y-2">
+                          <div className="flex items-start space-x-2 text-sm text-slate-300">
+                            <ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                            <span>担心副作用</span>
+                          </div>
+                          {expandedConcerns && (
+                            <div className="ml-6 p-3 bg-slate-900/50 rounded text-xs text-slate-400 leading-relaxed">
+                              <span className="text-blue-300 font-semibold">AI分析：</span>
+                              敏感肌背景导致对副作用格外关注。需要提供详细的安全性数据和成功案例。接受度：
+                              <span className="text-yellow-400 font-semibold">中等</span>（需要建立信任）
+                            </div>
+                          )}
+                        </li>
+                        <li className="space-y-2">
+                          <div className="flex items-start space-x-2 text-sm text-slate-300">
+                            <ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                            <span>价格是否合理</span>
+                          </div>
+                          {expandedConcerns && (
+                            <div className="ml-6 p-3 bg-slate-900/50 rounded text-xs text-slate-400 leading-relaxed">
+                              <span className="text-blue-300 font-semibold">AI分析：</span>
+                              预算5000元，对价格较为敏感。建议提供性价比高的组合方案和分期付款选项。接受度：
+                              <span className="text-green-400 font-semibold">高</span>（在预算范围内）
+                            </div>
+                          )}
+                        </li>
                       </ul>
                     </Card>
 
-                    {/* 提及产品/项目 */}
+                    {/* 提及产品/项目 - Expandable */}
                     <Card className="bg-slate-800/50 border-slate-700 p-5">
-                      <h4 className="text-sm font-semibold text-white mb-3">提及产品/项目</h4>
-                      <ul className="space-y-2">
-                        {["热玛吉", "超声刀", "水光针", "肉毒素"].map((product, index) => (
-                          <li key={index} className="flex items-start space-x-2 text-sm text-slate-300">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-semibold text-white">提及产品/项目</h4>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => setExpandedProducts(!expandedProducts)}
+                        >
+                          {expandedProducts ? (
+                            <ChevronUp className="w-4 h-4 text-slate-400" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 text-slate-400" />
+                          )}
+                        </Button>
+                      </div>
+                      <ul className="space-y-3">
+                        <li className="space-y-2">
+                          <div className="flex items-start space-x-2 text-sm text-slate-300">
                             <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                            <span>{product}</span>
-                          </li>
-                        ))}
+                            <span>热玛吉</span>
+                          </div>
+                          {expandedProducts && (
+                            <div className="ml-6 p-3 bg-slate-900/50 rounded text-xs text-slate-400 leading-relaxed">
+                              <span className="text-blue-300 font-semibold">AI分析：</span>
+                              客户对热玛吉表现出较高兴趣，但价格超出预算。意向度：
+                              <span className="text-yellow-400 font-semibold">中等</span>
+                              ，建议作为升级方案保留，或推荐局部治疗降低价格。
+                            </div>
+                          )}
+                        </li>
+                        <li className="space-y-2">
+                          <div className="flex items-start space-x-2 text-sm text-slate-300">
+                            <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                            <span>超声刀</span>
+                          </div>
+                          {expandedProducts && (
+                            <div className="ml-6 p-3 bg-slate-900/50 rounded text-xs text-slate-400 leading-relaxed">
+                              <span className="text-blue-300 font-semibold">AI分析：</span>
+                              了解程度较浅，主要是听说过。意向度：
+                              <span className="text-yellow-400 font-semibold">低-中等</span>
+                              ，需要详细介绍与热玛吉的区别和优势。
+                            </div>
+                          )}
+                        </li>
+                        <li className="space-y-2">
+                          <div className="flex items-start space-x-2 text-sm text-slate-300">
+                            <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                            <span>水光针</span>
+                          </div>
+                          {expandedProducts && (
+                            <div className="ml-6 p-3 bg-slate-900/50 rounded text-xs text-slate-400 leading-relaxed">
+                              <span className="text-blue-300 font-semibold">AI分析：</span>
+                              顾问推荐后表现出兴趣，符合预算范围。意向度：
+                              <span className="text-green-400 font-semibold">高</span>
+                              ，建议作为主推方案，强调补水保湿和改善肤质的效果。
+                            </div>
+                          )}
+                        </li>
+                        <li className="space-y-2">
+                          <div className="flex items-start space-x-2 text-sm text-slate-300">
+                            <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                            <span>肉毒素</span>
+                          </div>
+                          {expandedProducts && (
+                            <div className="ml-6 p-3 bg-slate-900/50 rounded text-xs text-slate-400 leading-relaxed">
+                              <span className="text-blue-300 font-semibold">AI分析：</span>
+                              与水光针组合推荐，客户接受度良好。意向度：
+                              <span className="text-green-400 font-semibold">高</span>
+                              ，需要重点说明安全性和针对动态纹的显著效果。
+                            </div>
+                          )}
+                        </li>
                       </ul>
                     </Card>
 
-                    {/* 相关生活习惯 */}
+                    {/* 相关生活习惯 - Expandable */}
                     <Card className="bg-slate-800/50 border-slate-700 p-5">
-                      <h4 className="text-sm font-semibold text-white mb-3">相关生活习惯</h4>
-                      <ul className="space-y-2">
-                        {["经常熬夜", "工作压力大", "饮食不规律", "缺乏运动"].map((habit, index) => (
-                          <li key={index} className="flex items-start space-x-2 text-sm text-slate-300">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-semibold text-white">相关生活习惯</h4>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => setExpandedHabits(!expandedHabits)}
+                        >
+                          {expandedHabits ? (
+                            <ChevronUp className="w-4 h-4 text-slate-400" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 text-slate-400" />
+                          )}
+                        </Button>
+                      </div>
+                      <ul className="space-y-3">
+                        <li className="space-y-2">
+                          <div className="flex items-start space-x-2 text-sm text-slate-300">
                             <ChevronRight className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
-                            <span>{habit}</span>
-                          </li>
-                        ))}
+                            <span>经常熬夜</span>
+                          </div>
+                          {expandedHabits && (
+                            <div className="ml-6 p-3 bg-slate-900/50 rounded text-xs text-slate-400 leading-relaxed">
+                              熬夜会加速皮肤衰老，影响胶原蛋白生成。建议在方案中加入抗氧化和修复类产品，同时提醒客户改善作息习惯以提升治疗效果。
+                            </div>
+                          )}
+                        </li>
+                        <li className="space-y-2">
+                          <div className="flex items-start space-x-2 text-sm text-slate-300">
+                            <ChevronRight className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+                            <span>工作压力大</span>
+                          </div>
+                          {expandedHabits && (
+                            <div className="ml-6 p-3 bg-slate-900/50 rounded text-xs text-slate-400 leading-relaxed">
+                              压力会导致皮质醇升高，影响皮肤状态。可以推荐舒缓类护理项目，如芳疗按摩、舒缓面膜等，帮助客户放松身心。
+                            </div>
+                          )}
+                        </li>
+                        <li className="space-y-2">
+                          <div className="flex items-start space-x-2 text-sm text-slate-300">
+                            <ChevronRight className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+                            <span>饮食不规律</span>
+                          </div>
+                          {expandedHabits && (
+                            <div className="ml-6 p-3 bg-slate-900/50 rounded text-xs text-slate-400 leading-relaxed">
+                              不规律饮食影响营养吸收和皮肤代谢。建议配合口服美容产品（胶原蛋白、维生素C等）来改善皮肤状态。
+                            </div>
+                          )}
+                        </li>
+                        <li className="space-y-2">
+                          <div className="flex items-start space-x-2 text-sm text-slate-300">
+                            <ChevronRight className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+                            <span>缺乏运动</span>
+                          </div>
+                          {expandedHabits && (
+                            <div className="ml-6 p-3 bg-slate-900/50 rounded text-xs text-slate-400 leading-relaxed">
+                              运动不足导致血液循环不佳，影响皮肤新陈代谢。可以推荐促进循环的护理项目，如淋巴排毒、面部提拉按摩等。
+                            </div>
+                          )}
+                        </li>
                       </ul>
                     </Card>
                   </div>
 
-                  {/* 查看完整聊天记录按钮 */}
                   <div className="flex justify-center">
-                    <Button className="bg-blue-500 hover:bg-blue-600">
+                    <Button className="bg-blue-500 hover:bg-blue-600" onClick={() => setShowChatHistory(true)}>
                       <Eye className="w-4 h-4 mr-2" />
                       查看完整聊天记录
                     </Button>
@@ -700,6 +1001,54 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
           </Tabs>
         </div>
       </div>
+
+      <Dialog open={showChatHistory} onOpenChange={setShowChatHistory}>
+        <DialogContent className="max-w-3xl max-h-[80vh] bg-slate-900 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span className="flex items-center">
+                <MessageSquare className="w-5 h-5 mr-2 text-blue-400" />
+                完整聊天记录
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowChatHistory(false)}
+                className="hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-[60vh] pr-4">
+            <div className="space-y-4">
+              {mockChatHistory.map((message, index) => (
+                <div key={index} className={`flex ${message.role === "customer" ? "justify-start" : "justify-end"}`}>
+                  <div
+                    className={`max-w-[70%] ${
+                      message.role === "customer"
+                        ? "bg-slate-800/50 border border-slate-700"
+                        : "bg-blue-500/20 border border-blue-500/30"
+                    } rounded-lg p-4`}
+                  >
+                    <div className="flex items-center space-x-2 mb-2">
+                      <span
+                        className={`text-xs font-semibold ${
+                          message.role === "customer" ? "text-pink-300" : "text-blue-300"
+                        }`}
+                      >
+                        {message.name}
+                      </span>
+                      <span className="text-xs text-slate-500">{message.time}</span>
+                    </div>
+                    <p className="text-sm text-slate-200 leading-relaxed">{message.message}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
