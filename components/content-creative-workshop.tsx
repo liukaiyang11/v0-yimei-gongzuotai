@@ -494,7 +494,7 @@ function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" 
                 <AlertTriangle className="w-4 h-4 text-yellow-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs font-semibold text-yellow-500 mb-1">合规提示</p>
-                  <p className="text-xs text-slate-300">
+                  <p className="text-xs text-slate-400">
                     检测到可能违规词语：<span className="text-yellow-400 underline">医美老司机</span>
                   </p>
                 </div>
@@ -543,21 +543,21 @@ function BrandCenter() {
               <label className="text-sm font-medium text-slate-300 mb-2 block">主色</label>
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-lg bg-blue-500 border-2 border-white/20 cursor-pointer"></div>
-                <Input value="#3B82F6" className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
+                <Input value="#3B82F6" readOnly className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
               </div>
             </div>
             <div>
               <label className="text-sm font-medium text-slate-300 mb-2 block">辅助色 1</label>
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-lg bg-purple-500 border-2 border-white/20 cursor-pointer"></div>
-                <Input value="#A855F7" className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
+                <Input value="#A855F7" readOnly className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
               </div>
             </div>
             <div>
               <label className="text-sm font-medium text-slate-300 mb-2 block">辅助色 2</label>
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-lg bg-pink-500 border-2 border-white/20 cursor-pointer"></div>
-                <Input value="#EC4899" className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
+                <Input value="#EC4899" readOnly className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
               </div>
             </div>
           </div>
