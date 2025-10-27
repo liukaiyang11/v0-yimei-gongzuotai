@@ -1,5 +1,7 @@
-import { WorkspaceLayout } from "@/components/workspace-layout"
+"use client"
 
-export default function HomePage() {
-  return <WorkspaceLayout />
+import { AICollaborationAssistant } from "../components/ai-collaboration-assistant"
+
+export default function SyntheticV0PageForDeployment() {
+  return <AICollaborationAssistant />
 }

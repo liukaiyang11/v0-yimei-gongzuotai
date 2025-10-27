@@ -44,7 +44,7 @@ interface AICollaborationAssistantProps {
   onBack: () => void
 }
 
-// <CHANGE> Updated mockProducts to mockProjects with treatment project data
+// Updated mockProducts to mockProjects with treatment project data
 const mockProjects = [
   {
     id: 1,
@@ -391,6 +391,10 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
     setPlanItems(planItems.filter((item) => item.id !== id))
   }
 
+  const updatePlanItem = (id: number, field: string, value: any) => {
+    setPlanItems(planItems.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
+  }
+
   const calculateTotal = () => {
     return planItems.reduce((total, item) => {
       const priceStr = item.price.replace(/[¥,]/g, "")
@@ -639,7 +643,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
               </TabsList>
             </div>
 
-            {/* <CHANGE> Tab 1: 快速病历 - Complete implementation with AI-generated medical record */}
+            {/* Tab 1: 快速病历 - Complete implementation with AI-generated medical record */}
             <TabsContent value="medical-record" className="flex-1 m-0 overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
@@ -1245,7 +1249,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
               </ScrollArea>
             </TabsContent>
 
-            {/* <CHANGE> Tab 3: 辅助通用方案 - Complete implementation */}
+            {/* Tab 3: 辅助通用方案 - Complete implementation */}
             <TabsContent value="general-plan" className="flex-1 m-0 overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
@@ -1255,9 +1259,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                       <Lightbulb className="w-5 h-5 text-purple-400" />
                       <div>
                         <p className="text-sm font-semibold text-white">AI辅助方案已生成</p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          基于快速病历、咨询纪要及美沃斯医院行业标准数据库
-                        </p>
+                        <p className="text-xs text-slate-400 mt-1">基于快速病历、咨询纪要及美沃斯医院行业标准数据库</p>
                       </div>
                     </div>
                   </Card>
@@ -1398,9 +1400,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                         <div className="ml-11 space-y-2">
                           <div className="bg-slate-900/50 rounded p-3">
                             <p className="text-sm font-semibold text-white mb-1">推荐项目：水光针（1次）</p>
-                            <p className="text-xs text-slate-400">
-                              深层补水保湿，改善皮肤干燥状态，为后续治疗打好基础
-                            </p>
+                            <p className="text-xs text-slate-400">深层补水保湿，改善皮肤干燥状态，为后续治疗打好基础</p>
                             <p className="text-xs text-blue-400 mt-2">预算：¥1800-2500</p>
                           </div>
                           <div className="bg-slate-900/50 rounded p-3">
@@ -1425,9 +1425,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                         <div className="ml-11 space-y-2">
                           <div className="bg-slate-900/50 rounded p-3">
                             <p className="text-sm font-semibold text-white mb-1">推荐项目：肉毒素除皱（1次）</p>
-                            <p className="text-xs text-slate-400">
-                              针对法令纹区域注射，放松肌肉，减少动态纹的产生
-                            </p>
+                            <p className="text-xs text-slate-400">针对法令纹区域注射，放松肌肉，减少动态纹的产生</p>
                             <p className="text-xs text-purple-400 mt-2">预算：¥2000-3000</p>
                           </div>
                           <div className="bg-slate-900/50 rounded p-3">
@@ -1594,7 +1592,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
               </ScrollArea>
             </TabsContent>
 
-            {/* <CHANGE> Tab 4: 智能推荐 - Updated to show treatment projects instead of products */}
+            {/* Tab 4: 智能推荐 - Updated to show treatment projects instead of products */}
             <TabsContent value="recommendation" className="flex-1 m-0 overflow-hidden">
               <div className="flex h-full">
                 {/* 项目推荐列表 */}
@@ -1863,14 +1861,16 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                                     <div>
                                       <label className="text-slate-400">频次</label>
                                       <Input
-                                        defaultValue={item.frequency}
+                                        value={item.frequency}
+                                        onChange={(e) => updatePlanItem(item.id, "frequency", e.target.value)}
                                         className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
                                       />
                                     </div>
                                     <div>
                                       <label className="text-slate-400">单价</label>
                                       <Input
-                                        defaultValue={item.price}
+                                        value={item.price}
+                                        onChange={(e) => updatePlanItem(item.id, "price", e.target.value)}
                                         className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
                                       />
                                     </div>
@@ -1878,7 +1878,10 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                                       <label className="text-slate-400">数量</label>
                                       <Input
                                         type="number"
-                                        defaultValue={item.quantity}
+                                        value={item.quantity}
+                                        onChange={(e) =>
+                                          updatePlanItem(item.id, "quantity", Number.parseInt(e.target.value) || 1)
+                                        }
                                         className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
                                       />
                                     </div>
@@ -1892,7 +1895,8 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                                   <Textarea
                                     placeholder="操作备注和注意事项..."
                                     className="text-xs bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[60px]"
-                                    defaultValue={item.notes}
+                                    value={item.notes}
+                                    onChange={(e) => updatePlanItem(item.id, "notes", e.target.value)}
                                   />
                                 </div>
                               ))}
@@ -1943,14 +1947,16 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                                     <div>
                                       <label className="text-slate-400">频次</label>
                                       <Input
-                                        defaultValue={item.frequency}
+                                        value={item.frequency}
+                                        onChange={(e) => updatePlanItem(item.id, "frequency", e.target.value)}
                                         className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
                                       />
                                     </div>
                                     <div>
                                       <label className="text-slate-400">单价</label>
                                       <Input
-                                        defaultValue={item.price}
+                                        value={item.price}
+                                        onChange={(e) => updatePlanItem(item.id, "price", e.target.value)}
                                         className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
                                       />
                                     </div>
@@ -1958,7 +1964,10 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                                       <label className="text-slate-400">数量</label>
                                       <Input
                                         type="number"
-                                        defaultValue={item.quantity}
+                                        value={item.quantity}
+                                        onChange={(e) =>
+                                          updatePlanItem(item.id, "quantity", Number.parseInt(e.target.value) || 1)
+                                        }
                                         className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
                                       />
                                     </div>
@@ -1966,4 +1975,139 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                                       <label className="text-slate-400">小计</label>
                                       <div className="h-7 flex items-center text-blue-400 font-semibold mt-1">
                                         {item.price}
-                                      </div\
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <Textarea
+                                    placeholder="操作备注和注意事项..."
+                                    className="text-xs bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[60px]"
+                                    value={item.notes}
+                                    onChange={(e) => updatePlanItem(item.id, "notes", e.target.value)}
+                                  />
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 第三阶段 */}
+                      <div className="border border-slate-700 rounded-lg p-4 bg-slate-900/50">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-semibold text-white flex items-center">
+                            <div className="w-6 h-6 rounded-full bg-green-500 text-white text-xs flex items-center justify-center mr-2">
+                              3
+                            </div>
+                            第三阶段：居家维稳与产品使用
+                          </h4>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-green-500/50 text-green-300 hover:bg-green-500/20 bg-transparent"
+                            onClick={() => openAddModal("第三阶段")}
+                          >
+                            <Plus className="w-3 h-3 mr-1" />
+                            添加项目
+                          </Button>
+                        </div>
+
+                        {planItems.filter((item) => item.phase === "第三阶段").length === 0 ? (
+                          <p className="text-sm text-slate-400 text-center py-4">暂无项目，点击上方按钮添加</p>
+                        ) : (
+                          <div className="space-y-3">
+                            {planItems
+                              .filter((item) => item.phase === "第三阶段")
+                              .map((item) => (
+                                <div key={item.id} className="bg-slate-800/50 rounded-lg p-3 space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm font-semibold text-white">{item.name}</span>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      onClick={() => removeFromPlan(item.id)}
+                                      className="h-6 w-6 text-red-400 hover:text-red-300 hover:bg-red-500/20"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                  <div className="grid grid-cols-4 gap-2 text-xs">
+                                    <div>
+                                      <label className="text-slate-400">频次</label>
+                                      <Input
+                                        value={item.frequency}
+                                        onChange={(e) => updatePlanItem(item.id, "frequency", e.target.value)}
+                                        className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-slate-400">单价</label>
+                                      <Input
+                                        value={item.price}
+                                        onChange={(e) => updatePlanItem(item.id, "price", e.target.value)}
+                                        className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-slate-400">数量</label>
+                                      <Input
+                                        type="number"
+                                        value={item.quantity}
+                                        onChange={(e) =>
+                                          updatePlanItem(item.id, "quantity", Number.parseInt(e.target.value) || 1)
+                                        }
+                                        className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-slate-400">小计</label>
+                                      <div className="h-7 flex items-center text-blue-400 font-semibold mt-1">
+                                        {item.price}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <Textarea
+                                    placeholder="操作备注和注意事项..."
+                                    className="text-xs bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[60px]"
+                                    value={item.notes}
+                                    onChange={(e) => updatePlanItem(item.id, "notes", e.target.value)}
+                                  />
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 方案状态和总价 */}
+                    <div className="mt-6 p-4 border border-slate-700 rounded-lg bg-slate-900/50">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-semibold text-white flex items-center">
+                          <Tag className="w-4 h-4 mr-2 text-yellow-400" />
+                          方案状态
+                        </h4>
+                        <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">{planStatus}</Badge>
+                      </div>
+                      <div className="flex items-center justify-between text-lg font-bold text-white">
+                        <span>总计费用:</span>
+                        <span>
+                          {Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(calculateTotal())}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 保存方案按钮 */}
+                    <div className="mt-6 flex justify-end">
+                      <Button className="bg-blue-500 hover:bg-blue-600">
+                        <Save className="w-4 h-4 mr-2" />
+                        保存定制方案
+                      </Button>
+                    </div>
+                  </Card>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </div>
+  )
+}
