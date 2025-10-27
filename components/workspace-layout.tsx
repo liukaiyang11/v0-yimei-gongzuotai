@@ -15,6 +15,7 @@ import { CustomerAcquisitionSystem } from "@/components/customer-acquisition-sys
 import { AppMarketplace } from "@/components/app-marketplace"
 import { MedicalBeautyThinkTank } from "@/components/medical-beauty-think-tank"
 import { Screensaver } from "@/components/screensaver"
+import { ContentCreativeWorkshop } from "@/components/content-creative-workshop"
 
 const IDLE_TIMEOUT = 5 * 60 * 1000 // 5 minutes in milliseconds
 
@@ -35,6 +36,7 @@ export function WorkspaceLayout() {
   const [showCustomerAcquisition, setShowCustomerAcquisition] = useState(false)
   const [showAppMarketplace, setShowAppMarketplace] = useState(false)
   const [showScreensaver, setShowScreensaver] = useState(false)
+  const [showContentWorkshop, setShowContentWorkshop] = useState(false)
 
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -104,6 +106,9 @@ export function WorkspaceLayout() {
     if (appId === "customer-acquisition") {
       setShowCustomerAcquisition(true)
     }
+    if (appId === "content-workshop") {
+      setShowContentWorkshop(true)
+    }
   }
 
   const handleAddApp = (appId: string) => {
@@ -114,6 +119,10 @@ export function WorkspaceLayout() {
 
   if (showScreensaver) {
     return <Screensaver onExit={() => setShowScreensaver(false)} />
+  }
+
+  if (showContentWorkshop) {
+    return <ContentCreativeWorkshop onBack={() => setShowContentWorkshop(false)} />
   }
 
   if (showCustomerAcquisition) {
