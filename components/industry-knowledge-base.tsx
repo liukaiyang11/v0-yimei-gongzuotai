@@ -8,15 +8,32 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BookLibrary } from "@/components/industry-knowledge-base/book-library"
 import { CourseCenter } from "@/components/industry-knowledge-base/course-center"
 import { BookReader } from "@/components/industry-knowledge-base/book-reader"
+import { CoursePlayer } from "@/components/industry-knowledge-base/course-player"
 
 interface IndustryKnowledgeBaseProps {
   onOpenBookReader: (state: { show: boolean; bookTitle: string }) => void
   bookReaderState: { show: boolean; bookTitle: string }
+  onOpenCoursePlayer: (state: { show: boolean; courseTitle: string }) => void
+  coursePlayerState: { show: boolean; courseTitle: string }
 }
 
-export function IndustryKnowledgeBase({ onOpenBookReader, bookReaderState }: IndustryKnowledgeBaseProps) {
+export function IndustryKnowledgeBase({
+  onOpenBookReader,
+  bookReaderState,
+  onOpenCoursePlayer,
+  coursePlayerState,
+}: IndustryKnowledgeBaseProps) {
   const [activeTab, setActiveTab] = useState("books")
   const [searchQuery, setSearchQuery] = useState("")
+
+  if (coursePlayerState.show) {
+    return (
+      <CoursePlayer
+        courseTitle={coursePlayerState.courseTitle}
+        onBack={() => onOpenCoursePlayer({ show: false, courseTitle: "" })}
+      />
+    )
+  }
 
   if (bookReaderState.show) {
     return (
@@ -75,7 +92,7 @@ export function IndustryKnowledgeBase({ onOpenBookReader, bookReaderState }: Ind
         </TabsContent>
 
         <TabsContent value="courses" className="mt-6">
-          <CourseCenter searchQuery={searchQuery} />
+          <CourseCenter searchQuery={searchQuery} onOpenCoursePlayer={onOpenCoursePlayer} />
         </TabsContent>
       </Tabs>
     </div>
