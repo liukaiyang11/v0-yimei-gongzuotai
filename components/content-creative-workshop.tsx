@@ -298,6 +298,12 @@ function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" 
   const [generatedPosters, setGeneratedPosters] = useState<number[]>([])
   const [selectedPoster, setSelectedPoster] = useState<number | null>(null)
 
+  const [projectName, setProjectName] = useState("")
+  const [keyPoints, setKeyPoints] = useState("")
+  const [keywords, setKeywords] = useState("")
+  const [style, setStyle] = useState("自然风")
+  const [searchQuery, setSearchQuery] = useState("")
+
   const handleGenerate = () => {
     setGeneratedPosters([1, 2, 3, 4])
     setSelectedPoster(1)
@@ -346,12 +352,19 @@ function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" 
 
             <div>
               <label className="text-sm font-medium text-slate-300 mb-2 block">项目名称</label>
-              <Input placeholder="例如：水光针推广" className="bg-slate-700/50 border-slate-600 text-white" />
+              <Input
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                placeholder="例如：水光针推广"
+                className="bg-slate-700/50 border-slate-600 text-white"
+              />
             </div>
 
             <div>
               <label className="text-sm font-medium text-slate-300 mb-2 block">核心卖点</label>
               <Textarea
+                value={keyPoints}
+                onChange={(e) => setKeyPoints(e.target.value)}
                 placeholder="例如：深层补水、提亮肤色、改善细纹"
                 className="bg-slate-700/50 border-slate-600 text-white min-h-[100px]"
               />
@@ -366,12 +379,21 @@ function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" 
                   </Badge>
                 ))}
               </div>
-              <Input placeholder="添加关键词" className="bg-slate-700/50 border-slate-600 text-white" />
+              <Input
+                value={keywords}
+                onChange={(e) => setKeywords(e.target.value)}
+                placeholder="添加关键词"
+                className="bg-slate-700/50 border-slate-600 text-white"
+              />
             </div>
 
             <div>
               <label className="text-sm font-medium text-slate-300 mb-2 block">风格选择</label>
-              <select className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white">
+              <select
+                value={style}
+                onChange={(e) => setStyle(e.target.value)}
+                className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white"
+              >
                 <option>自然风</option>
                 <option>高级感</option>
                 <option>科技感</option>
@@ -661,6 +683,7 @@ function BrandCenter() {
 function MaterialsLibrary() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [selectedCategory, setSelectedCategory] = useState("all")
+  const [searchQuery, setSearchQuery] = useState("")
 
   const categories = [
     { id: "all", name: "全部素材" },
@@ -711,7 +734,12 @@ function MaterialsLibrary() {
             </Button>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <Input placeholder="搜索素材..." className="pl-10 bg-slate-700/50 border-slate-600 text-white w-64" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="搜索素材..."
+                className="pl-10 bg-slate-700/50 border-slate-600 text-white w-64"
+              />
             </div>
           </div>
           <div className="flex items-center gap-2">
