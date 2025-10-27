@@ -29,7 +29,7 @@ interface App {
 const allApps: App[] = [
   {
     id: "collaborative-service",
-    name: "智能协同服务工作台",
+    name: "智能群聊服务工作台",
     description: "群聊协同·AI辅助",
     icon: "Users",
     category: "featured",
@@ -51,7 +51,7 @@ const allApps: App[] = [
   {
     id: "sales-assistant",
     name: "咨询师&医生协作平台",
-    description: "咨询师与医生协作平台",
+    description: "咨询师医生协作平台",
     icon: "Stethoscope",
     category: "featured",
   },
@@ -373,7 +373,7 @@ const allApps: App[] = [
   {
     id: "sales-assistant-marketing",
     name: "咨询师&医生协作平台",
-    description: "咨询师与医生协作平台",
+    description: "咨询师医生协作平台",
     icon: "Stethoscope",
     category: "marketing",
   },

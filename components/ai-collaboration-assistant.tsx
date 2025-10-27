@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react"
 import {
   ArrowLeft,
-  Search,
   TrendingUp,
   DollarSign,
   Package,
@@ -26,6 +25,10 @@ import {
   X,
   GripVertical,
   Check,
+  Upload,
+  Mic,
+  Droplet,
+  Users,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -195,6 +198,13 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
   const [isResizing, setIsResizing] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  const [selectedAge, setSelectedAge] = useState("")
+  const [selectedSkinType, setSelectedSkinType] = useState("")
+  const [selectedGender, setSelectedGender] = useState("")
+  const [uploadedScreenshots, setUploadedScreenshots] = useState<string[]>([])
+  const [uploadedAudio, setUploadedAudio] = useState<string | null>(null)
+  const [customInput, setCustomInput] = useState("")
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizing || !containerRef.current) return
@@ -290,100 +300,172 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
         </Button>
         <div className="ml-4 flex items-center space-x-2">
           <Stethoscope className="w-5 h-5 text-blue-400" />
-          <h1 className="text-lg font-semibold text-white">AI协作助理</h1>
+          <h1 className="text-lg font-semibold text-white">咨询师&医生协作平台</h1>
         </div>
       </div>
 
       <div ref={containerRef} className="flex h-[calc(100vh-4rem)]">
-        {/* 左侧栏 - 客户信息中心 (可调整大小) */}
         <div
           style={{ width: leftWidth }}
           className="border-r border-slate-700/50 bg-slate-900/50 backdrop-blur-sm flex-shrink-0"
         >
           <ScrollArea className="h-full">
             <div className="p-6 space-y-6">
-              {/* 搜索框 */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <Input
-                  placeholder="搜索客户..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
-                />
-              </div>
+              <h2 className="text-lg font-semibold text-white mb-4">客户信息录入</h2>
 
-              {/* 客户基本画像 */}
+              {/* Part 1: 点选区域 */}
               <Card className="bg-slate-800/50 border-slate-700 p-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold text-white">张女士</h3>
-                      <p className="text-sm text-slate-400">28岁</p>
+                <h3 className="text-sm font-semibold text-white mb-4">基本信息</h3>
+                <div className="space-y-4">
+                  {/* 年龄选择 */}
+                  <div>
+                    <label className="text-xs text-slate-400 mb-2 block">年龄</label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {["18-25", "26-35", "36-45", "46+"].map((age) => (
+                        <Button
+                          key={age}
+                          variant="outline"
+                          size="sm"
+                          className={`${
+                            selectedAge === age
+                              ? "bg-blue-500 text-white border-blue-500"
+                              : "bg-slate-900/50 border-slate-700 text-slate-300 hover:bg-slate-800"
+                          }`}
+                          onClick={() => setSelectedAge(age)}
+                        >
+                          {age}
+                        </Button>
+                      ))}
                     </div>
-                    <Badge className="bg-pink-500/20 text-pink-300 border-pink-500/30">干性敏感肌</Badge>
+                  </div>
+
+                  {/* 性别选择 */}
+                  <div>
+                    <label className="text-xs text-slate-400 mb-2 block">性别</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {["女", "男", "其他"].map((gender) => (
+                        <Button
+                          key={gender}
+                          variant="outline"
+                          size="sm"
+                          className={`${
+                            selectedGender === gender
+                              ? "bg-blue-500 text-white border-blue-500"
+                              : "bg-slate-900/50 border-slate-700 text-slate-300 hover:bg-slate-800"
+                          }`}
+                          onClick={() => setSelectedGender(gender)}
+                        >
+                          <Users className="w-3 h-3 mr-1" />
+                          {gender}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 肤质选择 */}
+                  <div>
+                    <label className="text-xs text-slate-400 mb-2 block">肤质</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {["干性", "油性", "混合性", "敏感性"].map((skinType) => (
+                        <Button
+                          key={skinType}
+                          variant="outline"
+                          size="sm"
+                          className={`${
+                            selectedSkinType === skinType
+                              ? "bg-blue-500 text-white border-blue-500"
+                              : "bg-slate-900/50 border-slate-700 text-slate-300 hover:bg-slate-800"
+                          }`}
+                          onClick={() => setSelectedSkinType(skinType)}
+                        >
+                          <Droplet className="w-3 h-3 mr-1" />
+                          {skinType}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </Card>
 
-              {/* 关键数据统计 */}
-              <div className="space-y-3">
-                <Card className="bg-slate-800/50 border-slate-700 p-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-400">历史消费总额</span>
-                    <span className="text-lg font-semibold text-white">¥28,650</span>
-                  </div>
-                </Card>
-                <Card className="bg-slate-800/50 border-slate-700 p-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-400">购买频率</span>
-                    <span className="text-lg font-semibold text-white">2.3次/月</span>
-                  </div>
-                </Card>
-              </div>
-
-              {/* 品类偏好分析 */}
+              {/* Part 2: 上传部分 */}
               <Card className="bg-slate-800/50 border-slate-700 p-4">
-                <h4 className="text-sm font-semibold text-white mb-3">品类偏好</h4>
-                <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-white mb-4">资料上传</h3>
+                <div className="space-y-4">
+                  {/* 截图上传 */}
                   <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-slate-400">面霜</span>
-                      <span className="text-slate-300">85%</span>
-                    </div>
-                    <Progress value={85} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-slate-400">精华</span>
-                      <span className="text-slate-300">72%</span>
-                    </div>
-                    <Progress value={72} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-slate-400">眼霜</span>
-                      <span className="text-slate-300">58%</span>
-                    </div>
-                    <Progress value={58} className="h-2" />
-                  </div>
-                </div>
-              </Card>
-
-              {/* 近期购买/服务记录 */}
-              <Card className="bg-slate-800/50 border-slate-700 p-4">
-                <h4 className="text-sm font-semibold text-white mb-3">近期购买记录</h4>
-                <div className="space-y-2">
-                  {["海蓝之谜面霜", "雅诗兰黛精华", "SK-II神仙水"].map((item, index) => (
-                    <div key={index} className="flex items-center space-x-3 text-sm">
-                      <div className="w-10 h-10 rounded-lg bg-slate-700/50 flex items-center justify-center">
-                        <Package className="w-5 h-5 text-slate-400" />
+                    <label className="text-xs text-slate-400 mb-2 block">微信聊天截图</label>
+                    <div className="border-2 border-dashed border-slate-700 rounded-lg p-4 hover:border-blue-500/50 transition-colors cursor-pointer bg-slate-900/30">
+                      <div className="flex flex-col items-center space-y-2">
+                        <Upload className="w-8 h-8 text-slate-400" />
+                        <p className="text-xs text-slate-400 text-center">点击或拖拽上传截图</p>
+                        <p className="text-xs text-slate-500">支持 PNG, JPG 格式</p>
                       </div>
-                      <span className="text-slate-300">{item}</span>
                     </div>
-                  ))}
+                    {uploadedScreenshots.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {uploadedScreenshots.map((file, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between bg-slate-900/50 rounded px-3 py-2 text-xs"
+                          >
+                            <span className="text-slate-300">{file}</span>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-5 w-5 text-red-400 hover:text-red-300"
+                              onClick={() => setUploadedScreenshots(uploadedScreenshots.filter((_, i) => i !== index))}
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 录音上传 */}
+                  <div>
+                    <label className="text-xs text-slate-400 mb-2 block">咨询录音</label>
+                    <div className="border-2 border-dashed border-slate-700 rounded-lg p-4 hover:border-blue-500/50 transition-colors cursor-pointer bg-slate-900/30">
+                      <div className="flex flex-col items-center space-y-2">
+                        <Mic className="w-8 h-8 text-slate-400" />
+                        <p className="text-xs text-slate-400 text-center">点击上传录音文件</p>
+                        <p className="text-xs text-slate-500">支持 MP3, WAV, M4A 格式</p>
+                      </div>
+                    </div>
+                    {uploadedAudio && (
+                      <div className="mt-2 flex items-center justify-between bg-slate-900/50 rounded px-3 py-2 text-xs">
+                        <span className="text-slate-300">{uploadedAudio}</span>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-5 w-5 text-red-400 hover:text-red-300"
+                          onClick={() => setUploadedAudio(null)}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </Card>
+
+              {/* Part 3: 自定义输入部分 */}
+              <Card className="bg-slate-800/50 border-slate-700 p-4">
+                <h3 className="text-sm font-semibold text-white mb-4">补充信息</h3>
+                <Textarea
+                  placeholder="请输入客户的其他相关信息，如特殊需求、过往病史、用药情况等..."
+                  value={customInput}
+                  onChange={(e) => setCustomInput(e.target.value)}
+                  className="min-h-[120px] bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                />
+              </Card>
+
+              {/* 提交按钮 */}
+              <Button className="w-full bg-blue-500 hover:bg-blue-600">
+                <Save className="w-4 h-4 mr-2" />
+                保存客户信息
+              </Button>
             </div>
           </ScrollArea>
         </div>
@@ -397,17 +479,30 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
           </div>
         </div>
 
-        {/* 右侧主区域 - 核心功能工作台 (Tab切换) */}
         <div className="flex-1 bg-slate-900/30 overflow-hidden">
-          <Tabs defaultValue="consultation" className="h-full flex flex-col">
+          <Tabs defaultValue="medical-record" className="h-full flex flex-col">
             <div className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm px-6 flex-shrink-0">
               <TabsList className="bg-transparent h-14">
+                <TabsTrigger
+                  value="medical-record"
+                  className="data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-300"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  快速病历
+                </TabsTrigger>
                 <TabsTrigger
                   value="consultation"
                   className="data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-300"
                 >
                   <MessageSquare className="w-4 h-4 mr-2" />
                   咨询沟通纪要
+                </TabsTrigger>
+                <TabsTrigger
+                  value="general-plan"
+                  className="data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-300"
+                >
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  辅助通用方案
                 </TabsTrigger>
                 <TabsTrigger
                   value="recommendation"
@@ -420,13 +515,30 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                   value="plan"
                   className="data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-300"
                 >
-                  <FileText className="w-4 h-4 mr-2" />
+                  <Stethoscope className="w-4 h-4 mr-2" />
                   医生定制方案
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            {/* Tab 1: 咨询沟通纪要 */}
+            <TabsContent value="medical-record" className="flex-1 m-0 overflow-hidden">
+              <ScrollArea className="h-full">
+                <div className="p-6">
+                  <Card className="bg-slate-800/50 border-slate-700 p-8">
+                    <div className="flex flex-col items-center justify-center space-y-4 text-center py-12">
+                      <FileText className="w-16 h-16 text-slate-600" />
+                      <h3 className="text-xl font-semibold text-white">快速病历</h3>
+                      <p className="text-slate-400 max-w-md">
+                        该功能正在开发中，将提供快速生成和管理客户病历的功能，包括病史记录、诊断信息、治疗方案等。
+                      </p>
+                      <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 px-4 py-2">待开发</Badge>
+                    </div>
+                  </Card>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            {/* Tab 2: 咨询沟通纪要 */}
             <TabsContent value="consultation" className="flex-1 m-0 overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
@@ -707,7 +819,25 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
               </ScrollArea>
             </TabsContent>
 
-            {/* Tab 2: 智能推荐 (保持原有设计) */}
+            {/* Tab 3: 辅助通用方案 (Auxiliary General Plan) - Placeholder */}
+            <TabsContent value="general-plan" className="flex-1 m-0 overflow-hidden">
+              <ScrollArea className="h-full">
+                <div className="p-6">
+                  <Card className="bg-slate-800/50 border-slate-700 p-8">
+                    <div className="flex flex-col items-center justify-center space-y-4 text-center py-12">
+                      <Lightbulb className="w-16 h-16 text-slate-600" />
+                      <h3 className="text-xl font-semibold text-white">辅助通用方案</h3>
+                      <p className="text-slate-400 max-w-md">
+                        该功能正在开发中，将提供基于行业标准和最佳实践的通用治疗方案模板，帮助医生快速制定初步方案。
+                      </p>
+                      <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 px-4 py-2">待开发</Badge>
+                    </div>
+                  </Card>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            {/* Tab 4: 智能推荐 */}
             <TabsContent value="recommendation" className="flex-1 m-0 overflow-hidden">
               <div className="flex h-full">
                 {/* 产品推荐列表 */}
@@ -896,7 +1026,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
               </div>
             </TabsContent>
 
-            {/* Tab 3: 医生定制方案 */}
+            {/* Tab 5: 医生定制方案 */}
             <TabsContent value="plan" className="flex-1 m-0 overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
