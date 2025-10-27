@@ -297,12 +297,10 @@ function CreationCenter() {
 function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" | "offline"; onBack: () => void }) {
   const [generatedPosters, setGeneratedPosters] = useState<number[]>([])
   const [selectedPoster, setSelectedPoster] = useState<number | null>(null)
-
   const [projectName, setProjectName] = useState("")
   const [keyPoints, setKeyPoints] = useState("")
-  const [keywords, setKeywords] = useState("")
+  const [newKeyword, setNewKeyword] = useState("")
   const [style, setStyle] = useState("自然风")
-  const [searchQuery, setSearchQuery] = useState("")
 
   const handleGenerate = () => {
     setGeneratedPosters([1, 2, 3, 4])
@@ -353,20 +351,20 @@ function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" 
             <div>
               <label className="text-sm font-medium text-slate-300 mb-2 block">项目名称</label>
               <Input
-                value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
                 placeholder="例如：水光针推广"
                 className="bg-slate-700/50 border-slate-600 text-white"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
               />
             </div>
 
             <div>
               <label className="text-sm font-medium text-slate-300 mb-2 block">核心卖点</label>
               <Textarea
-                value={keyPoints}
-                onChange={(e) => setKeyPoints(e.target.value)}
                 placeholder="例如：深层补水、提亮肤色、改善细纹"
                 className="bg-slate-700/50 border-slate-600 text-white min-h-[100px]"
+                value={keyPoints}
+                onChange={(e) => setKeyPoints(e.target.value)}
               />
             </div>
 
@@ -380,19 +378,19 @@ function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" 
                 ))}
               </div>
               <Input
-                value={keywords}
-                onChange={(e) => setKeywords(e.target.value)}
                 placeholder="添加关键词"
                 className="bg-slate-700/50 border-slate-600 text-white"
+                value={newKeyword}
+                onChange={(e) => setNewKeyword(e.target.value)}
               />
             </div>
 
             <div>
               <label className="text-sm font-medium text-slate-300 mb-2 block">风格选择</label>
               <select
+                className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white"
                 value={style}
                 onChange={(e) => setStyle(e.target.value)}
-                className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white"
               >
                 <option>自然风</option>
                 <option>高级感</option>
@@ -516,7 +514,7 @@ function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" 
                 <AlertTriangle className="w-4 h-4 text-yellow-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs font-semibold text-yellow-500 mb-1">合规提示</p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-300">
                     检测到可能违规词语：<span className="text-yellow-400 underline">医美老司机</span>
                   </p>
                 </div>
@@ -617,9 +615,9 @@ function BrandCenter() {
         <div className="bg-slate-800/50 rounded-xl p-6 border border-white/10">
           <h3 className="text-lg font-semibold text-white mb-4">品牌字体 (Font)</h3>
           <select
+            className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-4 py-3 text-white"
             value={selectedFont}
             onChange={(e) => setSelectedFont(e.target.value)}
-            className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-4 py-3 text-white"
           >
             <option>思源黑体 (Source Han Sans)</option>
             <option>思源宋体 (Source Han Serif)</option>
@@ -638,10 +636,10 @@ function BrandCenter() {
                 机构地址
               </label>
               <Input
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
                 placeholder="例如：北京市朝阳区xxx路xxx号"
                 className="bg-slate-700/50 border-slate-600 text-white"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
               />
             </div>
             <div>
@@ -650,10 +648,10 @@ function BrandCenter() {
                 联系电话
               </label>
               <Input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
                 placeholder="例如：400-xxx-xxxx"
                 className="bg-slate-700/50 border-slate-600 text-white"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
             </div>
             <div>
@@ -735,10 +733,10 @@ function MaterialsLibrary() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="搜索素材..."
                 className="pl-10 bg-slate-700/50 border-slate-600 text-white w-64"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
