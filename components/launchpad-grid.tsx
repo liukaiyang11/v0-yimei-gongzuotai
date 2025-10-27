@@ -18,7 +18,6 @@ import {
   BookOpen,
   Stethoscope,
   Target,
-  DollarSign,
   Headphones,
   BarChart3,
   MessageSquare,
@@ -70,9 +69,9 @@ const apps = [
   },
   {
     id: "sales-assistant",
-    name: "AI协作助理",
-    description: "AI协作智能助手",
-    icon: DollarSign,
+    name: "咨询师&医生协作平台", // Updated name to 咨询师&医生协作平台
+    description: "咨询师与医生协作",
+    icon: Stethoscope,
     gradient: "from-blue-500 to-blue-600",
     bgColor: "bg-blue-500",
     action: "使用",

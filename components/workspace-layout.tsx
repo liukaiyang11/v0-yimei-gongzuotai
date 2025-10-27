@@ -9,12 +9,12 @@ import { Sidebar } from "@/components/sidebar"
 import { KnowledgeBase } from "@/components/knowledge-base"
 import { IndustryKnowledgeBase } from "@/components/industry-knowledge-base"
 import { AdComplianceReview } from "@/components/ad-compliance-review"
-import { AICollaborationAssistant } from "@/components/ai-collaboration-assistant"
 import { CollaborativeServicePlatform } from "@/components/collaborative-service-platform"
 import { CustomerAcquisitionSystem } from "@/components/customer-acquisition-system"
 import { AppMarketplace } from "@/components/app-marketplace"
 import { MedicalBeautyThinkTank } from "@/components/medical-beauty-think-tank"
 import { Screensaver } from "@/components/screensaver"
+import { ConsultantDoctorPlatform } from "@/components/consultant-doctor-platform"
 
 const IDLE_TIMEOUT = 5 * 60 * 1000 // 5 minutes in milliseconds
 
@@ -125,7 +125,7 @@ export function WorkspaceLayout() {
   }
 
   if (showCollaborationAssistant) {
-    return <AICollaborationAssistant onBack={() => setShowCollaborationAssistant(false)} />
+    return <ConsultantDoctorPlatform onBack={() => setShowCollaborationAssistant(false)} />
   }
 
   if (showAdCompliance) {
