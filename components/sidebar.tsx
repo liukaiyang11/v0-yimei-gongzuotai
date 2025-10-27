@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, BookOpen, Database, TrendingUp, Settings, ShoppingCart } from "lucide-react"
+import { Home, BookOpen, Database, TrendingUp, Settings, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -14,7 +14,7 @@ const menuItems = [
   { id: "知识库", label: "知识库", icon: BookOpen },
   { id: "行业知识库", label: "行业知识库", icon: Database },
   { id: "医美智库", label: "医美智库", icon: TrendingUp },
-  { id: "医美商城", label: "医美商城", icon: ShoppingCart },
+  { id: "医美商城", label: "医美商城", icon: ShoppingBag },
 ]
 
 export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
