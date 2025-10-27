@@ -16,6 +16,8 @@ import { AppMarketplace } from "@/components/app-marketplace"
 import { MedicalBeautyThinkTank } from "@/components/medical-beauty-think-tank"
 import { Screensaver } from "@/components/screensaver"
 import { ContentCreativeWorkshop } from "@/components/content-creative-workshop"
+import { MedicalBeautyMall } from "@/components/medical-beauty-mall"
+import { InventoryManagement } from "@/components/inventory-management"
 
 const IDLE_TIMEOUT = 5 * 60 * 1000 // 5 minutes in milliseconds
 
@@ -37,6 +39,8 @@ export function WorkspaceLayout() {
   const [showAppMarketplace, setShowAppMarketplace] = useState(false)
   const [showScreensaver, setShowScreensaver] = useState(false)
   const [showContentWorkshop, setShowContentWorkshop] = useState(false)
+  const [showMedicalBeautyMall, setShowMedicalBeautyMall] = useState(false)
+  const [showInventoryManagement, setShowInventoryManagement] = useState(false)
 
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -56,7 +60,6 @@ export function WorkspaceLayout() {
 
   useEffect(() => {
     if (activeSection !== "启动台") {
-      // Clear timer if not on launchpad
       if (idleTimerRef.current) {
         clearTimeout(idleTimerRef.current)
         idleTimerRef.current = null
@@ -73,14 +76,12 @@ export function WorkspaceLayout() {
       }, IDLE_TIMEOUT)
     }
 
-    // Events that reset the idle timer
     const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart", "click"]
 
     events.forEach((event) => {
       document.addEventListener(event, resetIdleTimer)
     })
 
-    // Start the timer
     resetIdleTimer()
 
     return () => {
@@ -109,6 +110,9 @@ export function WorkspaceLayout() {
     if (appId === "content-workshop") {
       setShowContentWorkshop(true)
     }
+    if (appId === "inventory-management") {
+      setShowInventoryManagement(true)
+    }
   }
 
   const handleAddApp = (appId: string) => {
@@ -117,8 +121,23 @@ export function WorkspaceLayout() {
     }
   }
 
+  const handleNavigateToMall = () => {
+    setShowInventoryManagement(false)
+    setShowMedicalBeautyMall(true)
+  }
+
   if (showScreensaver) {
     return <Screensaver onExit={() => setShowScreensaver(false)} />
+  }
+
+  if (showMedicalBeautyMall) {
+    return <MedicalBeautyMall onBack={() => setShowMedicalBeautyMall(false)} />
+  }
+
+  if (showInventoryManagement) {
+    return (
+      <InventoryManagement onBack={() => setShowInventoryManagement(false)} onNavigateToMall={handleNavigateToMall} />
+    )
   }
 
   if (showContentWorkshop) {
@@ -162,6 +181,13 @@ export function WorkspaceLayout() {
         </div>
       )
     }
+    if (activeSection === "医美商城") {
+      return (
+        <div className="fixed inset-0 left-20 flex flex-col">
+          <MedicalBeautyMall />
+        </div>
+      )
+    }
     return <LaunchpadGrid searchQuery={searchQuery} onAppClick={handleAppClick} addedApps={addedApps} />
   }
 
@@ -169,11 +195,11 @@ export function WorkspaceLayout() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* 侧边栏 */}
       <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
 
-      {/* 主内容区域 */}
-      <div className={`ml-20 min-h-screen relative z-10 ${activeSection === "医美智库" ? "" : "px-8"}`}>
+      <div
+        className={`ml-20 min-h-screen relative z-10 ${activeSection === "医美智库" || activeSection === "医美商城" ? "" : "px-8"}`}
+      >
         {showSearchBar && (
           <div className="flex justify-center pt-16 pb-8">
             <div className="relative w-full max-w-2xl">
@@ -190,8 +216,11 @@ export function WorkspaceLayout() {
           </div>
         )}
 
-        {/* 内容区域 */}
-        <div className={activeSection === "医美智库" ? "" : `pb-8 ${!showSearchBar ? "pt-8" : ""}`}>
+        <div
+          className={
+            activeSection === "医美智库" || activeSection === "医美商城" ? "" : `pb-8 ${!showSearchBar ? "pt-8" : ""}`
+          }
+        >
           {renderContent()}
         </div>
 

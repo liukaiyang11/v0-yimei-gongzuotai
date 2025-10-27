@@ -24,6 +24,7 @@ import {
   ShieldCheck,
   Users,
   UserSearch,
+  Package,
 } from "lucide-react"
 
 interface LaunchpadGridProps {
@@ -38,6 +39,7 @@ const defaultAppIds = [
   "sales-assistant",
   "customer-acquisition",
   "content-workshop",
+  "inventory-management",
   "ai-ppt",
   "ai-writing",
   "ai-mindmap",
@@ -69,9 +71,9 @@ const apps = [
   },
   {
     id: "sales-assistant",
-    name: "咨询师&医生协作平台", // Updated from "AI协作助理"
+    name: "咨询师&医生协作平台",
     description: "咨询师医生协作平台",
-    icon: Stethoscope, // Changed icon to Stethoscope
+    icon: Stethoscope,
     gradient: "from-blue-500 to-blue-600",
     bgColor: "bg-blue-500",
     action: "使用",
@@ -85,6 +87,16 @@ const apps = [
     gradient: "from-violet-500 to-purple-600",
     bgColor: "bg-violet-500",
     action: "启动",
+    size: "regular",
+  },
+  {
+    id: "inventory-management",
+    name: "院内库存/耗材管理",
+    description: "库存管理·智能补货",
+    icon: Package,
+    gradient: "from-teal-500 to-teal-600",
+    bgColor: "bg-teal-500",
+    action: "管理",
     size: "regular",
   },
   {
