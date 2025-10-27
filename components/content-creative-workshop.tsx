@@ -509,6 +509,10 @@ function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" 
 
 // Module 3: Brand Center
 function BrandCenter() {
+  const [primaryColor, setPrimaryColor] = useState("#3B82F6")
+  const [secondaryColor1, setSecondaryColor1] = useState("#A855F7")
+  const [secondaryColor2, setSecondaryColor2] = useState("#EC4899")
+
   return (
     <ScrollArea className="h-full">
       <div className="max-w-4xl mx-auto p-8 space-y-8">
@@ -542,22 +546,43 @@ function BrandCenter() {
             <div>
               <label className="text-sm font-medium text-slate-300 mb-2 block">主色</label>
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-lg bg-blue-500 border-2 border-white/20 cursor-pointer"></div>
-                <Input value="#3B82F6" className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
+                <div
+                  className="w-16 h-16 rounded-lg border-2 border-white/20 cursor-pointer"
+                  style={{ backgroundColor: primaryColor }}
+                ></div>
+                <Input
+                  value={primaryColor}
+                  onChange={(e) => setPrimaryColor(e.target.value)}
+                  className="flex-1 bg-slate-700/50 border-slate-600 text-white"
+                />
               </div>
             </div>
             <div>
               <label className="text-sm font-medium text-slate-300 mb-2 block">辅助色 1</label>
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-lg bg-purple-500 border-2 border-white/20 cursor-pointer"></div>
-                <Input value="#A855F7" className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
+                <div
+                  className="w-16 h-16 rounded-lg border-2 border-white/20 cursor-pointer"
+                  style={{ backgroundColor: secondaryColor1 }}
+                ></div>
+                <Input
+                  value={secondaryColor1}
+                  onChange={(e) => setSecondaryColor1(e.target.value)}
+                  className="flex-1 bg-slate-700/50 border-slate-600 text-white"
+                />
               </div>
             </div>
             <div>
               <label className="text-sm font-medium text-slate-300 mb-2 block">辅助色 2</label>
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-lg bg-pink-500 border-2 border-white/20 cursor-pointer"></div>
-                <Input value="#EC4899" className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
+                <div
+                  className="w-16 h-16 rounded-lg border-2 border-white/20 cursor-pointer"
+                  style={{ backgroundColor: secondaryColor2 }}
+                ></div>
+                <Input
+                  value={secondaryColor2}
+                  onChange={(e) => setSecondaryColor2(e.target.value)}
+                  className="flex-1 bg-slate-700/50 border-slate-600 text-white"
+                />
               </div>
             </div>
           </div>
