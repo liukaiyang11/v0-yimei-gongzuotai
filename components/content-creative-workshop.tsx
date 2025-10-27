@@ -494,7 +494,7 @@ function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" 
                 <AlertTriangle className="w-4 h-4 text-yellow-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs font-semibold text-yellow-500 mb-1">合规提示</p>
-                  <p className="text-xs text-slate-300">
+                  <p className="text-xs text-slate-400">
                     检测到可能违规词语：<span className="text-yellow-400 underline">医美老司机</span>
                   </p>
                 </div>
@@ -512,6 +512,9 @@ function BrandCenter() {
   const [primaryColor, setPrimaryColor] = useState("#3B82F6")
   const [secondaryColor1, setSecondaryColor1] = useState("#A855F7")
   const [secondaryColor2, setSecondaryColor2] = useState("#EC4899")
+  const [selectedFont, setSelectedFont] = useState("思源黑体 (Source Han Sans)")
+  const [address, setAddress] = useState("")
+  const [phone, setPhone] = useState("")
 
   return (
     <ScrollArea className="h-full">
@@ -591,7 +594,11 @@ function BrandCenter() {
         {/* Brand Font */}
         <div className="bg-slate-800/50 rounded-xl p-6 border border-white/10">
           <h3 className="text-lg font-semibold text-white mb-4">品牌字体 (Font)</h3>
-          <select className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-4 py-3 text-white">
+          <select
+            value={selectedFont}
+            onChange={(e) => setSelectedFont(e.target.value)}
+            className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-4 py-3 text-white"
+          >
             <option>思源黑体 (Source Han Sans)</option>
             <option>思源宋体 (Source Han Serif)</option>
             <option>阿里巴巴普惠体</option>
@@ -609,6 +616,8 @@ function BrandCenter() {
                 机构地址
               </label>
               <Input
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
                 placeholder="例如：北京市朝阳区xxx路xxx号"
                 className="bg-slate-700/50 border-slate-600 text-white"
               />
@@ -618,7 +627,12 @@ function BrandCenter() {
                 <Phone className="w-4 h-4" />
                 联系电话
               </label>
-              <Input placeholder="例如：400-xxx-xxxx" className="bg-slate-700/50 border-slate-600 text-white" />
+              <Input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="例如：400-xxx-xxxx"
+                className="bg-slate-700/50 border-slate-600 text-white"
+              />
             </div>
             <div>
               <label className="text-sm font-medium text-slate-300 mb-2 block">微信二维码</label>
