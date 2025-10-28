@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import {
-  Home,
+  ArrowLeft,
   Menu,
   ZoomIn,
   ZoomOut,
@@ -13,11 +13,6 @@ import {
   Underline,
   List,
   ListOrdered,
-  Link,
-  ImageIcon,
-  Table,
-  Code,
-  AlignLeft,
   Undo,
   Redo,
   Smile,
@@ -103,7 +98,7 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
             className="text-gray-300 hover:text-white hover:bg-slate-700"
             onClick={onBack}
           >
-            <Home className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5" />
           </Button>
           <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white hover:bg-slate-700">
             <Menu className="w-5 h-5" />
@@ -151,7 +146,7 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
                 </p>
               </div>
 
-              <p className="text-gray-700 mb-6">医美咨询师快速打消顾客怕受骗心理的5大招</p>
+              <p className="text-gray-700 mb-6">医美咨询师快速打消顾客害怕的心理的5大招</p>
 
               <div className="space-y-6 text-gray-800 leading-relaxed">
                 <p>
@@ -500,25 +495,6 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
                   </Button>
                   <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
                     <Smile className="w-4 h-4" />
-                  </Button>
-                  <div className="w-px h-6 bg-slate-600 mx-1" />
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
-                    <Smile className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
-                    <Link className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
-                    <ImageIcon className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
-                    <Table className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
-                    <Code className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
-                    <AlignLeft className="w-4 h-4" />
                   </Button>
                   <div className="w-px h-6 bg-slate-600 mx-1" />
                   <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">

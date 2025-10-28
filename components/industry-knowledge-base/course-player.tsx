@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import {
-  Home,
+  ArrowLeft,
   Download,
   MoreHorizontal,
   Play,
@@ -10,7 +10,6 @@ import {
   Volume2,
   Maximize,
   FileText,
-  Network,
   Send,
   Bold,
   Italic,
@@ -131,7 +130,7 @@ export function CoursePlayer({ courseTitle, onBack }: CoursePlayerProps) {
             onClick={onBack}
             className="text-gray-300 hover:text-white hover:bg-slate-700"
           >
-            <Home className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex items-center gap-3">
             <h1 className="text-white font-medium">{courseTitle}</h1>
@@ -290,15 +289,12 @@ export function CoursePlayer({ courseTitle, onBack }: CoursePlayerProps) {
                 {/* 功能按钮 */}
                 <div className="flex items-center gap-2">
                   <Button size="sm" variant="outline" className="bg-slate-700 border-slate-600 text-white">
-                    <FileText className="w-4 h-4 mr-1" />
                     全文速读
                   </Button>
                   <Button size="sm" variant="default" className="bg-blue-600">
-                    <FileText className="w-4 h-4 mr-1" />
                     文章摘要
                   </Button>
                   <Button size="sm" variant="outline" className="bg-slate-700 border-slate-600 text-white">
-                    <Network className="w-4 h-4 mr-1" />
                     思维导图
                   </Button>
                 </div>
