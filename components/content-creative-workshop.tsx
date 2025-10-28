@@ -959,7 +959,7 @@ function OfflineEventMaterials({ onBack }: { onBack: () => void }) {
                   <label className="text-sm font-medium text-slate-300 mb-2 block">背景颜色</label>
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-lg bg-white border-2 border-slate-600 cursor-pointer"></div>
-                    <Input value="#FFFFFF" className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
+                    <Input defaultValue="#FFFFFF" className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
                   </div>
                 </div>
               </div>
