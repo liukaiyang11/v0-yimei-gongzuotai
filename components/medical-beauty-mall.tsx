@@ -87,9 +87,10 @@ export function MedicalBeautyMall({ onBack }: MedicalBeautyMallProps) {
     { id: "skincare", name: "医学护肤", icon: "✨", color: "from-teal-500 to-teal-600" },
   ]
 
-  const recommendedProducts: Product[] = [
+  const allProducts: Product[] = [
+    // 注射类产品
     {
-      id: "1",
+      id: "inj-1",
       name: "瑞蓝2号玻尿酸",
       brand: "瑞蓝 Restylane",
       category: "injection",
@@ -104,7 +105,7 @@ export function MedicalBeautyMall({ onBack }: MedicalBeautyMallProps) {
       tags: ["NMPA认证", "热销", "培训支持"],
     },
     {
-      id: "2",
+      id: "inj-2",
       name: "乔雅登雅致玻尿酸",
       brand: "乔雅登 JUVÉDERM",
       category: "injection",
@@ -119,7 +120,67 @@ export function MedicalBeautyMall({ onBack }: MedicalBeautyMallProps) {
       tags: ["NMPA认证", "进口", "分期付款"],
     },
     {
-      id: "3",
+      id: "inj-3",
+      name: "艾莉薇玻尿酸",
+      brand: "艾莉薇 Ellansé",
+      category: "injection",
+      price: 4200,
+      originalPrice: 4500,
+      image: "/ellanse-hyaluronic-acid-injection-medical-beauty.jpg",
+      nmpaNumber: "国械注进20183085123",
+      rating: 4.7,
+      sales: 890,
+      hasTraining: true,
+      hasInstallment: true,
+      tags: ["NMPA认证", "长效", "培训支持"],
+    },
+    {
+      id: "inj-4",
+      name: "保妥适肉毒素",
+      brand: "保妥适 BOTOX",
+      category: "injection",
+      price: 2200,
+      image: "/botox-botulinum-toxin-injection-medical.jpg",
+      nmpaNumber: "国械注进20153085234",
+      rating: 4.9,
+      sales: 2100,
+      hasTraining: true,
+      hasInstallment: true,
+      tags: ["NMPA认证", "热销", "除皱"],
+    },
+    {
+      id: "inj-5",
+      name: "衡力肉毒素",
+      brand: "衡力 Hengli",
+      category: "injection",
+      price: 1800,
+      originalPrice: 2000,
+      image: "/hengli-botulinum-toxin-chinese-brand-medical.jpg",
+      nmpaNumber: "国械注准20183085345",
+      rating: 4.6,
+      sales: 1650,
+      hasTraining: true,
+      hasInstallment: false,
+      tags: ["NMPA认证", "国产", "性价比高"],
+    },
+    {
+      id: "inj-6",
+      name: "童颜针（舒颜萃）",
+      brand: "Sculptra",
+      category: "injection",
+      price: 5800,
+      image: "/sculptra-poly-l-lactic-acid-injection-anti-aging.jpg",
+      nmpaNumber: "国械注进20173085456",
+      rating: 4.8,
+      sales: 720,
+      hasTraining: true,
+      hasInstallment: true,
+      tags: ["NMPA认证", "抗衰", "胶原再生"],
+    },
+
+    // 光电类产品
+    {
+      id: "photo-1",
       name: "超皮秒激光设备耗材包",
       brand: "赛诺秀 Cynosure",
       category: "photoelectric",
@@ -133,7 +194,65 @@ export function MedicalBeautyMall({ onBack }: MedicalBeautyMallProps) {
       tags: ["NMPA认证", "设备耗材", "技术支持"],
     },
     {
-      id: "4",
+      id: "photo-2",
+      name: "热玛吉探头（900发）",
+      brand: "Thermage",
+      category: "photoelectric",
+      price: 15800,
+      image: "/thermage-rf-treatment-tip-900-shots-medical-device.jpg",
+      nmpaNumber: "国械注进20193085567",
+      rating: 4.9,
+      sales: 420,
+      hasTraining: true,
+      hasInstallment: true,
+      tags: ["NMPA认证", "正品", "紧致提升"],
+    },
+    {
+      id: "photo-3",
+      name: "超声刀探头套装",
+      brand: "Ultherapy",
+      category: "photoelectric",
+      price: 12500,
+      image: "/ultherapy-ultrasound-transducer-set-medical-beauty.jpg",
+      nmpaNumber: "国械注进20183085678",
+      rating: 4.8,
+      sales: 350,
+      hasTraining: true,
+      hasInstallment: true,
+      tags: ["NMPA认证", "抗衰", "无创"],
+    },
+    {
+      id: "photo-4",
+      name: "OPT光子嫩肤耗材",
+      brand: "科医人 Lumenis",
+      category: "photoelectric",
+      price: 6800,
+      image: "/opt-ipl-photofacial-consumables-medical-device.jpg",
+      nmpaNumber: "国械注进20173085789",
+      rating: 4.6,
+      sales: 680,
+      hasTraining: true,
+      hasInstallment: true,
+      tags: ["NMPA认证", "嫩肤", "祛斑"],
+    },
+    {
+      id: "photo-5",
+      name: "点阵激光治疗头",
+      brand: "飞顿 Alma",
+      category: "photoelectric",
+      price: 9200,
+      image: "/fractional-laser-treatment-head-medical-device.jpg",
+      nmpaNumber: "国械注进20183085890",
+      rating: 4.7,
+      sales: 520,
+      hasTraining: true,
+      hasInstallment: true,
+      tags: ["NMPA认证", "祛疤", "嫩肤"],
+    },
+
+    // 医用面膜
+    {
+      id: "mask-1",
       name: "可复美医用面膜",
       brand: "可复美 Cocovel",
       category: "mask",
@@ -147,9 +266,235 @@ export function MedicalBeautyMall({ onBack }: MedicalBeautyMallProps) {
       hasInstallment: false,
       tags: ["NMPA认证", "热销", "术后修复"],
     },
+    {
+      id: "mask-2",
+      name: "敷尔佳医用面膜",
+      brand: "敷尔佳 Foreo",
+      category: "mask",
+      price: 580,
+      originalPrice: 650,
+      image: "/foreo-medical-facial-mask-post-treatment-repair.jpg",
+      nmpaNumber: "国械注准20183640236",
+      rating: 4.8,
+      sales: 2850,
+      hasTraining: false,
+      hasInstallment: false,
+      tags: ["NMPA认证", "热销", "补水修复"],
+    },
+    {
+      id: "mask-3",
+      name: "创福康医用面膜",
+      brand: "创福康 Winfull",
+      category: "mask",
+      price: 520,
+      image: "/winfull-medical-facial-mask-wound-healing.jpg",
+      nmpaNumber: "国械注准20183640347",
+      rating: 4.7,
+      sales: 1980,
+      hasTraining: false,
+      hasInstallment: false,
+      tags: ["NMPA认证", "创面修复", "舒缓"],
+    },
+    {
+      id: "mask-4",
+      name: "芙清医用面膜",
+      brand: "芙清 Fuqing",
+      category: "mask",
+      price: 620,
+      originalPrice: 680,
+      image: "/fuqing-medical-facial-mask-sensitive-skin-repair.jpg",
+      nmpaNumber: "国械注准20183640458",
+      rating: 4.8,
+      sales: 2200,
+      hasTraining: false,
+      hasInstallment: false,
+      tags: ["NMPA认证", "敏感肌", "抗炎"],
+    },
+
+    // 线雕类
+    {
+      id: "thread-1",
+      name: "PDO蛋白线（平滑线）",
+      brand: "韩国 Cog",
+      category: "thread",
+      price: 3200,
+      image: "/pdo-thread-lift-smooth-threads-medical-beauty.jpg",
+      nmpaNumber: "国械注进20183085901",
+      rating: 4.7,
+      sales: 890,
+      hasTraining: true,
+      hasInstallment: true,
+      tags: ["NMPA认证", "提升", "培训支持"],
+    },
+    {
+      id: "thread-2",
+      name: "PPDO大V线",
+      brand: "韩国 V-Lift",
+      category: "thread",
+      price: 4500,
+      image: "/ppdo-v-line-thread-lift-face-contouring-medical.jpg",
+      nmpaNumber: "国械注进20183086012",
+      rating: 4.8,
+      sales: 650,
+      hasTraining: true,
+      hasInstallment: true,
+      tags: ["NMPA认证", "面部轮廓", "长效"],
+    },
+    {
+      id: "thread-3",
+      name: "螺旋线套装",
+      brand: "韩国 Mint",
+      category: "thread",
+      price: 3800,
+      image: "/mint-spiral-thread-lift-set-medical-beauty-korea.jpg",
+      nmpaNumber: "国械注进20183086123",
+      rating: 4.6,
+      sales: 720,
+      hasTraining: true,
+      hasInstallment: true,
+      tags: ["NMPA认证", "螺旋提升", "固定力强"],
+    },
+    {
+      id: "thread-4",
+      name: "锯齿线（Cog线）",
+      brand: "韩国 Cog",
+      category: "thread",
+      price: 4200,
+      image: "/cog-barbed-thread-lift-medical-beauty-korea.jpg",
+      nmpaNumber: "国械注进20183086234",
+      rating: 4.9,
+      sales: 580,
+      hasTraining: true,
+      hasInstallment: true,
+      tags: ["NMPA认证", "强力提升", "即刻见效"],
+    },
+
+    // 设备耗材
+    {
+      id: "equip-1",
+      name: "一次性无菌注射器套装",
+      brand: "BD",
+      category: "equipment",
+      price: 280,
+      image: "/placeholder.svg?height=400&width=400",
+      nmpaNumber: "国械注准20183086345",
+      rating: 4.8,
+      sales: 4500,
+      hasTraining: false,
+      hasInstallment: false,
+      tags: ["NMPA认证", "一次性", "安全"],
+    },
+    {
+      id: "equip-2",
+      name: "医用冷敷贴",
+      brand: "3M",
+      category: "equipment",
+      price: 380,
+      image: "/placeholder.svg?height=400&width=400",
+      nmpaNumber: "国械注准20183086456",
+      rating: 4.7,
+      sales: 3200,
+      hasTraining: false,
+      hasInstallment: false,
+      tags: ["NMPA认证", "术后护理", "消肿"],
+    },
+    {
+      id: "equip-3",
+      name: "医用无菌手套（100只装）",
+      brand: "Ansell",
+      category: "equipment",
+      price: 180,
+      image: "/placeholder.svg?height=400&width=400",
+      nmpaNumber: "国械注准20183086567",
+      rating: 4.9,
+      sales: 5800,
+      hasTraining: false,
+      hasInstallment: false,
+      tags: ["NMPA认证", "防护", "舒适"],
+    },
+    {
+      id: "equip-4",
+      name: "超声耦合剂",
+      brand: "Aquasonic",
+      category: "equipment",
+      price: 120,
+      image: "/placeholder.svg?height=400&width=400",
+      nmpaNumber: "国械注准20183086678",
+      rating: 4.6,
+      sales: 2800,
+      hasTraining: false,
+      hasInstallment: false,
+      tags: ["NMPA认证", "超声专用", "大容量"],
+    },
+
+    // 医学护肤
+    {
+      id: "skin-1",
+      name: "修丽可CE精华液",
+      brand: "SkinCeuticals",
+      category: "skincare",
+      price: 1280,
+      originalPrice: 1480,
+      image: "/placeholder.svg?height=400&width=400",
+      nmpaNumber: "国妆备进字J20183086789",
+      rating: 4.9,
+      sales: 1850,
+      hasTraining: false,
+      hasInstallment: false,
+      tags: ["抗氧化", "热销", "医学级"],
+    },
+    {
+      id: "skin-2",
+      name: "理肤泉B5修复霜",
+      brand: "La Roche-Posay",
+      category: "skincare",
+      price: 280,
+      image: "/placeholder.svg?height=400&width=400",
+      nmpaNumber: "国妆备进字J20183086890",
+      rating: 4.8,
+      sales: 3500,
+      hasTraining: false,
+      hasInstallment: false,
+      tags: ["修复", "敏感肌", "舒缓"],
+    },
+    {
+      id: "skin-3",
+      name: "薇诺娜舒敏保湿特护霜",
+      brand: "WINONA",
+      category: "skincare",
+      price: 320,
+      image: "/placeholder.svg?height=400&width=400",
+      nmpaNumber: "国妆备字G20183086901",
+      rating: 4.7,
+      sales: 2600,
+      hasTraining: false,
+      hasInstallment: false,
+      tags: ["国产", "敏感肌", "保湿"],
+    },
+    {
+      id: "skin-4",
+      name: "润百颜玻尿酸次抛精华",
+      brand: "Bloomage",
+      category: "skincare",
+      price: 580,
+      originalPrice: 680,
+      image: "/placeholder.svg?height=400&width=400",
+      nmpaNumber: "国妆备字G20183087012",
+      rating: 4.8,
+      sales: 2100,
+      hasTraining: false,
+      hasInstallment: false,
+      tags: ["玻尿酸", "补水", "医学级"],
+    },
   ]
 
-  const frequentlyPurchased = recommendedProducts.slice(0, 2)
+  const recommendedProducts = allProducts.slice(0, 4)
+  const frequentlyPurchased = allProducts.filter((p) => p.category === "injection").slice(0, 2)
+
+  const getFilteredProducts = () => {
+    if (!selectedCategory) return allProducts
+    return allProducts.filter((p) => p.category === selectedCategory)
+  }
 
   const addToCart = (product: Product) => {
     const existingItem = cart.find((item) => item.id === product.id)
@@ -222,7 +567,14 @@ export function MedicalBeautyMall({ onBack }: MedicalBeautyMallProps) {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-white">常购清单</h2>
-          <Button variant="ghost" className="text-blue-400 hover:text-blue-300" onClick={() => setCurrentView("list")}>
+          <Button
+            variant="ghost"
+            className="text-blue-400 hover:text-blue-300"
+            onClick={() => {
+              setSelectedCategory(null)
+              setCurrentView("list")
+            }}
+          >
             查看全部 <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         </div>
@@ -326,88 +678,106 @@ export function MedicalBeautyMall({ onBack }: MedicalBeautyMallProps) {
     </div>
   )
 
-  const renderProductList = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">
-          {selectedCategory ? categories.find((c) => c.id === selectedCategory)?.name : "全部商品"}
-        </h2>
-        <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
-          <Filter className="w-4 h-4 mr-2" />
-          筛选
-        </Button>
-      </div>
+  const renderProductList = () => {
+    const filteredProducts = getFilteredProducts()
+    const categoryName = selectedCategory ? categories.find((c) => c.id === selectedCategory)?.name : "全部商品"
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {recommendedProducts.map((product) => (
-          <Card
-            key={product.id}
-            className="overflow-hidden bg-white border-0 hover:shadow-xl transition-all duration-300 cursor-pointer"
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => {
-              setSelectedProduct(product)
-              setCurrentView("detail")
+              setCurrentView("home")
+              setSelectedCategory(null)
             }}
+            className="text-white hover:bg-white/10"
           >
-            <div className="relative">
-              <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-48 object-cover" />
-              <div className="absolute top-2 right-2 flex flex-col gap-1">
-                {product.tags.slice(0, 2).map((tag) => (
-                  <Badge key={tag} className="bg-orange-500 text-white border-0 text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-            <div className="p-4">
-              <h3 className="font-semibold text-gray-800 mb-1 line-clamp-1">{product.name}</h3>
-              <p className="text-sm text-gray-500 mb-2">{product.brand}</p>
-              <div className="flex items-center gap-1 mb-3">
-                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span className="text-sm font-medium">{product.rating}</span>
-                <span className="text-sm text-gray-400">({product.sales})</span>
-              </div>
-              <div className="space-y-2 mb-3">
-                <div className="flex items-center gap-2 text-xs text-gray-600">
-                  <Award className="w-3 h-3" />
-                  <span>NMPA: {product.nmpaNumber}</span>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h2 className="text-2xl font-bold text-white flex-1">{categoryName}</h2>
+          <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+            <Filter className="w-4 h-4 mr-2" />
+            筛选
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {filteredProducts.map((product) => (
+            <Card
+              key={product.id}
+              className="overflow-hidden bg-white border-0 hover:shadow-xl transition-all duration-300 cursor-pointer"
+              onClick={() => {
+                setSelectedProduct(product)
+                setCurrentView("detail")
+              }}
+            >
+              <div className="relative">
+                <img
+                  src={product.image || "/placeholder.svg"}
+                  alt={product.name}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="absolute top-2 right-2 flex flex-col gap-1">
+                  {product.tags.slice(0, 2).map((tag) => (
+                    <Badge key={tag} className="bg-orange-500 text-white border-0 text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
                 </div>
-                {product.hasInstallment && (
-                  <div className="flex items-center gap-2 text-xs text-green-600">
-                    <CreditCard className="w-3 h-3" />
-                    <span>支持分期付款</span>
-                  </div>
-                )}
-                {product.hasTraining && (
-                  <div className="flex items-center gap-2 text-xs text-blue-600">
-                    <FileText className="w-3 h-3" />
-                    <span>提供培训支持</span>
-                  </div>
-                )}
               </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-xl font-bold text-orange-600">¥{product.price}</span>
-                  {product.originalPrice && (
-                    <span className="text-xs text-gray-400 line-through ml-2">¥{product.originalPrice}</span>
+              <div className="p-4">
+                <h3 className="font-semibold text-gray-800 mb-1 line-clamp-1">{product.name}</h3>
+                <p className="text-sm text-gray-500 mb-2">{product.brand}</p>
+                <div className="flex items-center gap-1 mb-3">
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <span className="text-sm font-medium">{product.rating}</span>
+                  <span className="text-sm text-gray-400">({product.sales})</span>
+                </div>
+                <div className="space-y-2 mb-3">
+                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                    <Award className="w-3 h-3" />
+                    <span>NMPA: {product.nmpaNumber}</span>
+                  </div>
+                  {product.hasInstallment && (
+                    <div className="flex items-center gap-2 text-xs text-green-600">
+                      <CreditCard className="w-3 h-3" />
+                      <span>支持分期付款</span>
+                    </div>
+                  )}
+                  {product.hasTraining && (
+                    <div className="flex items-center gap-2 text-xs text-blue-600">
+                      <FileText className="w-3 h-3" />
+                      <span>提供培训支持</span>
+                    </div>
                   )}
                 </div>
-                <Button
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    addToCart(product)
-                  }}
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
-                >
-                  加购
-                </Button>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xl font-bold text-orange-600">¥{product.price}</span>
+                    {product.originalPrice && (
+                      <span className="text-xs text-gray-400 line-through ml-2">¥{product.originalPrice}</span>
+                    )}
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      addToCart(product)
+                    }}
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                  >
+                    加购
+                  </Button>
+                </div>
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))}
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   const renderProductDetail = () => {
     if (!selectedProduct) return null
@@ -700,7 +1070,7 @@ export function MedicalBeautyMall({ onBack }: MedicalBeautyMallProps) {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen max-h-screen overflow-y-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* 顶部导航栏 */}
       <div className="bg-white/10 backdrop-blur-sm border-b border-white/10 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
@@ -766,7 +1136,7 @@ export function MedicalBeautyMall({ onBack }: MedicalBeautyMallProps) {
                 <Button
                   size="sm"
                   onClick={() => {
-                    const product = recommendedProducts.find((p) => p.name.includes("瑞蓝"))
+                    const product = allProducts.find((p) => p.name.includes("瑞蓝"))
                     if (product) {
                       setSelectedProduct(product)
                       setCurrentView("detail")
