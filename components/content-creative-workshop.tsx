@@ -40,7 +40,8 @@ interface ContentCreativeWorkshopProps {
 }
 
 export function ContentCreativeWorkshop({ onBack }: ContentCreativeWorkshopProps) {
-  const [activeTab, setActiveTab] = useState<"home" | "creation" | "brand" | "materials">("home")
+  const [activeTab, setActiveTab] = useState<"home" | "brandMaterials">("home")
+  const [selectedScene, setSelectedScene] = useState<"xiaohongshu" | "wechat" | "offline" | null>(null)
 
   return (
     <div className="fixed inset-0 left-20 flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -65,31 +66,20 @@ export function ContentCreativeWorkshop({ onBack }: ContentCreativeWorkshopProps
           <div className="flex items-center gap-2">
             <Button
               variant={activeTab === "home" ? "default" : "ghost"}
-              onClick={() => setActiveTab("home")}
+              onClick={() => {
+                setActiveTab("home")
+                setSelectedScene(null)
+              }}
               className={`rounded-full ${activeTab === "home" ? "bg-blue-600 hover:bg-blue-700" : "text-slate-300 hover:text-white hover:bg-slate-700"}`}
             >
               首页
             </Button>
             <Button
-              variant={activeTab === "creation" ? "default" : "ghost"}
-              onClick={() => setActiveTab("creation")}
-              className={`rounded-full ${activeTab === "creation" ? "bg-blue-600 hover:bg-blue-700" : "text-slate-300 hover:text-white hover:bg-slate-700"}`}
+              variant={activeTab === "brandMaterials" ? "default" : "ghost"}
+              onClick={() => setActiveTab("brandMaterials")}
+              className={`rounded-full ${activeTab === "brandMaterials" ? "bg-blue-600 hover:bg-blue-700" : "text-slate-300 hover:text-white hover:bg-slate-700"}`}
             >
-              创作中心
-            </Button>
-            <Button
-              variant={activeTab === "brand" ? "default" : "ghost"}
-              onClick={() => setActiveTab("brand")}
-              className={`rounded-full ${activeTab === "brand" ? "bg-blue-600 hover:bg-blue-700" : "text-slate-300 hover:text-white hover:bg-slate-700"}`}
-            >
-              品牌中心
-            </Button>
-            <Button
-              variant={activeTab === "materials" ? "default" : "ghost"}
-              onClick={() => setActiveTab("materials")}
-              className={`rounded-full ${activeTab === "materials" ? "bg-blue-600 hover:bg-blue-700" : "text-slate-300 hover:text-white hover:bg-slate-700"}`}
-            >
-              素材库
+              品牌素材库
             </Button>
           </div>
         </div>
@@ -97,17 +87,21 @@ export function ContentCreativeWorkshop({ onBack }: ContentCreativeWorkshopProps
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-hidden">
-        {activeTab === "home" && <HomeDashboard />}
-        {activeTab === "creation" && <CreationCenter />}
-        {activeTab === "brand" && <BrandCenter />}
-        {activeTab === "materials" && <MaterialsLibrary />}
+        {selectedScene ? (
+          <CreationWorkspace scene={selectedScene} onBack={() => setSelectedScene(null)} />
+        ) : (
+          <>
+            {activeTab === "home" && <HomeDashboard onSceneSelect={setSelectedScene} />}
+            {activeTab === "brandMaterials" && <BrandMaterialsLibrary />}
+          </>
+        )}
       </div>
     </div>
   )
 }
 
 // Module 1: Homepage Dashboard
-function HomeDashboard() {
+function HomeDashboard({ onSceneSelect }: { onSceneSelect: (scene: "xiaohongshu" | "wechat" | "offline") => void }) {
   const recentProjects = [
     { id: 1, title: "幼态脸打造海报", thumbnail: "/youthful-face-poster.jpg", time: "2小时前" },
     { id: 2, title: "水光针推广文案", thumbnail: "/hydrafacial-promotion.jpg", time: "5小时前" },
@@ -127,29 +121,51 @@ function HomeDashboard() {
     <ScrollArea className="h-full">
       <div className="p-8 space-y-8">
         {/* Welcome Section */}
-        <div className="text-center py-12">
+        <div className="text-center py-8">
           <h2 className="text-4xl font-bold text-white mb-4">您好，欢迎回来！</h2>
           <p className="text-xl text-slate-300 mb-8">今天想创作点什么？</p>
 
           {/* Quick Entry Buttons */}
-          <div className="grid grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <div className="group relative bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-3xl p-8 border border-pink-500/30 hover:border-pink-500/50 transition-all duration-300 hover:scale-105 cursor-pointer">
+          <div className="grid grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {/* Xiaohongshu Scene */}
+            <div
+              onClick={() => onSceneSelect("xiaohongshu")}
+              className="group bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-3xl p-8 border border-red-500/30 hover:border-red-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
+            >
               <div className="flex flex-col items-center gap-4">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center">
                   <FileText className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-white">创作小红书图文</h3>
-                <p className="text-slate-300">AI智能生成爆款笔记</p>
+                <h3 className="text-xl font-bold text-white">小红书图文笔记</h3>
+                <p className="text-slate-300 text-center text-sm">生成爆款标题和精美配图，快速打造高质量笔记内容</p>
               </div>
             </div>
 
-            <div className="group relative bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-3xl p-8 border border-blue-500/30 hover:border-blue-500/50 transition-all duration-300 hover:scale-105 cursor-pointer">
+            {/* WeChat Scene */}
+            <div
+              onClick={() => onSceneSelect("wechat")}
+              className="group bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-3xl p-8 border border-green-500/30 hover:border-green-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
+            >
               <div className="flex flex-col items-center gap-4">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
                   <ImageIcon className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-white">创建活动海报</h3>
-                <p className="text-slate-300">专业设计一键生成</p>
+                <h3 className="text-xl font-bold text-white">微信朋友圈营销</h3>
+                <p className="text-slate-300 text-center text-sm">创作吸睛朋友圈文案和配图，提升品牌曝光和转化</p>
+              </div>
+            </div>
+
+            {/* Offline Scene */}
+            <div
+              onClick={() => onSceneSelect("offline")}
+              className="group bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-3xl p-8 border border-blue-500/30 hover:border-blue-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
+            >
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+                  <Palette className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white">线下活动物料</h3>
+                <p className="text-slate-300 text-center text-sm">设计海报、易拉宝、宣传单等线下营销物料</p>
               </div>
             </div>
           </div>
@@ -233,76 +249,6 @@ function HomeDashboard() {
   )
 }
 
-// Module 2: Creation Center
-function CreationCenter() {
-  const [step, setStep] = useState<"select" | "create">("select")
-  const [selectedScene, setSelectedScene] = useState<"xiaohongshu" | "wechat" | "offline" | null>(null)
-
-  if (step === "select") {
-    return (
-      <div className="h-full flex items-center justify-center p-8">
-        <div className="max-w-6xl w-full">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">选择创作场景</h2>
-          <div className="grid grid-cols-3 gap-8">
-            {/* Xiaohongshu Scene */}
-            <div
-              onClick={() => {
-                setSelectedScene("xiaohongshu")
-                setStep("create")
-              }}
-              className="group bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-3xl p-8 border border-red-500/30 hover:border-red-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
-            >
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center">
-                  <FileText className="w-12 h-12 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white">小红书图文笔记</h3>
-                <p className="text-slate-300 text-center">生成爆款标题和精美配图，快速打造高质量笔记内容</p>
-              </div>
-            </div>
-
-            {/* WeChat Scene */}
-            <div
-              onClick={() => {
-                setSelectedScene("wechat")
-                setStep("create")
-              }}
-              className="group bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-3xl p-8 border border-green-500/30 hover:border-green-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
-            >
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
-                  <ImageIcon className="w-12 h-12 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white">微信朋友圈营销</h3>
-                <p className="text-slate-300 text-center">创作吸睛朋友圈文案和配图，提升品牌曝光和转化</p>
-              </div>
-            </div>
-
-            {/* Offline Scene */}
-            <div
-              onClick={() => {
-                setSelectedScene("offline")
-                setStep("create")
-              }}
-              className="group bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-3xl p-8 border border-blue-500/30 hover:border-blue-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
-            >
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
-                  <Palette className="w-12 h-12 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white">线下活动物料</h3>
-                <p className="text-slate-300 text-center">设计海报、易拉宝、宣传单等线下营销物料</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  return <CreationWorkspace scene={selectedScene!} onBack={() => setStep("select")} />
-}
-
 // Creation Workspace (Three-column layout)
 function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" | "offline"; onBack: () => void }) {
   if (scene === "wechat") {
@@ -314,6 +260,307 @@ function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" 
   }
 }
 
+// Module 2: Creation Center (Now integrated into Home Dashboard and BrandMaterialsLibrary)
+// Removed: CreationCenter, WeChatMomentsCreation, OfflineEventMaterials, XiaohongshuCreation as they are now conditionally rendered.
+
+// Module 3: Brand Center & Module 4: Materials Library Combined
+function BrandMaterialsLibrary() {
+  const [activeSection, setActiveSection] = useState<"brand" | "materials">("brand")
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const [selectedCategory, setSelectedCategory] = useState("all")
+
+  const categories = [
+    { id: "all", name: "全部素材" },
+    { id: "doctors", name: "医生团队" },
+    { id: "facilities", name: "环境设施" },
+    { id: "equipment", name: "设备仪器" },
+    { id: "cases", name: "术前术后案例" },
+    { id: "general", name: "通用素材" },
+  ]
+
+  const materials = Array.from({ length: 12 }, (_, i) => ({
+    id: i + 1,
+    name: `素材_${i + 1}.jpg`,
+    category: categories[Math.floor(Math.random() * (categories.length - 1)) + 1].name,
+    thumbnail: `/placeholder.svg?height=300&width=400&query=medical beauty material ${i + 1}`,
+  }))
+
+  return (
+    <div className="h-full flex flex-col">
+      {/* Sub-navigation for Brand and Materials */}
+      <div className="bg-slate-800/50 border-b border-white/10 px-6 py-3">
+        <div className="flex items-center gap-2">
+          <Button
+            variant={activeSection === "brand" ? "default" : "ghost"}
+            onClick={() => setActiveSection("brand")}
+            className={`rounded-full ${activeSection === "brand" ? "bg-blue-600 hover:bg-blue-700" : "text-slate-300 hover:text-white hover:bg-slate-700"}`}
+          >
+            品牌中心
+          </Button>
+          <Button
+            variant={activeSection === "materials" ? "default" : "ghost"}
+            onClick={() => setActiveSection("materials")}
+            className={`rounded-full ${activeSection === "materials" ? "bg-blue-600 hover:bg-blue-700" : "text-slate-300 hover:text-white hover:bg-slate-700"}`}
+          >
+            素材库
+          </Button>
+        </div>
+      </div>
+
+      {/* Content Area */}
+      <div className="flex-1 overflow-hidden">
+        {activeSection === "brand" ? (
+          <ScrollArea className="h-full">
+            <div className="max-w-4xl mx-auto p-8 space-y-8">
+              <h2 className="text-2xl font-bold text-white">品牌设置</h2>
+
+              {/* Logo Upload */}
+              <div className="bg-slate-800/50 rounded-xl p-6 border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4">品牌标识 (Logo)</h3>
+                <div className="flex items-start gap-6">
+                  <div className="border-2 border-dashed border-slate-600 rounded-lg w-48 h-48 flex items-center justify-center hover:border-slate-500 transition-colors cursor-pointer">
+                    <div className="text-center">
+                      <Upload className="w-12 h-12 text-slate-400 mx-auto mb-2" />
+                      <p className="text-sm text-slate-400">上传Logo</p>
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-slate-300 mb-2">要求：</p>
+                    <ul className="text-sm text-slate-400 space-y-1">
+                      <li>• 格式：PNG（支持透明背景）</li>
+                      <li>• 尺寸：500x500px 或更高</li>
+                      <li>• 大小：不超过 2MB</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Brand Colors */}
+              <div className="bg-slate-800/50 rounded-xl p-6 border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4">品牌色彩 (Color Palette)</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-slate-300 mb-2 block">主色</label>
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-lg bg-blue-500 border-2 border-white/20 cursor-pointer"></div>
+                      <Input value="#3B82F6" readOnly className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-300 mb-2 block">辅助色 1</label>
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-lg bg-purple-500 border-2 border-white/20 cursor-pointer"></div>
+                      <Input value="#A855F7" readOnly className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-300 mb-2 block">辅助色 2</label>
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-lg bg-pink-500 border-2 border-white/20 cursor-pointer"></div>
+                      <Input value="#EC4899" readOnly className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Brand Font */}
+              <div className="bg-slate-800/50 rounded-xl p-6 border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4">品牌字体 (Font)</h3>
+                <select className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-4 py-3 text-white">
+                  <option>思源黑体 (Source Han Sans)</option>
+                  <option>思源宋体 (Source Han Serif)</option>
+                  <option>阿里巴巴普惠体</option>
+                  <option>站酷高端黑</option>
+                </select>
+              </div>
+
+              {/* Contact Information */}
+              <div className="bg-slate-800/50 rounded-xl p-6 border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4">预设联系信息</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-slate-300 mb-2 block flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      机构地址
+                    </label>
+                    <Input
+                      placeholder="例如：北京市朝阳区xxx路xxx号"
+                      className="bg-slate-700/50 border-slate-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-300 mb-2 block flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      联系电话
+                    </label>
+                    <Input placeholder="例如：400-xxx-xxxx" className="bg-slate-700/50 border-slate-600 text-white" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-300 mb-2 block">微信二维码</label>
+                    <div className="border-2 border-dashed border-slate-600 rounded-lg w-32 h-32 flex items-center justify-center hover:border-slate-500 transition-colors cursor-pointer">
+                      <div className="text-center">
+                        <Upload className="w-8 h-8 text-slate-400 mx-auto mb-1" />
+                        <p className="text-xs text-slate-400">上传二维码</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="sticky bottom-0 bg-slate-900/95 backdrop-blur-xl border-t border-white/10 p-4 -mx-8">
+                <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3">
+                  保存设置
+                </Button>
+              </div>
+            </div>
+          </ScrollArea>
+        ) : (
+          <div className="h-full flex">
+            {/* Left: Category Tree */}
+            <div className="w-64 bg-slate-800/50 border-r border-white/10 p-4">
+              <h3 className="text-sm font-semibold text-white mb-4">分类筛选</h3>
+              <div className="space-y-1">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                      selectedCategory === category.id
+                        ? "bg-slate-700 text-white"
+                        : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Materials Display */}
+            <div className="flex-1 flex flex-col">
+              {/* Operation Bar */}
+              <div className="bg-slate-800/50 border-b border-white/10 p-4 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    <Upload className="w-4 h-4 mr-2" />
+                    上传素材
+                  </Button>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Input
+                      placeholder="搜索素材..."
+                      className="pl-10 bg-slate-700/50 border-slate-600 text-white w-64"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="icon"
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    onClick={() => setViewMode("grid")}
+                    className={viewMode === "grid" ? "bg-slate-700" : ""}
+                  >
+                    <Grid3x3 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    onClick={() => setViewMode("list")}
+                    className={viewMode === "list" ? "bg-slate-700" : ""}
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Materials Grid */}
+              <ScrollArea className="flex-1">
+                <div className="p-6">
+                  <div className={viewMode === "grid" ? "grid grid-cols-4 gap-4" : "space-y-2"}>
+                    {materials.map((material) => (
+                      <div
+                        key={material.id}
+                        className="group relative bg-slate-800/50 rounded-lg overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer"
+                      >
+                        {viewMode === "grid" ? (
+                          <>
+                            <div className="aspect-[4/3] bg-slate-700 relative overflow-hidden">
+                              <img
+                                src={material.thumbnail || "/placeholder.svg"}
+                                alt={material.name}
+                                className="w-full h-full object-cover"
+                              />
+                              {/* Hover Overlay */}
+                              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="bg-white/10 hover:bg-white/20 text-white"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="bg-white/10 hover:bg-white/20 text-white"
+                                >
+                                  <Download className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="bg-white/10 hover:bg-white/20 text-white"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="p-3">
+                              <p className="text-sm font-medium text-white truncate">{material.name}</p>
+                              <p className="text-xs text-slate-400">{material.category}</p>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex items-center gap-4 p-3">
+                            <div className="w-16 h-16 bg-slate-700 rounded overflow-hidden flex-shrink-0">
+                              <img
+                                src={material.thumbnail || "/placeholder.svg"}
+                                alt={material.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-white truncate">{material.name}</p>
+                              <p className="text-xs text-slate-400">{material.category}</p>
+                            </div>
+                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button size="icon" variant="ghost" className="h-8 w-8">
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              <Button size="icon" variant="ghost" className="h-8 w-8">
+                                <Download className="w-4 h-4" />
+                              </Button>
+                              <Button size="icon" variant="ghost" className="h-8 w-8">
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </ScrollArea>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Re-definitions of creation modules to be conditionally rendered
 function WeChatMomentsCreation({ onBack }: { onBack: () => void }) {
   const [selectedType, setSelectedType] = useState<"event" | "newProject" | "holiday" | "greeting">("event")
   const [generatedPosters, setGeneratedPosters] = useState<number[]>([])
@@ -1425,265 +1672,6 @@ function XiaohongshuCreation({ onBack }: { onBack: () => void }) {
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  )
-}
-
-// Module 3: Brand Center
-function BrandCenter() {
-  return (
-    <ScrollArea className="h-full">
-      <div className="max-w-4xl mx-auto p-8 space-y-8">
-        <h2 className="text-2xl font-bold text-white">品牌设置</h2>
-
-        {/* Logo Upload */}
-        <div className="bg-slate-800/50 rounded-xl p-6 border border-white/10">
-          <h3 className="text-lg font-semibold text-white mb-4">品牌标识 (Logo)</h3>
-          <div className="flex items-start gap-6">
-            <div className="border-2 border-dashed border-slate-600 rounded-lg w-48 h-48 flex items-center justify-center hover:border-slate-500 transition-colors cursor-pointer">
-              <div className="text-center">
-                <Upload className="w-12 h-12 text-slate-400 mx-auto mb-2" />
-                <p className="text-sm text-slate-400">上传Logo</p>
-              </div>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm text-slate-300 mb-2">要求：</p>
-              <ul className="text-sm text-slate-400 space-y-1">
-                <li>• 格式：PNG（支持透明背景）</li>
-                <li>• 尺寸：500x500px 或更高</li>
-                <li>• 大小：不超过 2MB</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Brand Colors */}
-        <div className="bg-slate-800/50 rounded-xl p-6 border border-white/10">
-          <h3 className="text-lg font-semibold text-white mb-4">品牌色彩 (Color Palette)</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-slate-300 mb-2 block">主色</label>
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-lg bg-blue-500 border-2 border-white/20 cursor-pointer"></div>
-                <Input value="#3B82F6" readOnly className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-300 mb-2 block">辅助色 1</label>
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-lg bg-purple-500 border-2 border-white/20 cursor-pointer"></div>
-                <Input value="#A855F7" readOnly className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-300 mb-2 block">辅助色 2</label>
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-lg bg-pink-500 border-2 border-white/20 cursor-pointer"></div>
-                <Input value="#EC4899" readOnly className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Brand Font */}
-        <div className="bg-slate-800/50 rounded-xl p-6 border border-white/10">
-          <h3 className="text-lg font-semibold text-white mb-4">品牌字体 (Font)</h3>
-          <select className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-4 py-3 text-white">
-            <option>思源黑体 (Source Han Sans)</option>
-            <option>思源宋体 (Source Han Serif)</option>
-            <option>阿里巴巴普惠体</option>
-            <option>站酷高端黑</option>
-          </select>
-        </div>
-
-        {/* Contact Information */}
-        <div className="bg-slate-800/50 rounded-xl p-6 border border-white/10">
-          <h3 className="text-lg font-semibold text-white mb-4">预设联系信息</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-slate-300 mb-2 block flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                机构地址
-              </label>
-              <Input
-                placeholder="例如：北京市朝阳区xxx路xxx号"
-                className="bg-slate-700/50 border-slate-600 text-white"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-300 mb-2 block flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                联系电话
-              </label>
-              <Input placeholder="例如：400-xxx-xxxx" className="bg-slate-700/50 border-slate-600 text-white" />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-300 mb-2 block">微信二维码</label>
-              <div className="border-2 border-dashed border-slate-600 rounded-lg w-32 h-32 flex items-center justify-center hover:border-slate-500 transition-colors cursor-pointer">
-                <div className="text-center">
-                  <Upload className="w-8 h-8 text-slate-400 mx-auto mb-1" />
-                  <p className="text-xs text-slate-400">上传二维码</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Save Button */}
-        <div className="sticky bottom-0 bg-slate-900/95 backdrop-blur-xl border-t border-white/10 p-4 -mx-8">
-          <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3">
-            保存设置
-          </Button>
-        </div>
-      </div>
-    </ScrollArea>
-  )
-}
-
-// Module 4: Materials Library
-function MaterialsLibrary() {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const [selectedCategory, setSelectedCategory] = useState("all")
-
-  const categories = [
-    { id: "all", name: "全部素材" },
-    { id: "doctors", name: "医生团队" },
-    { id: "facilities", name: "环境设施" },
-    { id: "equipment", name: "设备仪器" },
-    { id: "cases", name: "术前术后案例" },
-    { id: "general", name: "通用素材" },
-  ]
-
-  const materials = Array.from({ length: 12 }, (_, i) => ({
-    id: i + 1,
-    name: `素材_${i + 1}.jpg`,
-    category: categories[Math.floor(Math.random() * (categories.length - 1)) + 1].name,
-    thumbnail: `/placeholder.svg?height=300&width=400&query=medical beauty material ${i + 1}`,
-  }))
-
-  return (
-    <div className="h-full flex">
-      {/* Left: Category Tree */}
-      <div className="w-64 bg-slate-800/50 border-r border-white/10 p-4">
-        <h3 className="text-sm font-semibold text-white mb-4">分类筛选</h3>
-        <div className="space-y-1">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setSelectedCategory(category.id)}
-              className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                selectedCategory === category.id
-                  ? "bg-slate-700 text-white"
-                  : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
-              }`}
-            >
-              {category.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Right: Materials Display */}
-      <div className="flex-1 flex flex-col">
-        {/* Operation Bar */}
-        <div className="bg-slate-800/50 border-b border-white/10 p-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Upload className="w-4 h-4 mr-2" />
-              上传素材
-            </Button>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <Input placeholder="搜索素材..." className="pl-10 bg-slate-700/50 border-slate-600 text-white w-64" />
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              size="icon"
-              variant={viewMode === "grid" ? "default" : "ghost"}
-              onClick={() => setViewMode("grid")}
-              className={viewMode === "grid" ? "bg-slate-700" : ""}
-            >
-              <Grid3x3 className="w-4 h-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant={viewMode === "list" ? "default" : "ghost"}
-              onClick={() => setViewMode("list")}
-              className={viewMode === "list" ? "bg-slate-700" : ""}
-            >
-              <List className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Materials Grid */}
-        <ScrollArea className="flex-1">
-          <div className="p-6">
-            <div className={viewMode === "grid" ? "grid grid-cols-4 gap-4" : "space-y-2"}>
-              {materials.map((material) => (
-                <div
-                  key={material.id}
-                  className="group relative bg-slate-800/50 rounded-lg overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer"
-                >
-                  {viewMode === "grid" ? (
-                    <>
-                      <div className="aspect-[4/3] bg-slate-700 relative overflow-hidden">
-                        <img
-                          src={material.thumbnail || "/placeholder.svg"}
-                          alt={material.name}
-                          className="w-full h-full object-cover"
-                        />
-                        {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                          <Button size="icon" variant="ghost" className="bg-white/10 hover:bg-white/20 text-white">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button size="icon" variant="ghost" className="bg-white/10 hover:bg-white/20 text-white">
-                            <Download className="w-4 h-4" />
-                          </Button>
-                          <Button size="icon" variant="ghost" className="bg-white/10 hover:bg-white/20 text-white">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="p-3">
-                        <p className="text-sm font-medium text-white truncate">{material.name}</p>
-                        <p className="text-xs text-slate-400">{material.category}</p>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="flex items-center gap-4 p-3">
-                      <div className="w-16 h-16 bg-slate-700 rounded overflow-hidden flex-shrink-0">
-                        <img
-                          src={material.thumbnail || "/placeholder.svg"}
-                          alt={material.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">{material.name}</p>
-                        <p className="text-xs text-slate-400">{material.category}</p>
-                      </div>
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button size="icon" variant="ghost" className="h-8 w-8">
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button size="icon" variant="ghost" className="h-8 w-8">
-                          <Download className="w-4 h-4" />
-                        </Button>
-                        <Button size="icon" variant="ghost" className="h-8 w-8">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </ScrollArea>
       </div>
     </div>
   )
