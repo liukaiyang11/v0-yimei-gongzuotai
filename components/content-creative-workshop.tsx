@@ -17,7 +17,17 @@ import {
   Grid3x3,
   List,
   Copy,
-  AlertTriangle,
+  Calendar,
+  Tag,
+  Clock,
+  Check,
+  Plus,
+  X,
+  Type,
+  ImageIcon as ImageIconSolid,
+  Move,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -295,213 +305,832 @@ function CreationCenter() {
 
 // Creation Workspace (Three-column layout)
 function CreationWorkspace({ scene, onBack }: { scene: "xiaohongshu" | "wechat" | "offline"; onBack: () => void }) {
+  if (scene === "wechat") {
+    return <WeChatMomentsCreation onBack={onBack} />
+  } else if (scene === "offline") {
+    return <OfflineEventMaterials onBack={onBack} />
+  } else {
+    return <XiaohongshuCreation onBack={onBack} />
+  }
+}
+
+function WeChatMomentsCreation({ onBack }: { onBack: () => void }) {
+  const [selectedType, setSelectedType] = useState<"event" | "newProject" | "holiday" | "greeting">("event")
   const [generatedPosters, setGeneratedPosters] = useState<number[]>([])
   const [selectedPoster, setSelectedPoster] = useState<number | null>(null)
+  const [copywritingVersion, setCopywritingVersion] = useState<"formal" | "personal">("formal")
+  const [highlights, setHighlights] = useState<string[]>(["1v1设计", "现场折扣"])
+  const [newHighlight, setNewHighlight] = useState("")
 
   const handleGenerate = () => {
     setGeneratedPosters([1, 2, 3, 4])
     setSelectedPoster(1)
   }
 
-  const titles = [
-    "🔥 医美小白必看！这些项目让你变美不踩坑",
-    "✨ 30岁+女性抗衰指南｜这样做年轻10岁",
-    "💡 医美项目避雷｜花最少的钱，做最有效的项目",
-    "🌟 医美新手入门｜从零开始的变美之路",
-  ]
+  const addHighlight = () => {
+    if (newHighlight.trim()) {
+      setHighlights([...highlights, newHighlight.trim()])
+      setNewHighlight("")
+    }
+  }
 
-  const content = `大家好呀～今天来分享一下我的医美心得💕
+  const removeHighlight = (index: number) => {
+    setHighlights(highlights.filter((_, i) => i !== index))
+  }
 
-作为一个医美老司机，经常有姐妹问我：
-"第一次做医美，应该选什么项目？"
-"怎么避免踩坑？"
-"哪些项目性价比高？"
+  const formalCopywriting = `🎉【重磅活动】幼态脸打造专场来啦！
 
-今天就来给大家详细讲讲！👇
+亲爱的朋友们，我们诊所本月将举办"幼态脸打造"专场活动，特邀资深医美专家现场坐诊！
 
-【新手友好项目推荐】
-1️⃣ 水光针 - 补水保湿，皮肤立刻水嫩
-2️⃣ 光子嫩肤 - 改善肤色，提亮肤质
-3️⃣ 热玛吉 - 紧致提升，抗衰首选
+📅 活动时间：2025年1月15日 14:00-18:00
+📍 活动地点：XX医美诊所（朝阳区xxx路xxx号）
 
-【避雷指南】
-⚠️ 一定要选正规医院
-⚠️ 不要贪便宜
-⚠️ 术前充分沟通
+✨ 活动亮点：
+• 1v1专属设计方案
+• 现场享受特别折扣
+• 专家面对面咨询
+• 精美伴手礼赠送
 
-姐妹们有什么想了解的可以评论区告诉我～
+💝 限时优惠：前20名预约享8折优惠！
 
-#医美分享 #变美日记 #医美避雷 #新手入门`
+扫描海报二维码即可预约，名额有限，先到先得！
+
+#医美活动 #幼态脸 #变美计划 #专家坐诊`
+
+  const personalCopywriting = `姐妹们！重磅消息来啦！🎊
+
+我们诊所要办"幼态脸打造"专场活动啦～这次请来的专家真的超厉害，我自己之前就是找他做的，效果绝了！💕
+
+📅 时间：1月15日下午2点-6点
+📍 地点：XX医美诊所（朝阳区那边）
+
+这次活动真的太划算了：
+✅ 一对一设计方案（平时要排队的！）
+✅ 现场有折扣（具体多少到时候问）
+✅ 可以直接跟专家面聊
+✅ 还有小礼物拿～
+
+前20个预约的姐妹有8折！！我已经帮闺蜜约上了😎
+
+想去的赶紧扫海报上的码，手慢无！
+
+有问题随时问我～
+
+#变美 #医美 #幼态脸 #姐妹们冲`
 
   return (
     <div className="h-full flex">
-      {/* Left: Smart Input Area */}
-      <div className="w-80 bg-slate-800/50 border-r border-white/10 p-6">
-        <ScrollArea className="h-full">
-          <div className="space-y-6">
-            <Button variant="ghost" onClick={onBack} className="w-full justify-start text-slate-400 hover:text-white">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              返回场景选择
-            </Button>
+      {/* Left Column: Template Selection & Content Input */}
+      <div className="w-80 bg-slate-800/50 border-r border-white/10 flex flex-col">
+        <div className="p-4 border-b border-white/10">
+          <Button variant="ghost" onClick={onBack} className="w-full justify-start text-slate-400 hover:text-white">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            返回场景选择
+          </Button>
+        </div>
 
+        <ScrollArea className="flex-1">
+          <div className="p-6 space-y-6">
+            {/* Template Type Navigation */}
             <div>
-              <label className="text-sm font-medium text-slate-300 mb-2 block">项目名称</label>
-              <Input placeholder="例如：水光针推广" className="bg-slate-700/50 border-slate-600 text-white" />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-slate-300 mb-2 block">核心卖点</label>
-              <Textarea
-                placeholder="例如：深层补水、提亮肤色、改善细纹"
-                className="bg-slate-700/50 border-slate-600 text-white min-h-[100px]"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-slate-300 mb-2 block">关键词标签</label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {["医美", "水光针", "补水", "提亮", "抗衰"].map((tag) => (
-                  <Badge key={tag} variant="secondary" className="bg-slate-700 text-slate-300">
-                    {tag}
-                  </Badge>
-                ))}
+              <h3 className="text-sm font-semibold text-white mb-3">选择模板类型</h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => setSelectedType("event")}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    selectedType === "event"
+                      ? "bg-green-500/20 border border-green-500/50 text-white"
+                      : "bg-slate-700/30 border border-slate-600/50 text-slate-300 hover:bg-slate-700/50"
+                  }`}
+                >
+                  <Calendar className="w-5 h-5" />
+                  <span className="font-medium">活动海报</span>
+                  {selectedType === "event" && <Check className="w-4 h-4 ml-auto text-green-400" />}
+                </button>
+                <button
+                  onClick={() => setSelectedType("newProject")}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    selectedType === "newProject"
+                      ? "bg-green-500/20 border border-green-500/50 text-white"
+                      : "bg-slate-700/30 border border-slate-600/50 text-slate-300 hover:bg-slate-700/50"
+                  }`}
+                >
+                  <Sparkles className="w-5 h-5" />
+                  <span className="font-medium">项目上新</span>
+                  {selectedType === "newProject" && <Check className="w-4 h-4 ml-auto text-green-400" />}
+                </button>
+                <button
+                  onClick={() => setSelectedType("holiday")}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    selectedType === "holiday"
+                      ? "bg-green-500/20 border border-green-500/50 text-white"
+                      : "bg-slate-700/30 border border-slate-600/50 text-slate-300 hover:bg-slate-700/50"
+                  }`}
+                >
+                  <Tag className="w-5 h-5" />
+                  <span className="font-medium">节日祝福</span>
+                  {selectedType === "holiday" && <Check className="w-4 h-4 ml-auto text-green-400" />}
+                </button>
+                <button
+                  onClick={() => setSelectedType("greeting")}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    selectedType === "greeting"
+                      ? "bg-green-500/20 border border-green-500/50 text-white"
+                      : "bg-slate-700/30 border border-slate-600/50 text-slate-300 hover:bg-slate-700/50"
+                  }`}
+                >
+                  <Clock className="w-5 h-5" />
+                  <span className="font-medium">早晚安图</span>
+                  {selectedType === "greeting" && <Check className="w-4 h-4 ml-auto text-green-400" />}
+                </button>
               </div>
-              <Input placeholder="添加关键词" className="bg-slate-700/50 border-slate-600 text-white" />
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-slate-300 mb-2 block">风格选择</label>
-              <select className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white">
-                <option>自然风</option>
-                <option>高级感</option>
-                <option>科技感</option>
-                <option>温馨风</option>
-              </select>
-            </div>
+            {/* Dynamic Form Area */}
+            {selectedType === "event" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">
+                    活动主题 <span className="text-red-400">*</span>
+                  </label>
+                  <Input placeholder="例如：幼态脸打造专场" className="bg-slate-700/50 border-slate-600 text-white" />
+                </div>
 
-            <div>
-              <label className="text-sm font-medium text-slate-300 mb-2 block">上传案例图片</label>
-              <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-slate-500 transition-colors cursor-pointer">
-                <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                <p className="text-sm text-slate-400">点击或拖拽上传图片</p>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">主讲人（选填）</label>
+                  <Input placeholder="例如：李医生" className="bg-slate-700/50 border-slate-600 text-white" />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">时间</label>
+                  <Input type="datetime-local" className="bg-slate-700/50 border-slate-600 text-white" />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">地点</label>
+                  <Input placeholder="例如：XX医美诊所" className="bg-slate-700/50 border-slate-600 text-white" />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">核心亮点</label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {highlights.map((highlight, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="bg-green-500/20 text-green-300 border border-green-500/30 pr-1"
+                      >
+                        {highlight}
+                        <button
+                          onClick={() => removeHighlight(index)}
+                          className="ml-1 hover:bg-green-500/30 rounded-full p-0.5"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      value={newHighlight}
+                      onChange={(e) => setNewHighlight(e.target.value)}
+                      onKeyPress={(e) => e.key === "Enter" && addHighlight()}
+                      placeholder="添加亮点标签"
+                      className="bg-slate-700/50 border-slate-600 text-white flex-1"
+                    />
+                    <Button onClick={addHighlight} size="icon" className="bg-green-600 hover:bg-green-700">
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">上传主图</label>
+                  <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-slate-500 transition-colors cursor-pointer">
+                    <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                    <p className="text-xs text-slate-400">点击或拖拽上传图片</p>
+                    <p className="text-xs text-slate-500 mt-1">支持 JPG、PNG，建议尺寸 1080x1080</p>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
 
+            {selectedType === "newProject" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">
+                    项目名称 <span className="text-red-400">*</span>
+                  </label>
+                  <Input placeholder="例如：超声刀紧致提升" className="bg-slate-700/50 border-slate-600 text-white" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">项目卖点</label>
+                  <Textarea
+                    placeholder="例如：无创紧致、即刻见效、持久抗衰"
+                    className="bg-slate-700/50 border-slate-600 text-white min-h-[100px]"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">优惠信息</label>
+                  <Input placeholder="例如：首次体验8折" className="bg-slate-700/50 border-slate-600 text-white" />
+                </div>
+              </div>
+            )}
+
+            {selectedType === "holiday" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">节日类型</label>
+                  <select className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white">
+                    <option>春节</option>
+                    <option>情人节</option>
+                    <option>妇女节</option>
+                    <option>母亲节</option>
+                    <option>中秋节</option>
+                    <option>圣诞节</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">祝福语</label>
+                  <Textarea
+                    placeholder="自定义祝福语，留空则使用AI生成"
+                    className="bg-slate-700/50 border-slate-600 text-white min-h-[100px]"
+                  />
+                </div>
+              </div>
+            )}
+
+            {selectedType === "greeting" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">问候类型</label>
+                  <select className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white">
+                    <option>早安</option>
+                    <option>晚安</option>
+                    <option>午安</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">风格</label>
+                  <select className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white">
+                    <option>温馨治愈</option>
+                    <option>励志正能量</option>
+                    <option>简约文艺</option>
+                    <option>可爱俏皮</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Generate Button */}
             <Button
               onClick={handleGenerate}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
+              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3"
             >
               <Sparkles className="w-5 h-5 mr-2" />
-              一键智能生成
+              智能生成海报与文案
             </Button>
           </div>
         </ScrollArea>
       </div>
 
-      {/* Middle: Poster Preview & Editing Area */}
+      {/* Middle Column: Poster Preview & Selection */}
       <div className="flex-1 bg-slate-900/50 p-6">
         <ScrollArea className="h-full">
           {generatedPosters.length === 0 ? (
             <div className="h-full flex items-center justify-center">
               <div className="text-center">
-                <Sparkles className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                <p className="text-slate-400">点击"一键智能生成"开始创作</p>
+                <ImageIcon className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-400 text-lg mb-2">等待生成海报</p>
+                <p className="text-slate-500 text-sm">填写左侧表单后点击"智能生成"</p>
               </div>
             </div>
           ) : (
-            <div>
-              <h3 className="text-lg font-bold text-white mb-4">AI生成方案</h3>
-              <div className="grid grid-cols-2 gap-4">
-                {generatedPosters.map((id) => (
-                  <div
-                    key={id}
-                    onClick={() => setSelectedPoster(id)}
-                    className={`relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer transition-all duration-300 ${
-                      selectedPoster === id ? "ring-4 ring-blue-500 scale-105" : "hover:scale-102"
-                    }`}
-                  >
-                    <img
-                      src={`/medical-beauty-poster-design-.jpg?height=600&width=450&query=medical beauty poster design ${id}`}
-                      alt={`方案 ${id}`}
-                      className="w-full h-full object-cover"
-                    />
-                    {selectedPoster === id && (
-                      <div className="absolute top-2 right-2 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        已选中
-                      </div>
-                    )}
-                  </div>
-                ))}
+            <div className="space-y-6">
+              {/* Main Preview */}
+              <div>
+                <h3 className="text-lg font-bold text-white mb-4">主预览</h3>
+                <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-slate-800 border-2 border-green-500/50">
+                  <img
+                    src={`/wechat-moments-poster-event-${selectedPoster}.jpg?height=800&width=600&query=wechat moments medical beauty event poster ${selectedPoster}`}
+                    alt="主预览海报"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Alternative Options */}
+              <div>
+                <h3 className="text-sm font-semibold text-slate-300 mb-3">备选方案</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  {generatedPosters.map((id) => (
+                    <div
+                      key={id}
+                      onClick={() => setSelectedPoster(id)}
+                      className={`relative aspect-[3/4] rounded-lg overflow-hidden cursor-pointer transition-all ${
+                        selectedPoster === id
+                          ? "ring-2 ring-green-500 scale-105"
+                          : "hover:scale-102 opacity-70 hover:opacity-100"
+                      }`}
+                    >
+                      <img
+                        src={`/wechat-moments-poster-event-${id}.jpg?height=400&width=300&query=wechat moments medical beauty event poster ${id}`}
+                        alt={`方案 ${id}`}
+                        className="w-full h-full object-cover"
+                      />
+                      {selectedPoster === id && (
+                        <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                          当前
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
         </ScrollArea>
       </div>
 
-      {/* Right: AI Copywriting Area */}
-      <div className="w-96 bg-slate-800/50 border-l border-white/10 p-6">
-        <ScrollArea className="h-full">
-          <div className="space-y-6">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-white">AI文案生成</h3>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="text-xs bg-transparent">
-                    标题
-                  </Button>
-                  <Button size="sm" variant="ghost" className="text-xs">
-                    正文
-                  </Button>
-                </div>
-              </div>
+      {/* Right Column: Copywriting & Export */}
+      <div className="w-96 bg-slate-800/50 border-l border-white/10 flex flex-col">
+        <div className="p-6 border-b border-white/10">
+          <h3 className="text-lg font-bold text-white mb-4">配套朋友圈文案</h3>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setCopywritingVersion("formal")}
+              className={`flex-1 ${
+                copywritingVersion === "formal"
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-slate-700/50 hover:bg-slate-700 text-slate-300"
+              }`}
+            >
+              正式版
+            </Button>
+            <Button
+              onClick={() => setCopywritingVersion("personal")}
+              className={`flex-1 ${
+                copywritingVersion === "personal"
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-slate-700/50 hover:bg-slate-700 text-slate-300"
+              }`}
+            >
+              顾问个人版
+            </Button>
+          </div>
+        </div>
 
-              <div className="space-y-3">
-                {titles.map((title, index) => (
-                  <div
-                    key={index}
-                    className="bg-slate-700/50 rounded-lg p-3 group hover:bg-slate-700 transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm text-white flex-1">{title}</p>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Copy className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-white">完整正文</h3>
-                <Button size="sm" variant="ghost" className="text-xs">
+        <ScrollArea className="flex-1">
+          <div className="p-6 space-y-4">
+            {/* Copywriting Content */}
+            <div className="bg-slate-700/30 rounded-lg p-4 border border-slate-600/50">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold text-slate-400">
+                  {copywritingVersion === "formal" ? "正式版文案" : "顾问个人版文案"}
+                </span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 text-xs text-green-400 hover:text-green-300 hover:bg-green-500/10"
+                >
                   <Copy className="w-3 h-3 mr-1" />
-                  复制
+                  一键复制文案
                 </Button>
               </div>
-              <div className="bg-slate-700/50 rounded-lg p-4">
-                <p className="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">{content}</p>
+              <div className="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed">
+                {copywritingVersion === "formal" ? formalCopywriting : personalCopywriting}
               </div>
             </div>
 
-            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+            {/* Tips */}
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
               <div className="flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-yellow-500 flex-shrink-0 mt-0.5" />
+                <Sparkles className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-semibold text-yellow-500 mb-1">合规提示</p>
+                  <p className="text-xs font-semibold text-blue-400 mb-1">文案建议</p>
                   <p className="text-xs text-slate-400">
-                    检测到可能违规词语：<span className="text-yellow-400 underline">医美老司机</span>
+                    正式版适合机构官方账号发布，顾问个人版更适合个人朋友圈，语气更亲切自然。
                   </p>
                 </div>
               </div>
             </div>
           </div>
         </ScrollArea>
+
+        {/* Bottom Action Buttons */}
+        <div className="p-6 border-t border-white/10 space-y-3">
+          <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3">
+            <Download className="w-4 h-4 mr-2" />
+            下载海报
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onBack}
+            className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent"
+          >
+            返回
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function OfflineEventMaterials({ onBack }: { onBack: () => void }) {
+  const [materialType, setMaterialType] = useState<"poster" | "rollup" | "flyer">("poster")
+  const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null)
+  const [selectedElement, setSelectedElement] = useState<"text" | "image" | null>(null)
+
+  const templates = {
+    poster: [
+      { id: 1, name: "专家坐诊风", thumbnail: "/poster-template-1.jpg" },
+      { id: 2, name: "科技感", thumbnail: "/poster-template-2.jpg" },
+      { id: 3, name: "温馨促销风", thumbnail: "/poster-template-3.jpg" },
+      { id: 4, name: "高端奢华", thumbnail: "/poster-template-4.jpg" },
+    ],
+    rollup: [
+      { id: 1, name: "简约商务", thumbnail: "/rollup-template-1.jpg" },
+      { id: 2, name: "活力时尚", thumbnail: "/rollup-template-2.jpg" },
+      { id: 3, name: "专业医疗", thumbnail: "/rollup-template-3.jpg" },
+      { id: 4, name: "优雅高级", thumbnail: "/rollup-template-4.jpg" },
+    ],
+    flyer: [
+      { id: 1, name: "双面宣传", thumbnail: "/flyer-template-1.jpg" },
+      { id: 2, name: "优惠券式", thumbnail: "/flyer-template-2.jpg" },
+      { id: 3, name: "项目介绍", thumbnail: "/flyer-template-3.jpg" },
+      { id: 4, name: "活动邀请", thumbnail: "/flyer-template-4.jpg" },
+    ],
+  }
+
+  const currentTemplates = templates[materialType]
+
+  const materialSizes = {
+    poster: "60x90cm",
+    rollup: "80x200cm",
+    flyer: "A4 (21x29.7cm)",
+  }
+
+  return (
+    <div className="h-full flex">
+      {/* Left Column: Material Type & Template Library */}
+      <div className="w-80 bg-slate-800/50 border-r border-white/10 flex flex-col">
+        <div className="p-4 border-b border-white/10">
+          <Button variant="ghost" onClick={onBack} className="w-full justify-start text-slate-400 hover:text-white">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            返回场景选择
+          </Button>
+        </div>
+
+        <ScrollArea className="flex-1">
+          <div className="p-6 space-y-6">
+            {/* Material Type Selector */}
+            <div>
+              <h3 className="text-sm font-semibold text-white mb-3">选择物料类型</h3>
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  onClick={() => {
+                    setMaterialType("poster")
+                    setSelectedTemplate(null)
+                  }}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg transition-all ${
+                    materialType === "poster"
+                      ? "bg-blue-500/20 border-2 border-blue-500/50 text-white"
+                      : "bg-slate-700/30 border border-slate-600/50 text-slate-300 hover:bg-slate-700/50"
+                  }`}
+                >
+                  <FileText className="w-8 h-8" />
+                  <span className="text-xs font-medium">海报</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setMaterialType("rollup")
+                    setSelectedTemplate(null)
+                  }}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg transition-all ${
+                    materialType === "rollup"
+                      ? "bg-blue-500/20 border-2 border-blue-500/50 text-white"
+                      : "bg-slate-700/30 border border-slate-600/50 text-slate-300 hover:bg-slate-700/50"
+                  }`}
+                >
+                  <ImageIcon className="w-8 h-8" />
+                  <span className="text-xs font-medium">易拉宝</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setMaterialType("flyer")
+                    setSelectedTemplate(null)
+                  }}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg transition-all ${
+                    materialType === "flyer"
+                      ? "bg-blue-500/20 border-2 border-blue-500/50 text-white"
+                      : "bg-slate-700/30 border border-slate-600/50 text-slate-300 hover:bg-slate-700/50"
+                  }`}
+                >
+                  <FileText className="w-8 h-8" />
+                  <span className="text-xs font-medium">宣传单</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Template Library */}
+            <div>
+              <h3 className="text-sm font-semibold text-white mb-3">模板库</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {currentTemplates.map((template) => (
+                  <div
+                    key={template.id}
+                    onClick={() => setSelectedTemplate(template.id)}
+                    className={`relative aspect-[3/4] rounded-lg overflow-hidden cursor-pointer transition-all ${
+                      selectedTemplate === template.id
+                        ? "ring-2 ring-blue-500 scale-105"
+                        : "hover:scale-102 opacity-80 hover:opacity-100"
+                    }`}
+                  >
+                    <img
+                      src={`/${materialType}-template-${template.id}.jpg?height=400&width=300&query=${materialType} template ${template.name}`}
+                      alt={template.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                      <p className="text-xs font-medium text-white">{template.name}</p>
+                    </div>
+                    {selectedTemplate === template.id && (
+                      <div className="absolute top-2 right-2 bg-blue-500 text-white p-1 rounded-full">
+                        <Check className="w-3 h-3" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
+
+      {/* Middle Column: Canvas & Real-time Editing */}
+      <div className="flex-1 bg-slate-900/50 p-6 flex flex-col">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-white">设计画布</h3>
+          <div className="flex items-center gap-2">
+            <Button size="icon" variant="ghost" className="text-slate-400 hover:text-white">
+              <ZoomOut className="w-4 h-4" />
+            </Button>
+            <span className="text-sm text-slate-400">100%</span>
+            <Button size="icon" variant="ghost" className="text-slate-400 hover:text-white">
+              <ZoomIn className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        <ScrollArea className="flex-1">
+          {selectedTemplate === null ? (
+            <div className="h-full flex items-center justify-center">
+              <div className="text-center">
+                <Palette className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-400 text-lg mb-2">选择模板开始设计</p>
+                <p className="text-slate-500 text-sm">从左侧模板库中选择一个模板</p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center min-h-full p-8">
+              <div
+                className={`relative bg-white rounded-lg shadow-2xl ${
+                  materialType === "rollup"
+                    ? "aspect-[2/5]"
+                    : materialType === "flyer"
+                      ? "aspect-[1/1.414]"
+                      : "aspect-[2/3]"
+                } ${materialType === "rollup" ? "h-[600px]" : "h-[500px]"}`}
+              >
+                <img
+                  src={`/${materialType}-template-${selectedTemplate}.jpg?height=800&width=600&query=${materialType} design template editable`}
+                  alt="设计画布"
+                  className="w-full h-full object-cover rounded-lg"
+                />
+                {/* Editable Elements Overlay */}
+                <div className="absolute inset-0">
+                  {/* Example editable text element */}
+                  <div
+                    onClick={() => setSelectedElement("text")}
+                    className={`absolute top-[10%] left-[10%] right-[10%] p-4 cursor-move ${
+                      selectedElement === "text" ? "ring-2 ring-blue-500" : "hover:ring-2 hover:ring-blue-300"
+                    }`}
+                  >
+                    <h2 className="text-2xl font-bold text-center">双击编辑标题</h2>
+                  </div>
+                  {/* Example editable image element */}
+                  <div
+                    onClick={() => setSelectedElement("image")}
+                    className={`absolute top-[30%] left-[20%] right-[20%] aspect-video bg-slate-200 rounded cursor-move ${
+                      selectedElement === "image" ? "ring-2 ring-blue-500" : "hover:ring-2 hover:ring-blue-300"
+                    }`}
+                  >
+                    <div className="w-full h-full flex items-center justify-center text-slate-400">
+                      <ImageIconSolid className="w-12 h-12" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </ScrollArea>
+      </div>
+
+      {/* Right Column: Element Properties & Export */}
+      <div className="w-96 bg-slate-800/50 border-l border-white/10 flex flex-col">
+        <div className="p-6 border-b border-white/10">
+          <h3 className="text-lg font-bold text-white">图层与属性</h3>
+        </div>
+
+        <ScrollArea className="flex-1">
+          <div className="p-6 space-y-6">
+            {/* Global Settings */}
+            {selectedElement === null && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">整体尺寸</label>
+                  <Input
+                    value={materialSizes[materialType]}
+                    readOnly
+                    className="bg-slate-700/50 border-slate-600 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">背景颜色</label>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-white border-2 border-slate-600 cursor-pointer"></div>
+                    <Input value="#FFFFFF" className="flex-1 bg-slate-700/50 border-slate-600 text-white" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Text Element Properties */}
+            {selectedElement === "text" && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Type className="w-5 h-5 text-blue-400" />
+                  <span className="text-sm font-semibold text-white">文本属性</span>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">文本内容</label>
+                  <Textarea
+                    defaultValue="双击编辑标题"
+                    className="bg-slate-700/50 border-slate-600 text-white min-h-[80px]"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">字体</label>
+                  <select className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white">
+                    <option>思源黑体</option>
+                    <option>思源宋体</option>
+                    <option>阿里巴巴普惠体</option>
+                    <option>站酷高端黑</option>
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-medium text-slate-300 mb-2 block">字号</label>
+                    <Input type="number" defaultValue="24" className="bg-slate-700/50 border-slate-600 text-white" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-300 mb-2 block">颜色</label>
+                    <Input type="color" defaultValue="#000000" className="bg-slate-700/50 border-slate-600 h-10" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">样式</label>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" className="flex-1 bg-slate-700/50 border-slate-600">
+                      <strong>B</strong>
+                    </Button>
+                    <Button size="sm" variant="outline" className="flex-1 bg-slate-700/50 border-slate-600">
+                      <em>I</em>
+                    </Button>
+                    <Button size="sm" variant="outline" className="flex-1 bg-slate-700/50 border-slate-600">
+                      <u>U</u>
+                    </Button>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">对齐方式</label>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" className="flex-1 bg-slate-700/50 border-slate-600">
+                      左对齐
+                    </Button>
+                    <Button size="sm" variant="outline" className="flex-1 bg-slate-700/50 border-slate-600">
+                      居中
+                    </Button>
+                    <Button size="sm" variant="outline" className="flex-1 bg-slate-700/50 border-slate-600">
+                      右对齐
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Image Element Properties */}
+            {selectedElement === "image" && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <ImageIconSolid className="w-5 h-5 text-blue-400" />
+                  <span className="text-sm font-semibold text-white">图片属性</span>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">替换图片</label>
+                  <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-slate-500 transition-colors cursor-pointer">
+                    <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                    <p className="text-xs text-slate-400">点击上传新图片</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">裁剪</label>
+                  <Button className="w-full bg-slate-700/50 hover:bg-slate-700 border border-slate-600">
+                    <Move className="w-4 h-4 mr-2" />
+                    裁剪图片
+                  </Button>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">滤镜</label>
+                  <select className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white">
+                    <option>无</option>
+                    <option>黑白</option>
+                    <option>复古</option>
+                    <option>鲜艳</option>
+                    <option>柔和</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Core Content Form */}
+            <div className="space-y-4 pt-6 border-t border-white/10">
+              <h4 className="text-sm font-semibold text-white">核心内容填写</h4>
+              <div>
+                <label className="text-sm font-medium text-slate-300 mb-2 block">主标题</label>
+                <Input placeholder="例如：幼态脸打造专场" className="bg-slate-700/50 border-slate-600 text-white" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-300 mb-2 block">副标题</label>
+                <Input placeholder="例如：专家坐诊 限时优惠" className="bg-slate-700/50 border-slate-600 text-white" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-300 mb-2 block">活动时间</label>
+                <Input type="datetime-local" className="bg-slate-700/50 border-slate-600 text-white" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-300 mb-2 block">地址</label>
+                <Input placeholder="例如：朝阳区xxx路xxx号" className="bg-slate-700/50 border-slate-600 text-white" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-300 mb-2 block">二维码图片</label>
+                <div className="border-2 border-dashed border-slate-600 rounded-lg w-24 h-24 flex items-center justify-center hover:border-slate-500 transition-colors cursor-pointer">
+                  <Upload className="w-6 h-6 text-slate-400" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+
+        {/* Export Module */}
+        <div className="p-6 border-t border-white/10 space-y-4">
+          <h4 className="text-sm font-semibold text-white">导出为打印文件</h4>
+          <div>
+            <label className="text-sm font-medium text-slate-300 mb-2 block">文件格式</label>
+            <select className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white">
+              <option>PDF印刷格式</option>
+              <option>JPG高清图</option>
+              <option>PNG透明背景</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-slate-300 mb-2 block">分辨率</label>
+            <select className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white">
+              <option>300 DPI (印刷标准)</option>
+              <option>150 DPI (普通打印)</option>
+              <option>72 DPI (屏幕显示)</option>
+            </select>
+          </div>
+          <Button className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold py-3">
+            <Download className="w-4 h-4 mr-2" />
+            生成并下载
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function XiaohongshuCreation({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="h-full flex items-center justify-center">
+      <div className="text-center">
+        <FileText className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+        <p className="text-slate-400 text-lg">小红书图文笔记创作</p>
+        <p className="text-slate-500 text-sm mt-2">功能开发中...</p>
+        <Button onClick={onBack} className="mt-6">
+          返回
+        </Button>
       </div>
     </div>
   )
