@@ -1122,15 +1122,309 @@ function OfflineEventMaterials({ onBack }: { onBack: () => void }) {
 }
 
 function XiaohongshuCreation({ onBack }: { onBack: () => void }) {
+  const [projectName, setProjectName] = useState("")
+  const [corePoints, setCorePoints] = useState("")
+  const [keywords, setKeywords] = useState<string[]>(["医美", "水光针", "补水", "提亮"])
+  const [newKeyword, setNewKeyword] = useState("")
+  const [style, setStyle] = useState("自然风")
+  const [hasGenerated, setHasGenerated] = useState(false)
+  const [activeTab, setActiveTab] = useState<"title" | "body">("title")
+
+  const addKeyword = () => {
+    if (newKeyword.trim() && keywords.length < 10) {
+      setKeywords([...keywords, newKeyword.trim()])
+      setNewKeyword("")
+    }
+  }
+
+  const removeKeyword = (index: number) => {
+    setKeywords(keywords.filter((_, i) => i !== index))
+  }
+
+  const handleGenerate = () => {
+    setHasGenerated(true)
+  }
+
+  const generatedTitles = [
+    "🔥 医美小白必看！这些项目让你变美不踩坑",
+    "✨ 30岁+女性抗衰指南｜这样做年轻10岁",
+    "💎 医美项目避雷｜花最少的钱，做最有效的项目",
+    "🌟 医美新手入门｜从零开始的变美之路",
+  ]
+
+  const generatedBody = `大家好呀～今天来分享一下我的医美心得💕
+
+作为一个医美老司机，经常有姐妹问我：
+"第一次做医美，应该选什么项目？"
+"怎么避免踩坑？"
+"哪些项目性价比高？"
+
+今天就来给大家详细讲讲！👇
+
+【新手友好项目推荐】
+1️⃣ 水光针 - 补水保湿，皮肤立刻水嫩
+2️⃣ 光子嫩肤 - 改善肤色，提亮肤质
+3️⃣ 热玛吉 - 紧致提升，抗衰首选
+
+【避雷指南】
+⚠️ 一定要选正规医院
+⚠️ 不要贪便宜
+⚠️ 术前一定要和医生充分沟通
+
+有问题随时问我～
+
+#医美 #变美日记 #医美攻略 #新手必看`
+
   return (
-    <div className="h-full flex items-center justify-center">
-      <div className="text-center">
-        <FileText className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-        <p className="text-slate-400 text-lg">小红书图文笔记创作</p>
-        <p className="text-slate-500 text-sm mt-2">功能开发中...</p>
-        <Button onClick={onBack} className="mt-6">
-          返回
-        </Button>
+    <div className="h-full flex">
+      {/* Left Column: Input Form */}
+      <div className="w-96 bg-slate-800/50 border-r border-white/10 flex flex-col">
+        <div className="p-4 border-b border-white/10">
+          <Button variant="ghost" onClick={onBack} className="w-full justify-start text-slate-400 hover:text-white">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            返回场景选择
+          </Button>
+        </div>
+
+        <ScrollArea className="flex-1">
+          <div className="p-6 space-y-6">
+            {/* Project Name */}
+            <div>
+              <label className="text-sm font-medium text-white mb-2 block">项目名称</label>
+              <Input
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                placeholder="例如：水光针推广"
+                className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+              />
+            </div>
+
+            {/* Core Selling Points */}
+            <div>
+              <label className="text-sm font-medium text-white mb-2 block">核心卖点</label>
+              <Textarea
+                value={corePoints}
+                onChange={(e) => setCorePoints(e.target.value)}
+                placeholder="例如：深层补水、提亮肤色、改善细纹"
+                className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500 min-h-[120px]"
+              />
+            </div>
+
+            {/* Keywords */}
+            <div>
+              <label className="text-sm font-medium text-white mb-2 block">关键词标签</label>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {keywords.map((keyword, index) => (
+                  <Badge
+                    key={index}
+                    className="bg-slate-700/70 text-slate-200 border border-slate-600 hover:bg-slate-700 pr-1"
+                  >
+                    {keyword}
+                    <button
+                      onClick={() => removeKeyword(index)}
+                      className="ml-1.5 hover:bg-slate-600 rounded-full p-0.5"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  value={newKeyword}
+                  onChange={(e) => setNewKeyword(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && addKeyword()}
+                  placeholder="添加关键词"
+                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500 flex-1"
+                />
+                <Button
+                  onClick={addKeyword}
+                  size="icon"
+                  className="bg-slate-700 hover:bg-slate-600 border border-slate-600"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Style Selection */}
+            <div>
+              <label className="text-sm font-medium text-white mb-2 block">风格选择</label>
+              <select
+                value={style}
+                onChange={(e) => setStyle(e.target.value)}
+                className="w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white"
+              >
+                <option>自然风</option>
+                <option>时尚风</option>
+                <option>专业风</option>
+                <option>温馨风</option>
+                <option>高级感</option>
+              </select>
+            </div>
+
+            {/* Upload Case Images */}
+            <div>
+              <label className="text-sm font-medium text-white mb-2 block">上传案例图片</label>
+              <div className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center hover:border-slate-500 transition-colors cursor-pointer">
+                <Upload className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+                <p className="text-sm text-slate-400 mb-1">点击或拖拽上传图片</p>
+                <p className="text-xs text-slate-500">支持 JPG、PNG，建议尺寸 1080x1080</p>
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+
+        {/* Generate Button */}
+        <div className="p-6 border-t border-white/10">
+          <Button
+            onClick={handleGenerate}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 text-base"
+          >
+            <Sparkles className="w-5 h-5 mr-2" />
+            一键智能生成
+          </Button>
+        </div>
+      </div>
+
+      {/* Middle Column: Preview/Generation Status */}
+      <div className="flex-1 bg-slate-900/50 flex items-center justify-center p-8">
+        {!hasGenerated ? (
+          <div className="text-center">
+            <div className="w-24 h-24 mx-auto mb-6 relative">
+              <Sparkles className="w-24 h-24 text-slate-600" />
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-xl"></div>
+            </div>
+            <p className="text-lg text-slate-300">点击"一键智能生成"开始创作</p>
+          </div>
+        ) : (
+          <div className="max-w-2xl w-full">
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-white/10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                  <Check className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">生成完成！</h3>
+                  <p className="text-sm text-slate-400">已为您生成小红书笔记内容</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <Check className="w-4 h-4 text-green-400" />
+                  <span>已生成 4 个爆款标题</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <Check className="w-4 h-4 text-green-400" />
+                  <span>已生成完整正文内容</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <Check className="w-4 h-4 text-green-400" />
+                  <span>已优化关键词布局</span>
+                </div>
+              </div>
+              <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <Sparkles className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-semibold text-blue-400 mb-1">创作建议</p>
+                    <p className="text-xs text-slate-400">
+                      右侧为您提供了多个标题选项和完整正文，您可以直接复制使用或根据需要进行修改。
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Right Column: AI Generated Content */}
+      <div className="w-[420px] bg-slate-800/50 border-l border-white/10 flex flex-col">
+        <div className="p-6 border-b border-white/10">
+          <h3 className="text-lg font-bold text-white mb-4">AI文案生成</h3>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setActiveTab("title")}
+              className={`flex-1 ${
+                activeTab === "title"
+                  ? "bg-purple-600 hover:bg-purple-700"
+                  : "bg-slate-700/50 hover:bg-slate-700 text-slate-300"
+              }`}
+            >
+              标题
+            </Button>
+            <Button
+              onClick={() => setActiveTab("body")}
+              className={`flex-1 ${
+                activeTab === "body"
+                  ? "bg-purple-600 hover:bg-purple-700"
+                  : "bg-slate-700/50 hover:bg-slate-700 text-slate-300"
+              }`}
+            >
+              正文
+            </Button>
+          </div>
+        </div>
+
+        <ScrollArea className="flex-1">
+          <div className="p-6 space-y-4">
+            {activeTab === "title" ? (
+              <>
+                {generatedTitles.map((title, index) => (
+                  <div
+                    key={index}
+                    className="group bg-slate-700/30 hover:bg-slate-700/50 rounded-lg p-4 border border-slate-600/50 hover:border-slate-500 transition-all cursor-pointer"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-sm text-slate-200 leading-relaxed flex-1">{title}</p>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity h-7 text-xs text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
+                      >
+                        <Copy className="w-3 h-3 mr-1" />
+                        复制
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-white">完整正文</h4>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 text-xs text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
+                  >
+                    <Copy className="w-3 h-3 mr-1" />
+                    复制
+                  </Button>
+                </div>
+                <div className="bg-slate-700/30 rounded-lg p-4 border border-slate-600/50">
+                  <div className="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed">{generatedBody}</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+
+        {/* Bottom Tips */}
+        <div className="p-6 border-t border-white/10">
+          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg p-4">
+            <div className="flex items-start gap-2">
+              <Sparkles className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-semibold text-purple-400 mb-1">使用提示</p>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  标题和正文都可以直接复制使用。建议根据实际情况适当调整，让内容更贴合您的品牌调性。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
