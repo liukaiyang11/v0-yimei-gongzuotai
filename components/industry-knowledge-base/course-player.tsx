@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import {
-  ArrowLeft,
   Download,
   MoreHorizontal,
   Play,
@@ -26,6 +25,7 @@ import {
   Smile,
   MoreVertical,
   Maximize2,
+  ArrowLeft,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -58,12 +58,37 @@ interface Transcript {
 }
 
 const mockChapters: Chapter[] = [
-  { id: "1", title: "诺和诺德与医美", time: "00:00", thumbnail: "/placeholder.svg?height=80&width=120" },
-  { id: "2", title: "生活美容与医疗", time: "03:27", thumbnail: "/placeholder.svg?height=80&width=120" },
-  { id: "3", title: "轻医美项目解析", time: "06:57", thumbnail: "/placeholder.svg?height=80&width=120" },
-  { id: "4", title: "医美行业产业链", time: "11:24", thumbnail: "/placeholder.svg?height=80&width=120" },
-  { id: "5", title: "营销医美行业三大难题", time: "15:24", thumbnail: "/placeholder.svg?height=80&width=120" },
-  { id: "6", title: "医美行业合规化", time: "17:50", thumbnail: "/placeholder.svg?height=80&width=120" },
+  {
+    id: "1",
+    title: "诺和诺德与医美行业：揭秘减肥药与医美市场",
+    time: "00:00",
+    thumbnail: "/placeholder.svg?height=80&width=120",
+  },
+  {
+    id: "2",
+    title: "生活美容与医疗美容的区别及发展",
+    time: "03:27",
+    thumbnail: "/placeholder.svg?height=80&width=120",
+  },
+  {
+    id: "3",
+    title: "轻医美项目解析：注射疗法与光电疗法",
+    time: "06:57",
+    thumbnail: "/placeholder.svg?height=80&width=120",
+  },
+  {
+    id: "4",
+    title: "医美行业产业链与商业模式深度解析",
+    time: "11:24",
+    thumbnail: "/placeholder.svg?height=80&width=120",
+  },
+  {
+    id: "5",
+    title: "警惕医美行业三大黑幕：机构、医生、产品",
+    time: "15:24",
+    thumbnail: "/placeholder.svg?height=80&width=120",
+  },
+  { id: "6", title: "医美行业合规化与营销策略分析", time: "17:50", thumbnail: "/placeholder.svg?height=80&width=120" },
   { id: "7", title: "医美行业乱象与监管升级", time: "21:26", thumbnail: "/placeholder.svg?height=80&width=120" },
 ]
 
@@ -94,6 +119,93 @@ const mockTranscripts: Transcript[] = [
 ]
 
 const keywordTags = ["诺和诺德", "斯卡格鲁肽", "医美", "轻医美", "玻尿酸", "肉毒素", "医疗美容", "产业链"]
+
+// Added keyPointsData
+const keyPointsData = [
+  {
+    tag: "要点",
+    speaker: "发言人1",
+    content:
+      "月初时，LVMH集团的欧洲最大上市公司宝座被夺走了。打败LVMH的是丹麦生物制药公司诺和诺德，凭借其重磅减肥药产品斯卡格鲁肽在市场上的成功，诺和诺德的市值超越了拥有50多个奢侈品牌的LVMH集团。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人3",
+    content:
+      "斯卡格鲁肽在中国目前只批准用于二型糖尿病治疗，但在美国FDA已批准用于肥胖或超重人群减肥。这款药物的成功不仅来自医疗用途，更多是超适应症使用的需求，即医美行业的应用。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人4",
+    content:
+      "医美行业的市场规模以15%的年复合增长率持续扩大。其中轻医美项目（如注射类、光电类）因风险低、恢复快而受到消费者青睐，占据了医美市场的主要份额。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人6",
+    content:
+      "医美行业存在三大黑幕：黑机构违规经营、黑医生无资质行医、黑产品使用假冒伪劣产品。这些问题导致消费者权益受损，行业信任度下降。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人10",
+    content:
+      "医美行业正在经历合规化转型。政府及相关部门出台了一系列规范市场、保护消费者权益的措施，包括严格监管、专业人才培训等，推动行业向规范化、品牌化、精细化发展。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人12",
+    content:
+      "轻医美项目主要分为注射疗法和光电疗法。注射疗法包括玻尿酸、肉毒素、除皱、瘦脸等，光电疗法利用激光、射频、超声波技术作用于皮肤，实现脱毛、嫩肤、紧致等效果。新型产品和成熟技术的结合，推动了轻医美市场的发展。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人13",
+    content: "轻医美项目的主要成本是什么？轻医美项目主要分为两大类：注射疗法和光电疗法。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人14",
+    content:
+      "敷父母做医美项目的用药有哪些？敷父母尿酸（透明质酸）在医美领域主要用于皮肤填充和塑形，如填充皱纹、丰唇、隆鼻等，以及通过注射达到美容效果。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人15",
+    content:
+      "酶母肉毒素在医美中的工作原理是什么？酶母肉毒素主要利用激光、强脉冲光、射频和超声波等技术，作用于皮肤，实现脱毛、嫩肤、紧致等效果，作用于大体积或较深层次，但不能完全免疫问题，但能显著提升消费者安全意识。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人16",
+    content:
+      "激光和射频HIPL（光子嫩肤）的区别是什么？激光利用干激光技术，作用精准，辐射和超声波波段大；射频利用射频能量，作用于皮肤深层，刺激胶原蛋白再生，适用于紧致、提亮肤色、缩小毛孔等。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人18",
+    content:
+      "射频和超声波技术的工作原理是什么？射频技术利用射频能量作用于皮肤深层，刺激胶原蛋白再生，达到紧致提升效果；超声波技术则利用超声波能量，作用于皮下组织，促进胶原蛋白增生，达到紧致和提升效果。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人19",
+    content:
+      "射频技术和超声波技术的工作原理是什么？射频技术利用射频能量作用于皮肤深层，刺激胶原蛋白再生，达到紧致提升效果；超声波技术则利用超声波能量，作用于皮下组织，促进胶原蛋白增生，达到紧致和提升效果。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人20",
+    content:
+      "医美行业产业链的上游主要由哪些部分组成？医美行业上游主要由原材料供应商、器械制造商、药品生产商等组成。例如，玻尿酸和肉毒素等产品的生产商，以及激光设备、射频设备等器械的制造商。",
+  },
+  {
+    tag: "要点",
+    speaker: "发言人A",
+    content:
+      "公立医院的整形外科、皮肤科与非法医美机构的乱象，上游市场花样百出，新老玩家竞争激烈，中游则因门槛低导致乱象频发，非法医美机构和医生资质问题严重，消费者需警惕。",
+  },
+]
 
 export function CoursePlayer({ courseTitle, onBack }: CoursePlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false)
@@ -232,8 +344,8 @@ export function CoursePlayer({ courseTitle, onBack }: CoursePlayerProps) {
         </div>
 
         {/* 右侧AI功能面板 */}
-        <div className="w-[480px] bg-slate-800/50 backdrop-blur-sm border-l border-slate-700 flex flex-col">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+        <div className="w-[480px] bg-slate-800/50 backdrop-blur-sm border-l border-slate-700 flex flex-col overflow-hidden">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
             <TabsList className="bg-transparent border-b border-slate-700 rounded-none h-12 px-4">
               <TabsTrigger value="guide" className="data-[state=active]:bg-slate-700">
                 导读
@@ -286,7 +398,6 @@ export function CoursePlayer({ courseTitle, onBack }: CoursePlayerProps) {
                   </Button>
                 </div>
 
-                {/* 功能按钮 */}
                 <div className="flex items-center gap-2">
                   <Button size="sm" variant="outline" className="bg-slate-700 border-slate-600 text-white">
                     全文速读
@@ -315,22 +426,71 @@ export function CoursePlayer({ courseTitle, onBack }: CoursePlayerProps) {
                   </div>
                 </div>
 
-                {/* 文字稿 */}
-                <div className="space-y-4">
-                  {mockTranscripts.map((transcript, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs">
-                          {index + 1}
+                {activeGuideTab === "original" && (
+                  <div className="space-y-4">
+                    {mockTranscripts.map((transcript, index) => (
+                      <div key={index} className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs">
+                            {index + 1}
+                          </div>
+                          <span className="text-gray-400 text-sm">
+                            {transcript.speaker} {transcript.time}
+                          </span>
                         </div>
-                        <span className="text-gray-400 text-sm">
-                          {transcript.speaker} {transcript.time}
-                        </span>
+                        <p className="text-gray-300 text-sm leading-relaxed pl-8">{transcript.content}</p>
                       </div>
-                      <p className="text-gray-300 text-sm leading-relaxed pl-8">{transcript.content}</p>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeGuideTab === "speed" && (
+                  <div className="space-y-4">
+                    {mockChapters.map((chapter, index) => (
+                      <div key={chapter.id} className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs">
+                            {index + 1}
+                          </div>
+                          <span className="text-blue-400 text-sm font-medium">{chapter.time}</span>
+                        </div>
+                        <h4 className="text-white font-medium pl-8">{chapter.title}</h4>
+                        <p className="text-gray-300 text-sm leading-relaxed pl-8">
+                          {index === 0 &&
+                            "对话探讨了诺和诺德如何凭借一款糖尿病药意外克服肥胖药领域，从而在欧洲市值超越LVMH集团，成为欧洲最大上市公司。同时，深入分析了医美行业，包括其市场规模、分类、产业链及未来发展趋势，指出尽管行业存在乱象，但消费者需求和收入提升了酸碱经济的持续增长。"}
+                          {index === 1 &&
+                            "美容从古至今一直存在，随着技术发展，美容手段分为生活美容和医疗美容。生活美容包括化妆、护肤等非侵入性方法，医疗美容则涉及手术、药物等创伤性手段。分为重医美和轻医美因操作简单、风险低而日益受欢迎，与重医美平分市场，并有望在未来占主导地位。此外，还提到了一些具体的医美项目，如双眼皮、隆鼻、牙齿矫正等，以及部分项目是否合属于美容手术的争议。"}
+                          {index === 2 &&
+                            "轻医美项目主要分为注射疗法与光电疗法。注射疗法包括玻尿酸、肉毒素、除皱、瘦脸等，光电疗法利用激光、射频、超声波技术作用于皮肤，实现脱毛、嫩肤、紧致等效果。新型产品和成熟技术的结合，推动了轻医美市场的发展。"}
+                          {index === 3 &&
+                            "对话深入探讨了医美行业的产业链结构，从上游药品和器械厂商的市场态势，到中游医美机构的类型与问题，特别指出黑机构违规经营、黑医生无资质行医、黑产品使用假冒伪劣产品的三大问题，揭示了行业乱象频发、消费者需警惕的现状。"}
+                          {index === 4 &&
+                            "对话详细阐述了医美行业存在的三大问题：黑机构违规经营超出可证范围或无证经营、黑医生无资质行医或无证行医、黑产品使用假冒伪劣产品或无效产品。这些问题导致消费者权益受损，甚至危及生命安全，揭示了行业监管缺失、专业人才短缺等深层次问题，但能显著提升消费者安全意识。"}
+                          {index === 5 &&
+                            "医美行业面临入门槛低、竞争激烈、集中度低等问题，正向合规化、品牌化、精细化发展。不同于传统医疗行业，医美行业以To C模式为主，需通过广告、推广、异业合作仅是要客户，尤其在三四线城市和乡镇有效。结合式广告、推广、异业合作仅是要客户，尤其在三四线城市和乡镇有效。"}
+                          {index === 6 &&
+                            "对话深入探讨了医美行业的发展历程，从传统电视广告到自媒体流量，揭示了行业在追求暴利过程中的种种问题，包括虚假宣传、监管缺失、专业人才短缺等。同时，介绍了政府及相关部门为规范市场、保护消费者权益所采取的一系列措施，展现了医美行业规范化发展的前景。"}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeGuideTab === "keypoints" && (
+                  <div className="space-y-4">
+                    {keyPointsData.map((item, index) => (
+                      <div key={index} className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="bg-purple-500/10 border-purple-500/30 text-purple-400">
+                            {item.tag}
+                          </Badge>
+                          <span className="text-gray-400 text-sm">{item.speaker}</span>
+                        </div>
+                        <p className="text-gray-300 text-sm leading-relaxed">{item.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* 底部输入框 */}

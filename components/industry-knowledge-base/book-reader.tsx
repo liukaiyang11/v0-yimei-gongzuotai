@@ -13,6 +13,11 @@ import {
   Underline,
   List,
   ListOrdered,
+  Link,
+  ImageIcon,
+  Table,
+  Code,
+  AlignLeft,
   Undo,
   Redo,
   Smile,
@@ -100,6 +105,7 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
+          {/* </CHANGE> */}
           <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white hover:bg-slate-700">
             <Menu className="w-5 h-5" />
           </Button>
@@ -132,7 +138,7 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
 
       <div ref={containerRef} className="flex-1 flex overflow-hidden relative">
         {/* 左侧文档内容 */}
-        <div style={{ width: `${leftWidth}%` }} className="flex flex-col overflow-hidden">
+        <div style={{ width: `${leftWidth}%` }} className="flex flex-col overflow-y-auto">
           <ScrollArea className="flex-1 bg-white">
             <div className="max-w-4xl mx-auto p-12" style={{ fontSize: `${zoom}%` }}>
               <h1 className="text-3xl font-bold text-gray-900 mb-6">医美咨询师快速打消顾客怕受骗心理的5大招2页</h1>
@@ -146,7 +152,7 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
                 </p>
               </div>
 
-              <p className="text-gray-700 mb-6">医美咨询师快速打消顾客害怕的心理的5大招</p>
+              <p className="text-gray-700 mb-6">医美咨询师快速打消顾客怕受骗心理的5大招</p>
 
               <div className="space-y-6 text-gray-800 leading-relaxed">
                 <p>
@@ -210,6 +216,7 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
             </div>
           </ScrollArea>
         </div>
+        {/* </CHANGE> */}
 
         <div
           className="w-1 bg-slate-700 hover:bg-blue-500 cursor-col-resize transition-colors relative group flex-shrink-0"
@@ -221,9 +228,9 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
         {/* 右侧AI功能面板 */}
         <div
           style={{ width: `${100 - leftWidth}%` }}
-          className="flex flex-col overflow-hidden bg-slate-800/50 backdrop-blur-sm"
+          className="flex flex-col overflow-y-auto bg-slate-800/50 backdrop-blur-sm"
         >
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
             <TabsList className="bg-transparent border-b border-slate-700 rounded-none h-12 px-4 flex-shrink-0">
               <TabsTrigger
                 value="chat"
@@ -498,6 +505,25 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
                   </Button>
                   <div className="w-px h-6 bg-slate-600 mx-1" />
                   <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Smile className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Link className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <ImageIcon className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Table className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <Code className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
+                    <AlignLeft className="w-4 h-4" />
+                  </Button>
+                  <div className="w-px h-6 bg-slate-600 mx-1" />
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
                     <Undo className="w-4 h-4" />
                   </Button>
                   <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-gray-300">
@@ -698,6 +724,7 @@ export function BookReader({ bookTitle, onBack }: BookReaderProps) {
             </TabsContent>
           </Tabs>
         </div>
+        {/* </CHANGE> */}
       </div>
     </div>
   )
