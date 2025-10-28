@@ -33,11 +33,11 @@ interface LaunchpadGridProps {
 }
 
 const defaultAppIds = [
-  "collaborative-service",
-  "ad-compliance",
-  "sales-assistant",
   "customer-acquisition",
+  "sales-assistant",
+  "collaborative-service",
   "content-workshop",
+  "ad-compliance",
   "ai-ppt",
   "ai-writing",
   "ai-mindmap",
