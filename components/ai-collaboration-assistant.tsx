@@ -44,7 +44,7 @@ interface AICollaborationAssistantProps {
   onBack: () => void
 }
 
-// <CHANGE> Updated mockProducts to mockProjects with treatment project data
+// Updated mockProducts to mockProjects with treatment project data
 const mockProjects = [
   {
     id: 1,
@@ -639,7 +639,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
               </TabsList>
             </div>
 
-            {/* <CHANGE> Tab 1: 快速病历 - Complete implementation with AI-generated medical record */}
+            {/* Tab 1: 快速病历 - Complete implementation with AI-generated medical record */}
             <TabsContent value="medical-record" className="flex-1 m-0 overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
@@ -1245,7 +1245,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
               </ScrollArea>
             </TabsContent>
 
-            {/* <CHANGE> Tab 3: 辅助通用方案 - Complete implementation */}
+            {/* Tab 3: 辅助通用方案 - Complete implementation */}
             <TabsContent value="general-plan" className="flex-1 m-0 overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
@@ -1255,9 +1255,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                       <Lightbulb className="w-5 h-5 text-purple-400" />
                       <div>
                         <p className="text-sm font-semibold text-white">AI辅助方案已生成</p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          基于快速病历、咨询纪要及美沃斯医院行业标准数据库
-                        </p>
+                        <p className="text-xs text-slate-400 mt-1">基于快速病历、咨询纪要及美沃斯医院行业标准数据库</p>
                       </div>
                     </div>
                   </Card>
@@ -1398,9 +1396,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                         <div className="ml-11 space-y-2">
                           <div className="bg-slate-900/50 rounded p-3">
                             <p className="text-sm font-semibold text-white mb-1">推荐项目：水光针（1次）</p>
-                            <p className="text-xs text-slate-400">
-                              深层补水保湿，改善皮肤干燥状态，为后续治疗打好基础
-                            </p>
+                            <p className="text-xs text-slate-400">深层补水保湿，改善皮肤干燥状态，为后续治疗打好基础</p>
                             <p className="text-xs text-blue-400 mt-2">预算：¥1800-2500</p>
                           </div>
                           <div className="bg-slate-900/50 rounded p-3">
@@ -1425,9 +1421,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                         <div className="ml-11 space-y-2">
                           <div className="bg-slate-900/50 rounded p-3">
                             <p className="text-sm font-semibold text-white mb-1">推荐项目：肉毒素除皱（1次）</p>
-                            <p className="text-xs text-slate-400">
-                              针对法令纹区域注射，放松肌肉，减少动态纹的产生
-                            </p>
+                            <p className="text-xs text-slate-400">针对法令纹区域注射，放松肌肉，减少动态纹的产生</p>
                             <p className="text-xs text-purple-400 mt-2">预算：¥2000-3000</p>
                           </div>
                           <div className="bg-slate-900/50 rounded p-3">
@@ -1594,7 +1588,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
               </ScrollArea>
             </TabsContent>
 
-            {/* <CHANGE> Tab 4: 智能推荐 - Updated to show treatment projects instead of products */}
+            {/* Tab 4: 智能推荐 - Updated to show treatment projects instead of products */}
             <TabsContent value="recommendation" className="flex-1 m-0 overflow-hidden">
               <div className="flex h-full">
                 {/* 项目推荐列表 */}
@@ -1966,4 +1960,261 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
                                       <label className="text-slate-400">小计</label>
                                       <div className="h-7 flex items-center text-blue-400 font-semibold mt-1">
                                         {item.price}
-                                      </div\
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <Textarea
+                                    placeholder="操作备注和注意事项..."
+                                    className="text-xs bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[60px]"
+                                    defaultValue={item.notes}
+                                  />
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 第三阶段 */}
+                      <div className="border border-slate-700 rounded-lg p-4 bg-slate-900/50">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-semibold text-white flex items-center">
+                            <div className="w-6 h-6 rounded-full bg-green-500 text-white text-xs flex items-center justify-center mr-2">
+                              3
+                            </div>
+                            第三阶段：巩固保养
+                          </h4>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-green-500/50 text-green-300 hover:bg-green-500/20 bg-transparent"
+                            onClick={() => openAddModal("第三阶段")}
+                          >
+                            <Plus className="w-3 h-3 mr-1" />
+                            添加项目
+                          </Button>
+                        </div>
+
+                        {planItems.filter((item) => item.phase === "第三阶段").length === 0 ? (
+                          <p className="text-sm text-slate-400 text-center py-4">暂无项目，点击上方按钮添加</p>
+                        ) : (
+                          <div className="space-y-3">
+                            {planItems
+                              .filter((item) => item.phase === "第三阶段")
+                              .map((item) => (
+                                <div key={item.id} className="bg-slate-800/50 rounded-lg p-3 space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm font-semibold text-white">{item.name}</span>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      onClick={() => removeFromPlan(item.id)}
+                                      className="h-6 w-6 text-red-400 hover:text-red-300 hover:bg-red-500/20"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                  <div className="grid grid-cols-4 gap-2 text-xs">
+                                    <div>
+                                      <label className="text-slate-400">频次</label>
+                                      <Input
+                                        defaultValue={item.frequency}
+                                        className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-slate-400">单价</label>
+                                      <Input
+                                        defaultValue={item.price}
+                                        className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-slate-400">数量</label>
+                                      <Input
+                                        type="number"
+                                        defaultValue={item.quantity}
+                                        className="h-7 text-xs bg-slate-900/50 border-slate-700 text-white mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-slate-400">小计</label>
+                                      <div className="h-7 flex items-center text-blue-400 font-semibold mt-1">
+                                        {item.price}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <Textarea
+                                    placeholder="操作备注和注意事项..."
+                                    className="text-xs bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[60px]"
+                                    defaultValue={item.notes}
+                                  />
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* 方案总计 */}
+                  <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30 p-5">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-white">方案总计</h3>
+                      <div className="text-right">
+                        <p className="text-sm text-slate-400">预估总价</p>
+                        <p className="text-3xl font-bold text-blue-400">¥{calculateTotal().toLocaleString()}</p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* 操作按钮 */}
+                  <div className="flex items-center space-x-3">
+                    <Button className="flex-1 bg-blue-500 hover:bg-blue-600">
+                      <Save className="w-4 h-4 mr-2" />
+                      保存方案
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1 border-purple-500/50 text-purple-300 hover:bg-purple-500/20 bg-transparent"
+                      onClick={() => setShowPlanReport(true)}
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      生成方案书
+                    </Button>
+                  </div>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+
+      {/* 聊天记录弹窗 */}
+      {showChatHistory && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center">
+          <Card className="w-[800px] max-h-[80vh] bg-slate-900 border-slate-700">
+            <div className="flex items-center justify-between p-4 border-b border-slate-700">
+              <h3 className="text-lg font-semibold text-white">完整咨询记录</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowChatHistory(false)}
+                className="hover:bg-slate-800"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+            <ScrollArea className="h-[600px] p-6">
+              <div className="space-y-4">
+                {mockASRTranscript.map((msg, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-xs text-slate-500">{msg.timestamp}</span>
+                      <Badge
+                        className={
+                          msg.speaker.includes("客户")
+                            ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                            : "bg-green-500/20 text-green-300 border-green-500/30"
+                        }
+                      >
+                        {msg.speaker}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-slate-300 pl-16">{msg.text}</p>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </Card>
+        </div>
+      )}
+
+      {/* 从推荐添加弹窗 */}
+      {showAddFromRecommendation && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center">
+          <Card className="w-[900px] max-h-[80vh] bg-slate-900 border-slate-700">
+            <div className="flex items-center justify-between p-4 border-b border-slate-700">
+              <h3 className="text-lg font-semibold text-white">选择项目添加到{selectedPhase}</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setShowAddFromRecommendation(false)
+                  setSelectedRecommendations([])
+                }}
+                className="hover:bg-slate-800"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+            <ScrollArea className="h-[500px] p-6">
+              <div className="space-y-3">
+                {mockProjects.map((project) => (
+                  <div
+                    key={project.id}
+                    className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                      selectedRecommendations.includes(project.id)
+                        ? "bg-blue-500/10 border-blue-500"
+                        : "bg-slate-800/50 border-slate-700 hover:border-slate-600"
+                    }`}
+                    onClick={() => toggleRecommendation(project.id)}
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="w-20 h-20 rounded-lg overflow-hidden bg-slate-700/50 flex-shrink-0">
+                        <img
+                          src={project.image || "/placeholder.svg"}
+                          alt={project.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <h4 className="font-semibold text-white">{project.name}</h4>
+                          <Badge className="bg-slate-700/50 text-slate-300 border-slate-600 text-xs">
+                            {project.category}
+                          </Badge>
+                        </div>
+                        <p className="text-lg font-bold text-blue-400 mb-2">{project.price}</p>
+                        <div className="flex items-center space-x-3 text-xs text-slate-400">
+                          <span>{project.duration}</span>
+                          <span>•</span>
+                          <span>{project.recovery}</span>
+                        </div>
+                      </div>
+                      <div className="flex-shrink-0">
+                        {selectedRecommendations.includes(project.id) && (
+                          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                            <Check className="w-5 h-5 text-white" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+            <div className="p-4 border-t border-slate-700 flex justify-end space-x-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowAddFromRecommendation(false)
+                  setSelectedRecommendations([])
+                }}
+                className="border-slate-700"
+              >
+                取消
+              </Button>
+              <Button
+                onClick={addSelectedToPlan}
+                disabled={selectedRecommendations.length === 0}
+                className="bg-blue-500 hover:bg-blue-600"
+              >
+                添加{selectedRecommendations.length > 0 && `（${selectedRecommendations.length}）`}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+    </div>
+  )
+}
