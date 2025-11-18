@@ -144,112 +144,13 @@
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-/* 优化对话框/弹窗的对比度和可见性 */
-/* 对话框遮罩层 - 半透明黑色背景 */
-[data-radix-dialog-overlay],
-[data-state="open"] > [data-radix-popper-content-wrapper] {
-  background: rgba(0, 0, 0, 0.75) !important;
+/* Enhanced dialog overlay backdrop for better visual separation */
+[data-state="open"][data-radix-dialog-overlay] {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+  backdrop-filter: blur(4px);
 }
 
-/* 对话框内容 - 使用深色但有明显对比的背景 */
-[role="dialog"],
+/* Ensure dialog content stands out with proper z-index and shadow */
 [data-radix-dialog-content] {
-  background: oklch(0.16 0 0) !important;
-  border: 1px solid oklch(0.3 0 0) !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
-}
-
-/* 输入框 - 确保有明显的边框和背景 */
-[role="dialog"] input,
-[role="dialog"] textarea,
-[data-radix-dialog-content] input,
-[data-radix-dialog-content] textarea {
-  background: oklch(0.12 0 0) !important;
-  border: 1px solid oklch(0.35 0 0) !important;
-  color: oklch(0.98 0 0) !important;
-}
-
-[role="dialog"] input:focus,
-[role="dialog"] textarea:focus,
-[data-radix-dialog-content] input:focus,
-[data-radix-dialog-content] textarea:focus {
-  border-color: oklch(0.65 0.2 260) !important;
-  outline: none !important;
-  box-shadow: 0 0 0 3px oklch(0.65 0.2 260 / 0.2) !important;
-}
-
-/* 对话框标题 */
-[role="dialog"] h2,
-[role="dialog"] h3,
-[data-radix-dialog-content] h2,
-[data-radix-dialog-content] h3 {
-  color: oklch(0.98 0 0) !important;
-  font-weight: 600 !important;
-}
-
-/* 标签文字 */
-[role="dialog"] label,
-[data-radix-dialog-content] label {
-  color: oklch(0.90 0 0) !important;
-}
-
-/* 树形选择器项 */
-[role="dialog"] [data-tree-item],
-[data-radix-dialog-content] [data-tree-item] {
-  color: oklch(0.85 0 0) !important;
-}
-
-[role="dialog"] [data-tree-item]:hover,
-[data-radix-dialog-content] [data-tree-item]:hover {
-  background: oklch(0.2 0 0) !important;
-}
-
-/* 单选框和复选框容器 */
-[role="dialog"] [data-radio-group],
-[role="dialog"] [data-checkbox-group],
-[data-radix-dialog-content] [data-radio-group],
-[data-radix-dialog-content] [data-checkbox-group] {
-  color: oklch(0.90 0 0) !important;
-}
-
-/* 上传区域 */
-[role="dialog"] [data-upload-area],
-[data-radix-dialog-content] [data-upload-area] {
-  background: oklch(0.12 0 0) !important;
-  border: 2px dashed oklch(0.4 0 0) !important;
-}
-
-[role="dialog"] [data-upload-area]:hover,
-[data-radix-dialog-content] [data-upload-area]:hover {
-  border-color: oklch(0.65 0.2 260) !important;
-  background: oklch(0.14 0 0) !important;
-}
-
-/* 文件列表项 */
-[role="dialog"] [data-file-item],
-[data-radix-dialog-content] [data-file-item] {
-  background: oklch(0.12 0 0) !important;
-  border: 1px solid oklch(0.3 0 0) !important;
-}
-
-/* 权限说明文字 */
-[role="dialog"] [data-permission-text],
-[data-radix-dialog-content] [data-permission-text] {
-  color: oklch(0.75 0 0) !important;
-  background: oklch(0.12 0 0) !important;
-  border-left: 3px solid oklch(0.65 0.2 260) !important;
-}
-
-/* 按钮对比度优化 */
-[role="dialog"] button[data-variant="outline"],
-[data-radix-dialog-content] button[data-variant="outline"] {
-  border: 1px solid oklch(0.4 0 0) !important;
-  background: transparent !important;
-  color: oklch(0.90 0 0) !important;
-}
-
-[role="dialog"] button[data-variant="outline"]:hover,
-[data-radix-dialog-content] button[data-variant="outline"]:hover {
-  background: oklch(0.2 0 0) !important;
-  border-color: oklch(0.5 0 0) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
 }

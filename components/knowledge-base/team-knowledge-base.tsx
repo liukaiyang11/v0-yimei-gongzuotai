@@ -421,13 +421,13 @@ export function TeamKnowledgeBase() {
       <div className="text-center text-sm text-muted-foreground">没有更多了</div>
 
       <Dialog open={createKnowledgeBaseDialog} onOpenChange={setCreateKnowledgeBaseDialog}>
-        <DialogContent className="sm:max-w-[640px] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
+        <DialogContent className="sm:max-w-[640px] bg-card/95 backdrop-blur-md border-2 border-border shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-[oklch(0.98_0_0)]">新建知识库</DialogTitle>
+            <DialogTitle>新建知识库</DialogTitle>
           </DialogHeader>
           <div className="space-y-6 py-4">
             <div className="space-y-2">
-              <Label htmlFor="kb-name" className="text-sm text-[oklch(0.90_0_0)]">
+              <Label htmlFor="kb-name" className="text-sm">
                 <span className="text-red-500">*</span> 知识库名称：
               </Label>
               <Input
@@ -435,38 +435,34 @@ export function TeamKnowledgeBase() {
                 placeholder="全场景数字资产整合知识库"
                 value={knowledgeBaseName}
                 onChange={(e) => setKnowledgeBaseName(e.target.value)}
-                className="bg-[oklch(0.12_0_0)] border-[oklch(0.35_0_0)] text-[oklch(0.98_0_0)] focus:border-primary"
               />
             </div>
 
             <div className="space-y-3">
-              <Label className="text-sm text-[oklch(0.90_0_0)]">可见范围：</Label>
-              <RadioGroup value={visibility} onValueChange={setVisibility} data-radio-group>
+              <Label className="text-sm">可见范围：</Label>
+              <RadioGroup value={visibility} onValueChange={setVisibility}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="self" id="self" />
-                  <Label htmlFor="self" className="font-normal cursor-pointer text-[oklch(0.90_0_0)]">
+                  <Label htmlFor="self" className="font-normal cursor-pointer">
                     仅自己可见
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="selected" id="selected" />
-                  <Label htmlFor="selected" className="font-normal cursor-pointer text-[oklch(0.90_0_0)]">
+                  <Label htmlFor="selected" className="font-normal cursor-pointer">
                     指定范围可见
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="all" id="all" />
-                  <Label htmlFor="all" className="font-normal cursor-pointer text-[oklch(0.90_0_0)]">
+                  <Label htmlFor="all" className="font-normal cursor-pointer">
                     全部成员可见
                   </Label>
                 </div>
               </RadioGroup>
               
               {visibility === "selected" && (
-                <div 
-                  data-upload-area
-                  className="mt-4 p-6 bg-[oklch(0.12_0_0)] rounded-lg border-2 border-dashed border-[oklch(0.4_0_0)] min-h-[200px] flex flex-col items-center justify-center hover:border-primary hover:bg-[oklch(0.14_0_0)] transition-colors"
-                >
+                <div className="mt-4 p-6 bg-background/50 rounded-lg border-2 border-dashed border-primary/30 min-h-[200px] flex flex-col items-center justify-center">
                   <div className="text-center space-y-3">
                     <div className="w-12 h-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center">
                       <Folder className="w-6 h-6 text-primary" />
@@ -484,21 +480,18 @@ export function TeamKnowledgeBase() {
 
             {visibility === "all" && (
               <div className="space-y-3">
-                <Label className="text-sm text-[oklch(0.90_0_0)]">操作权限：</Label>
+                <Label className="text-sm">操作权限：</Label>
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
-                    <RadioGroup value={permissionLevel} onValueChange={setPermissionLevel} className="space-y-3" data-radio-group>
+                    <RadioGroup value={permissionLevel} onValueChange={setPermissionLevel} className="space-y-3">
                       <div className="space-y-1">
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="edit" id="edit" />
-                          <Label htmlFor="edit" className="font-medium cursor-pointer text-[oklch(0.90_0_0)]">
+                          <Label htmlFor="edit" className="font-medium cursor-pointer">
                             可编辑
                           </Label>
                         </div>
-                        <p 
-                          data-permission-text
-                          className="text-sm text-[oklch(0.75_0_0)] ml-6 p-2 bg-[oklch(0.12_0_0)] rounded border-l-3 border-l-primary"
-                        >
+                        <p className="text-sm text-muted-foreground ml-6">
                           创建并管理已新建的文件夹/文档
                         </p>
                       </div>
@@ -506,14 +499,11 @@ export function TeamKnowledgeBase() {
                       <div className="space-y-1">
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="manage" id="manage" />
-                          <Label htmlFor="manage" className="font-medium cursor-pointer text-[oklch(0.90_0_0)]">
+                          <Label htmlFor="manage" className="font-medium cursor-pointer">
                             可管理
                           </Label>
                         </div>
-                        <p 
-                          data-permission-text
-                          className="text-sm text-[oklch(0.75_0_0)] ml-6 p-2 bg-[oklch(0.12_0_0)] rounded border-l-3 border-l-primary"
-                        >
+                        <p className="text-sm text-muted-foreground ml-6">
                           管理知识库配置、权限及所有文件夹/文档
                         </p>
                       </div>
@@ -525,10 +515,7 @@ export function TeamKnowledgeBase() {
                             仅查看
                           </Label>
                         </div>
-                        <p 
-                          data-permission-text
-                          className="text-sm text-[oklch(0.75_0_0)] ml-6"
-                        >
+                        <p className="text-sm text-muted-foreground ml-6">
                           仅浏览内容、无任何编辑管理权限
                         </p>
                       </div>
@@ -538,13 +525,8 @@ export function TeamKnowledgeBase() {
               </div>
             )}
           </div>
-          <DialogFooter className="gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setCreateKnowledgeBaseDialog(false)}
-              data-variant="outline"
-              className="border-[oklch(0.4_0_0)] text-[oklch(0.90_0_0)]"
-            >
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateKnowledgeBaseDialog(false)}>
               取消
             </Button>
             <Button onClick={handleCreateKnowledgeBase}>确定</Button>
@@ -553,25 +535,19 @@ export function TeamKnowledgeBase() {
       </Dialog>
 
       <Dialog open={createFolderDialog} onOpenChange={setCreateFolderDialog}>
-        <DialogContent className="sm:max-w-[500px] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
+        <DialogContent className="sm:max-w-[500px] bg-card/95 backdrop-blur-md border-2 border-border shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-[oklch(0.98_0_0)]">新建文件夹</DialogTitle>
+            <DialogTitle>新建文件夹</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <Input
               placeholder="请在此输入文件夹名称"
               value={folderName}
               onChange={(e) => setFolderName(e.target.value)}
-              className="bg-[oklch(0.12_0_0)] border-[oklch(0.35_0_0)] text-[oklch(0.98_0_0)] focus:border-primary"
             />
           </div>
-          <DialogFooter className="gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setCreateFolderDialog(false)}
-              data-variant="outline"
-              className="border-[oklch(0.4_0_0)] text-[oklch(0.90_0_0)]"
-            >
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateFolderDialog(false)}>
               取消
             </Button>
             <Button onClick={handleCreateFolder}>确定</Button>
@@ -580,15 +556,12 @@ export function TeamKnowledgeBase() {
       </Dialog>
 
       <Dialog open={uploadFileDialog} onOpenChange={setUploadFileDialog}>
-        <DialogContent className="sm:max-w-[600px] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
+        <DialogContent className="sm:max-w-[600px] bg-card/95 backdrop-blur-md border-2 border-border shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-[oklch(0.98_0_0)]">上传文档</DialogTitle>
+            <DialogTitle>上传文档</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <div 
-              data-upload-area
-              className="border-2 border-dashed border-[oklch(0.4_0_0)] rounded-lg p-8 text-center bg-[oklch(0.12_0_0)] hover:border-primary hover:bg-[oklch(0.14_0_0)] transition-colors"
-            >
+            <div className="border-2 border-dashed border-primary/30 rounded-lg p-8 text-center bg-background/30 hover:bg-background/50 transition-colors">
               <input
                 type="file"
                 multiple
@@ -598,24 +571,20 @@ export function TeamKnowledgeBase() {
               />
               <label htmlFor="file-upload" className="cursor-pointer">
                 <Upload className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-sm text-[oklch(0.75_0_0)]">
+                <p className="text-sm text-muted-foreground">
                   点击或拖拽文件到此处上传
                 </p>
-                <p className="text-xs text-[oklch(0.65_0_0)] mt-2">
+                <p className="text-xs text-muted-foreground mt-2">
                   支持 PDF、Word、Excel、PPT、TXT 等格式
                 </p>
               </label>
             </div>
             {uploadedFiles.length > 0 && (
               <div className="mt-4 space-y-2">
-                <p className="text-sm font-medium text-[oklch(0.90_0_0)]">已选择文件：</p>
+                <p className="text-sm font-medium">已选择文件：</p>
                 {uploadedFiles.map((file, index) => (
-                  <div 
-                    key={index} 
-                    data-file-item
-                    className="flex items-center justify-between p-2 bg-[oklch(0.12_0_0)] rounded border border-[oklch(0.3_0_0)]"
-                  >
-                    <span className="text-sm text-[oklch(0.90_0_0)]">{file.name}</span>
+                  <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
+                    <span className="text-sm">{file.name}</span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -628,13 +597,8 @@ export function TeamKnowledgeBase() {
               </div>
             )}
           </div>
-          <DialogFooter className="gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setUploadFileDialog(false)}
-              data-variant="outline"
-              className="border-[oklch(0.4_0_0)] text-[oklch(0.90_0_0)]"
-            >
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUploadFileDialog(false)}>
               取消
             </Button>
             <Button onClick={handleUploadFiles} disabled={uploadedFiles.length === 0}>
@@ -645,18 +609,18 @@ export function TeamKnowledgeBase() {
       </Dialog>
 
       <Dialog open={viewDialog} onOpenChange={setViewDialog}>
-        <DialogContent className="sm:max-w-[800px] max-h-[80vh] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
+        <DialogContent className="sm:max-w-[800px] max-h-[80vh] bg-card/95 backdrop-blur-md border-2 border-border shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-[oklch(0.98_0_0)]">详情</DialogTitle>
+            <DialogTitle>详情</DialogTitle>
           </DialogHeader>
           <div className="py-4 space-y-4 overflow-y-auto">
-            <div className="border border-[oklch(0.3_0_0)] rounded-lg p-6 space-y-4 bg-[oklch(0.12_0_0)]">
-              <div className="flex items-start justify-between pb-4 border-b border-[oklch(0.3_0_0)]">
+            <div className="border-2 rounded-lg p-6 space-y-4 bg-background/30">
+              <div className="flex items-start justify-between pb-4 border-b">
                 <div className="flex items-center space-x-3">
                   <FileText className="w-8 h-8 text-blue-500" />
                   <div>
-                    <h3 className="font-medium text-lg text-[oklch(0.98_0_0)]">{selectedItem?.name}</h3>
-                    <p className="text-sm text-[oklch(0.75_0_0)]">
+                    <h3 className="font-medium text-lg">{selectedItem?.name}</h3>
+                    <p className="text-sm text-muted-foreground">
                       【法宝引证码】CLI.1.5308630
                     </p>
                   </div>
@@ -664,37 +628,37 @@ export function TeamKnowledgeBase() {
               </div>
               
               <div className="text-center py-8">
-                <h2 className="text-2xl font-bold mb-8 text-[oklch(0.98_0_0)]">中华人民共和国仲裁法(2025修订)</h2>
+                <h2 className="text-2xl font-bold mb-8">中华人民共和国仲裁法(2025修订)</h2>
                 
                 <div className="space-y-3 text-left max-w-2xl mx-auto bg-muted/30 p-6 rounded-lg">
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-[oklch(0.75_0_0)]">制定机关：</span>
+                      <span className="text-muted-foreground">制定机关：</span>
                       <span className="text-primary">全国人大常委会</span>
                     </div>
                     <div>
-                      <span className="text-[oklch(0.75_0_0)]">发文字号：</span>
-                      <span className="text-[oklch(0.90_0_0)]">中华人民共和国主席令第54号</span>
+                      <span className="text-muted-foreground">发文字号：</span>
+                      <span>中华人民共和国主席令第54号</span>
                     </div>
                     <div>
-                      <span className="text-[oklch(0.75_0_0)]">公布日期：</span>
-                      <span className="text-[oklch(0.90_0_0)]">2025.09.12</span>
+                      <span className="text-muted-foreground">公布日期：</span>
+                      <span>2025.09.12</span>
                     </div>
                     <div>
-                      <span className="text-[oklch(0.75_0_0)]">施行日期：</span>
-                      <span className="text-[oklch(0.90_0_0)]">2026.03.01</span>
+                      <span className="text-muted-foreground">施行日期：</span>
+                      <span>2026.03.01</span>
                     </div>
                     <div>
-                      <span className="text-[oklch(0.75_0_0)]">时效性：</span>
+                      <span className="text-muted-foreground">时效性：</span>
                       <span className="text-primary">尚未施行</span>
                     </div>
                     <div>
-                      <span className="text-[oklch(0.75_0_0)]">效力位阶：</span>
+                      <span className="text-muted-foreground">效力位阶：</span>
                       <span className="text-primary">法律</span>
                     </div>
                   </div>
-                  <div className="pt-3 border-t border-[oklch(0.3_0_0)]">
-                    <span className="text-[oklch(0.75_0_0)]">法规类别：</span>
+                  <div className="pt-3 border-t">
+                    <span className="text-muted-foreground">法规类别：</span>
                     <span className="text-primary ml-2">调解与仲裁</span>
                     <span className="text-primary ml-2">营商环境优化</span>
                   </div>
@@ -709,9 +673,9 @@ export function TeamKnowledgeBase() {
       </Dialog>
 
       <Dialog open={renameDialog} onOpenChange={setRenameDialog}>
-        <DialogContent className="sm:max-w-[500px] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
+        <DialogContent className="sm:max-w-[500px] bg-card/95 backdrop-blur-md border-2 border-border shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-[oklch(0.98_0_0)]">
+            <DialogTitle>
               {selectedItem?.type === "folder" 
                 ? (isInFolder ? "文件夹重命名" : "重命名知识库")
                 : "文档重命名"}
@@ -722,19 +686,13 @@ export function TeamKnowledgeBase() {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder={selectedItem?.name}
-              className="bg-[oklch(0.12_0_0)] border-[oklch(0.35_0_0)] text-[oklch(0.98_0_0)] focus:border-primary"
             />
             {selectedItem?.type === "file" && (
               <p className="text-sm text-red-500">请勿输入次，数字、字母及下划线经外的内容</p>
             )}
           </div>
-          <DialogFooter className="gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setRenameDialog(false)}
-              data-variant="outline"
-              className="border-[oklch(0.4_0_0)] text-[oklch(0.90_0_0)]"
-            >
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRenameDialog(false)}>
               取消
             </Button>
             <Button onClick={handleRename}>确定</Button>
@@ -743,18 +701,15 @@ export function TeamKnowledgeBase() {
       </Dialog>
 
       <Dialog open={moveDialog} onOpenChange={setMoveDialog}>
-        <DialogContent className="sm:max-w-[600px] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
+        <DialogContent className="sm:max-w-[600px] bg-card/95 backdrop-blur-md border-2 border-border shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-[oklch(0.98_0_0)]">移动至</DialogTitle>
+            <DialogTitle>移动至</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <div className="border border-[oklch(0.3_0_0)] rounded-lg max-h-[400px] overflow-y-auto bg-[oklch(0.12_0_0)]">
+            <div className="border-2 rounded-lg max-h-[400px] overflow-y-auto bg-background/50">
               {mockKnowledgeBases.map((kb) => (
-                <div key={kb.id} className="border-b border-[oklch(0.25_0_0)] last:border-b-0">
-                  <div 
-                    data-tree-item
-                    className="flex items-center space-x-2 p-3 hover:bg-[oklch(0.2_0_0)]"
-                  >
+                <div key={kb.id} className="border-b last:border-b-0">
+                  <div className="flex items-center space-x-2 p-3 hover:bg-muted/50">
                     <Checkbox
                       id={`kb-${kb.id}`}
                       checked={selectedTargetId === kb.id}
@@ -781,17 +736,13 @@ export function TeamKnowledgeBase() {
                         <div className="w-4" />
                       )}
                       <Folder className="w-5 h-5 text-blue-500" />
-                      <span className="text-sm text-[oklch(0.85_0_0)]">{kb.name}</span>
+                      <span className="text-sm">{kb.name}</span>
                     </button>
                   </div>
                   {expandedKnowledgeBases.includes(kb.id) && kb.children && (
                     <div className="pl-8 bg-muted/30">
                       {kb.children.map((folder) => (
-                        <div 
-                          key={folder.id} 
-                          data-tree-item
-                          className="flex items-center space-x-2 p-3 hover:bg-[oklch(0.2_0_0)]"
-                        >
+                        <div key={folder.id} className="flex items-center space-x-2 p-3 hover:bg-muted/50">
                           <Checkbox
                             id={`folder-${folder.id}`}
                             checked={selectedTargetId === folder.id}
@@ -800,7 +751,7 @@ export function TeamKnowledgeBase() {
                             }}
                           />
                           <Folder className="w-4 h-4 text-yellow-500" />
-                          <span className="text-sm text-[oklch(0.85_0_0)]">{folder.name}</span>
+                          <span className="text-sm">{folder.name}</span>
                         </div>
                       ))}
                     </div>
@@ -809,13 +760,8 @@ export function TeamKnowledgeBase() {
               ))}
             </div>
           </div>
-          <DialogFooter className="gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setMoveDialog(false)}
-              data-variant="outline"
-              className="border-[oklch(0.4_0_0)] text-[oklch(0.90_0_0)]"
-            >
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMoveDialog(false)}>
               取消
             </Button>
             <Button onClick={handleMove} disabled={!selectedTargetId}>
@@ -826,18 +772,15 @@ export function TeamKnowledgeBase() {
       </Dialog>
 
       <Dialog open={copyDialog} onOpenChange={setCopyDialog}>
-        <DialogContent className="sm:max-w-[600px] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
+        <DialogContent className="sm:max-w-[600px] bg-card/95 backdrop-blur-md border-2 border-border shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-[oklch(0.98_0_0)]">复制至</DialogTitle>
+            <DialogTitle>复制至</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <div className="border border-[oklch(0.3_0_0)] rounded-lg max-h-[400px] overflow-y-auto bg-[oklch(0.12_0_0)]">
+            <div className="border-2 rounded-lg max-h-[400px] overflow-y-auto bg-background/50">
               {mockKnowledgeBases.map((kb) => (
-                <div key={kb.id} className="border-b border-[oklch(0.25_0_0)] last:border-b-0">
-                  <div 
-                    data-tree-item
-                    className="flex items-center space-x-2 p-3 hover:bg-[oklch(0.2_0_0)]"
-                  >
+                <div key={kb.id} className="border-b last:border-b-0">
+                  <div className="flex items-center space-x-2 p-3 hover:bg-muted/50">
                     <Checkbox
                       id={`copy-kb-${kb.id}`}
                       checked={selectedTargetId === kb.id}
@@ -864,17 +807,13 @@ export function TeamKnowledgeBase() {
                         <div className="w-4" />
                       )}
                       <Folder className="w-5 h-5 text-blue-500" />
-                      <span className="text-sm text-[oklch(0.85_0_0)]">{kb.name}</span>
+                      <span className="text-sm">{kb.name}</span>
                     </button>
                   </div>
                   {expandedKnowledgeBases.includes(kb.id) && kb.children && (
                     <div className="pl-8 bg-muted/30">
                       {kb.children.map((folder) => (
-                        <div 
-                          key={folder.id} 
-                          data-tree-item
-                          className="flex items-center space-x-2 p-3 hover:bg-[oklch(0.2_0_0)]"
-                        >
+                        <div key={folder.id} className="flex items-center space-x-2 p-3 hover:bg-muted/50">
                           <Checkbox
                             id={`copy-folder-${folder.id}`}
                             checked={selectedTargetId === folder.id}
@@ -883,7 +822,7 @@ export function TeamKnowledgeBase() {
                             }}
                           />
                           <Folder className="w-4 h-4 text-yellow-500" />
-                          <span className="text-sm text-[oklch(0.85_0_0)]">{folder.name}</span>
+                          <span className="text-sm">{folder.name}</span>
                         </div>
                       ))}
                     </div>
@@ -892,13 +831,8 @@ export function TeamKnowledgeBase() {
               ))}
             </div>
           </div>
-          <DialogFooter className="gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setCopyDialog(false)}
-              data-variant="outline"
-              className="border-[oklch(0.4_0_0)] text-[oklch(0.90_0_0)]"
-            >
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCopyDialog(false)}>
               取消
             </Button>
             <Button onClick={handleCopy} disabled={!selectedTargetId}>
@@ -909,22 +843,17 @@ export function TeamKnowledgeBase() {
       </Dialog>
 
       <Dialog open={deleteDialog} onOpenChange={setDeleteDialog}>
-        <DialogContent className="sm:max-w-[400px] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
+        <DialogContent className="sm:max-w-[400px] bg-card/95 backdrop-blur-md border-2 border-border shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-[oklch(0.98_0_0)]">确认删除</DialogTitle>
+            <DialogTitle>确认删除</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <p className="text-sm text-[oklch(0.75_0_0)]">
+            <p className="text-sm text-muted-foreground">
               确定要删除 "{selectedItem?.name}" 吗？此操作无法撤销。
             </p>
           </div>
-          <DialogFooter className="gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setDeleteDialog(false)}
-              data-variant="outline"
-              className="border-[oklch(0.4_0_0)] text-[oklch(0.90_0_0)]"
-            >
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialog(false)}>
               取消
             </Button>
             <Button variant="destructive" onClick={handleDelete}>
