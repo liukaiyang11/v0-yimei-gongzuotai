@@ -143,6 +143,7 @@ export function PersonalKnowledgeBase() {
     return (
       <div key={node.id}>
         <div
+          data-tree-item
           className="flex items-center gap-2 py-2 px-3 hover:bg-muted/50 rounded cursor-pointer"
           style={{ paddingLeft: `${level * 20 + 12}px` }}
         >
@@ -347,12 +348,12 @@ export function PersonalKnowledgeBase() {
       
       {/* Create Dialog */}
       <Dialog open={dialogType === "create"} onOpenChange={closeDialog}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
           <DialogHeader>
-            <DialogTitle>{isInFolder ? "新建文件夹" : "新建知识库"}</DialogTitle>
+            <DialogTitle className="text-[oklch(0.98_0_0)]">{isInFolder ? "新建文件夹" : "新建知识库"}</DialogTitle>
             <button
               onClick={closeDialog}
-              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100"
+              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 text-[oklch(0.98_0_0)]"
             >
               <X className="h-4 w-4" />
             </button>
@@ -362,10 +363,16 @@ export function PersonalKnowledgeBase() {
               placeholder={isInFolder ? "请在此输入文件夹名称" : "请在此输入知识库名称"}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
+              className="bg-[oklch(0.12_0_0)] border-[oklch(0.35_0_0)] text-[oklch(0.98_0_0)] focus:border-primary"
             />
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={closeDialog}>
+            <Button 
+              variant="outline" 
+              onClick={closeDialog}
+              data-variant="outline"
+              className="border-[oklch(0.4_0_0)] text-[oklch(0.90_0_0)]"
+            >
               取消
             </Button>
             <Button onClick={handleConfirm}>确定</Button>
@@ -375,26 +382,35 @@ export function PersonalKnowledgeBase() {
 
       {/* Rename Dialog */}
       <Dialog open={dialogType === "rename"} onOpenChange={closeDialog}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-[oklch(0.98_0_0)]">
               {!isInFolder ? "重命名知识库" : selectedItem?.type === "folder" ? "文件夹重命名" : "文档重命名"}
             </DialogTitle>
             <button
               onClick={closeDialog}
-              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100"
+              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 text-[oklch(0.98_0_0)]"
             >
               <X className="h-4 w-4" />
             </button>
           </DialogHeader>
           <div className="py-4">
-            <Input value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
+            <Input 
+              value={inputValue} 
+              onChange={(e) => setInputValue(e.target.value)}
+              className="bg-[oklch(0.12_0_0)] border-[oklch(0.35_0_0)] text-[oklch(0.98_0_0)] focus:border-primary"
+            />
             {selectedItem?.type === "file" && (
               <p className="text-xs text-red-500 mt-2">请勿输入空文，数字，，字母及下划线以外的内容</p>
             )}
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={closeDialog}>
+            <Button 
+              variant="outline" 
+              onClick={closeDialog}
+              data-variant="outline"
+              className="border-[oklch(0.4_0_0)] text-[oklch(0.90_0_0)]"
+            >
               取消
             </Button>
             <Button onClick={handleConfirm}>确定</Button>
@@ -404,21 +420,26 @@ export function PersonalKnowledgeBase() {
 
       {/* Move Dialog */}
       <Dialog open={dialogType === "move"} onOpenChange={closeDialog}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
           <DialogHeader>
-            <DialogTitle>移动至</DialogTitle>
+            <DialogTitle className="text-[oklch(0.98_0_0)]">移动至</DialogTitle>
             <button
               onClick={closeDialog}
-              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100"
+              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 text-[oklch(0.98_0_0)]"
             >
               <X className="h-4 w-4" />
             </button>
           </DialogHeader>
-          <div className="py-4 max-h-[400px] overflow-y-auto border rounded-lg">
+          <div className="py-4 max-h-[400px] overflow-y-auto border border-[oklch(0.3_0_0)] rounded-lg bg-[oklch(0.12_0_0)]">
             {mockKnowledgeTree.map((node) => renderTreeNode(node))}
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={closeDialog}>
+            <Button 
+              variant="outline" 
+              onClick={closeDialog}
+              data-variant="outline"
+              className="border-[oklch(0.4_0_0)] text-[oklch(0.90_0_0)]"
+            >
               取消
             </Button>
             <Button onClick={handleConfirm}>确定</Button>
@@ -428,21 +449,26 @@ export function PersonalKnowledgeBase() {
 
       {/* Copy Dialog */}
       <Dialog open={dialogType === "copy"} onOpenChange={closeDialog}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
           <DialogHeader>
-            <DialogTitle>复制至</DialogTitle>
+            <DialogTitle className="text-[oklch(0.98_0_0)]">复制至</DialogTitle>
             <button
               onClick={closeDialog}
-              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100"
+              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 text-[oklch(0.98_0_0)]"
             >
               <X className="h-4 w-4" />
             </button>
           </DialogHeader>
-          <div className="py-4 max-h-[400px] overflow-y-auto border rounded-lg">
+          <div className="py-4 max-h-[400px] overflow-y-auto border border-[oklch(0.3_0_0)] rounded-lg bg-[oklch(0.12_0_0)]">
             {mockKnowledgeTree.map((node) => renderTreeNode(node))}
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={closeDialog}>
+            <Button 
+              variant="outline" 
+              onClick={closeDialog}
+              data-variant="outline"
+              className="border-[oklch(0.4_0_0)] text-[oklch(0.90_0_0)]"
+            >
               取消
             </Button>
             <Button onClick={handleConfirm}>确定</Button>
@@ -452,12 +478,12 @@ export function PersonalKnowledgeBase() {
 
       {/* View Dialog */}
       <Dialog open={dialogType === "view"} onOpenChange={closeDialog}>
-        <DialogContent className="sm:max-w-[900px] max-h-[80vh]">
+        <DialogContent className="sm:max-w-[900px] max-h-[80vh] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
           <DialogHeader>
-            <DialogTitle>详情</DialogTitle>
+            <DialogTitle className="text-[oklch(0.98_0_0)]">详情</DialogTitle>
             <button
               onClick={closeDialog}
-              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100"
+              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 text-[oklch(0.98_0_0)]"
             >
               <X className="h-4 w-4" />
             </button>
@@ -541,23 +567,28 @@ export function PersonalKnowledgeBase() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={dialogType === "delete"} onOpenChange={closeDialog}>
-        <DialogContent className="sm:max-w-[400px]">
+        <DialogContent className="sm:max-w-[400px] bg-[oklch(0.16_0_0)] border-[oklch(0.3_0_0)]">
           <DialogHeader>
-            <DialogTitle>确认删除</DialogTitle>
+            <DialogTitle className="text-[oklch(0.98_0_0)]">确认删除</DialogTitle>
             <button
               onClick={closeDialog}
-              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100"
+              className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 text-[oklch(0.98_0_0)]"
             >
               <X className="h-4 w-4" />
             </button>
           </DialogHeader>
           <div className="py-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[oklch(0.75_0_0)]">
               确定要删除 "{selectedItem?.name}" 吗？此操作不可恢复。
             </p>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={closeDialog}>
+            <Button 
+              variant="outline" 
+              onClick={closeDialog}
+              data-variant="outline"
+              className="border-[oklch(0.4_0_0)] text-[oklch(0.90_0_0)]"
+            >
               取消
             </Button>
             <Button variant="destructive" onClick={handleConfirm}>
