@@ -49,7 +49,7 @@ const defaultAppIds = [
 const apps = [
   {
     id: "collaborative-service",
-    name: "智能群聊服务工作台",
+    name: "医美智能群聊服务工作台",
     description: "群聊协同·AI辅助",
     icon: Users,
     gradient: "from-blue-500 to-indigo-600",
@@ -69,9 +69,9 @@ const apps = [
   },
   {
     id: "sales-assistant",
-    name: "咨询师&医生协作平台", // Updated from "AI协作助理"
+    name: "患者信息流转平台",
     description: "咨询师医生协作平台",
-    icon: Stethoscope, // Changed icon to Stethoscope
+    icon: Stethoscope,
     gradient: "from-blue-500 to-blue-600",
     bgColor: "bg-blue-500",
     action: "使用",

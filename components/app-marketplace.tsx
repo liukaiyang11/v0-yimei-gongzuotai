@@ -29,7 +29,7 @@ interface App {
 const allApps: App[] = [
   {
     id: "collaborative-service",
-    name: "智能群聊服务工作台",
+    name: "医美智能群聊服务工作台", // Updated from "智能群聊服务工作台"
     description: "群聊协同·AI辅助",
     icon: "Users",
     category: "featured",
@@ -50,7 +50,7 @@ const allApps: App[] = [
   },
   {
     id: "sales-assistant",
-    name: "咨询师&医生协作平台",
+    name: "患者信息流转平台", // Updated from "咨询师&医生协作平台"
     description: "咨询师医生协作平台",
     icon: "Stethoscope",
     category: "featured",
@@ -372,7 +372,7 @@ const allApps: App[] = [
   { id: "decision-cockpit", name: "决策驾驶舱", description: "数据分析决策", icon: "Gauge", category: "marketing" },
   {
     id: "sales-assistant-marketing",
-    name: "咨询师&医生协作平台",
+    name: "患者信息流转平台", // Updated from "咨询师&医生协作平台"
     description: "咨询师医生协作平台",
     icon: "Stethoscope",
     category: "marketing",

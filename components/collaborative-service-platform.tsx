@@ -84,10 +84,8 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            {/* Updated title to reflect role collaboration */}
             <h1 className="text-xl font-semibold text-white">医美智能群聊服务工作台</h1>
-            {/* Updated subtitle */}
-            <p className="text-sm text-slate-400">智能协作 · 高效服务</p>
+            <p className="text-sm text-slate-400">群聊协同 · AI辅助</p>
           </div>
         </div>
 
