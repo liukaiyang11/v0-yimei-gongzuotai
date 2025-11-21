@@ -19,6 +19,10 @@ import {
   ArrowLeft,
   UserCircle2,
   Stethoscope,
+  Mic,
+  ImageIcon,
+  FileUp,
+  X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -47,62 +51,42 @@ interface CollaborativeServicePlatformProps {
 }
 
 export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePlatformProps) {
-  const [activeTab, setActiveTab] = useState("chat")
-  const [selectedCustomer, setSelectedCustomer] = useState("张小美")
-  const [messageInput, setMessageInput] = useState("")
-  const [showNewQADialog, setShowNewQADialog] = useState(false)
-  const [showUploadDialog, setShowUploadDialog] = useState(false)
   const [currentRole, setCurrentRole] = useState<"咨询师" | "医生">("咨询师")
-
-  const getAvailableTabs = () => {
-    if (currentRole === "咨询师") {
-      return [
-        { value: "quick-record", label: "快速病历" },
-        { value: "communication", label: "资讯沟通纪要" },
-        { value: "general-plan", label: "辅助通用方案" },
-      ]
-    } else {
-      // 医生角色
-      return [
-        { value: "smart-recommend", label: "智能推荐" },
-        { value: "doctor-plan", label: "医生制定方案" },
-      ]
-    }
-  }
-
-  const availableTabs = getAvailableTabs()
-  const defaultTab = availableTabs[0]?.value || "quick-record"
 
   return (
     <div className="fixed inset-0 left-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-      {/* 顶部导航栏 */}
       <div className="h-16 bg-slate-800/50 backdrop-blur-sm border-b border-slate-700/50 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack} className="hover:bg-slate-700 text-slate-200">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div>
-            <h1 className="text-xl font-semibold text-white">咨询师&医生协作平台</h1>
-            <p className="text-sm text-slate-400">专业医疗协作 · 智能辅助决策</p>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-600/10 rounded-lg">
+              <FileText className="w-6 h-6 text-blue-400" />
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold text-white">咨询师&医生协作平台</h1>
+              <p className="text-sm text-slate-400">专业医疗协作 · 智能辅助决策</p>
+            </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <span className="text-sm text-slate-400">当前角色：</span>
           <Select value={currentRole} onValueChange={(value: "咨询师" | "医生") => setCurrentRole(value)}>
-            <SelectTrigger className="w-[140px] bg-slate-700/50 border-slate-600 text-white">
+            <SelectTrigger className="w-[150px] bg-slate-700/50 border-slate-600 text-white hover:bg-slate-700">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-slate-800 border-slate-700">
-              <SelectItem value="咨询师" className="text-white hover:bg-slate-700">
+              <SelectItem value="咨询师" className="text-white hover:bg-slate-700 cursor-pointer">
                 <div className="flex items-center gap-2">
-                  <UserCircle2 className="w-4 h-4" />
+                  <UserCircle2 className="w-4 h-4 text-blue-400" />
                   <span>咨询师</span>
                 </div>
               </SelectItem>
-              <SelectItem value="医生" className="text-white hover:bg-slate-700">
+              <SelectItem value="医生" className="text-white hover:bg-slate-700 cursor-pointer">
                 <div className="flex items-center gap-2">
-                  <Stethoscope className="w-4 h-4" />
+                  <Stethoscope className="w-4 h-4 text-green-400" />
                   <span>医生</span>
                 </div>
               </SelectItem>
@@ -112,74 +96,64 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
       </div>
 
       <div className="flex-1 overflow-hidden">
-        <RoleBasedContent
-          role={currentRole}
-          selectedCustomer={selectedCustomer}
-          onSelectCustomer={setSelectedCustomer}
-          messageInput={messageInput}
-          setMessageInput={setMessageInput}
-        />
+        <RoleBasedContent role={currentRole} />
       </div>
     </div>
   )
 }
 
-function RoleBasedContent({
-  role,
-  selectedCustomer,
-  onSelectCustomer,
-  messageInput,
-  setMessageInput,
-}: {
-  role: "咨询师" | "医生"
-  selectedCustomer: string
-  onSelectCustomer: (name: string) => void
-  messageInput: string
-  setMessageInput: (value: string) => void
-}) {
+function RoleBasedContent({ role }: { role: "咨询师" | "医生" }) {
   const [activeTab, setActiveTab] = useState(role === "咨询师" ? "quick-record" : "smart-recommend")
+
+  useState(() => {
+    setActiveTab(role === "咨询师" ? "quick-record" : "smart-recommend")
+  })
 
   if (role === "咨询师") {
     return (
       <div className="h-full flex flex-col">
-        {/* 咨询师功能导航 */}
         <div className="h-14 bg-slate-800/30 border-b border-slate-700/50 flex items-center justify-center gap-2 px-6">
           <Button
-            variant={activeTab === "quick-record" ? "default" : "ghost"}
+            variant="ghost"
+            size="sm"
             onClick={() => setActiveTab("quick-record")}
             className={
               activeTab === "quick-record"
-                ? "bg-blue-600 hover:bg-blue-700"
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
                 : "text-slate-300 hover:text-white hover:bg-slate-700/50"
             }
           >
+            <FileText className="w-4 h-4 mr-2" />
             快速病历
           </Button>
           <Button
-            variant={activeTab === "communication" ? "default" : "ghost"}
+            variant="ghost"
+            size="sm"
             onClick={() => setActiveTab("communication")}
             className={
               activeTab === "communication"
-                ? "bg-blue-600 hover:bg-blue-700"
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
                 : "text-slate-300 hover:text-white hover:bg-slate-700/50"
             }
           >
+            <FileText className="w-4 h-4 mr-2" />
             资讯沟通纪要
           </Button>
           <Button
-            variant={activeTab === "general-plan" ? "default" : "ghost"}
+            variant="ghost"
+            size="sm"
             onClick={() => setActiveTab("general-plan")}
             className={
               activeTab === "general-plan"
-                ? "bg-blue-600 hover:bg-blue-700"
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
                 : "text-slate-300 hover:text-white hover:bg-slate-700/50"
             }
           >
+            <FileText className="w-4 h-4 mr-2" />
             辅助通用方案
           </Button>
         </div>
 
-        {/* 咨询师功能内容 */}
         <div className="flex-1 overflow-auto">
           {activeTab === "quick-record" && <QuickRecordModule />}
           {activeTab === "communication" && <CommunicationModule />}
@@ -188,36 +162,37 @@ function RoleBasedContent({
       </div>
     )
   } else {
-    // 医生角色
     return (
       <div className="h-full flex flex-col">
-        {/* 医生功能导航 */}
         <div className="h-14 bg-slate-800/30 border-b border-slate-700/50 flex items-center justify-center gap-2 px-6">
           <Button
-            variant={activeTab === "smart-recommend" ? "default" : "ghost"}
+            variant="ghost"
+            size="sm"
             onClick={() => setActiveTab("smart-recommend")}
             className={
               activeTab === "smart-recommend"
-                ? "bg-blue-600 hover:bg-blue-700"
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
                 : "text-slate-300 hover:text-white hover:bg-slate-700/50"
             }
           >
+            <AlertCircle className="w-4 h-4 mr-2" />
             智能推荐
           </Button>
           <Button
-            variant={activeTab === "doctor-plan" ? "default" : "ghost"}
+            variant="ghost"
+            size="sm"
             onClick={() => setActiveTab("doctor-plan")}
             className={
               activeTab === "doctor-plan"
-                ? "bg-blue-600 hover:bg-blue-700"
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
                 : "text-slate-300 hover:text-white hover:bg-slate-700/50"
             }
           >
+            <Stethoscope className="w-4 h-4 mr-2" />
             医生制定方案
           </Button>
         </div>
 
-        {/* 医生功能内容 */}
         <div className="flex-1 overflow-auto">
           {activeTab === "smart-recommend" && <SmartRecommendModule />}
           {activeTab === "doctor-plan" && <DoctorPlanModule />}
@@ -227,6 +202,7 @@ function RoleBasedContent({
   }
 }
 
+// 咨询师模块 1: 快速病历
 function QuickRecordModule() {
   const [selectedPatient, setSelectedPatient] = useState<string | null>(null)
   const [recordForm, setRecordForm] = useState({
@@ -252,10 +228,13 @@ function QuickRecordModule() {
       {/* 客户列表 */}
       <div className="w-80 bg-slate-800/30 border-r border-slate-700/50 p-4">
         <div className="mb-4">
-          <Input
-            placeholder="搜索客户..."
-            className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
-          />
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              placeholder="搜索客户..."
+              className="pl-9 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+            />
+          </div>
         </div>
         <ScrollArea className="h-[calc(100%-60px)]">
           <div className="space-y-2">
@@ -269,9 +248,16 @@ function QuickRecordModule() {
                     : "bg-slate-700/30 hover:bg-slate-700/50"
                 }`}
               >
-                <h4 className="font-medium text-white">{patient.name}</h4>
-                <p className="text-sm text-slate-400">{patient.project}</p>
-                <p className="text-xs text-slate-500 mt-1">最后访问：{patient.lastVisit}</p>
+                <div className="flex items-start gap-3">
+                  <Avatar className="w-10 h-10 bg-blue-600">
+                    <AvatarFallback className="text-white">{patient.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-white truncate">{patient.name}</h4>
+                    <p className="text-sm text-slate-400 truncate">{patient.project}</p>
+                    <p className="text-xs text-slate-500 mt-1">最后访问：{patient.lastVisit}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -279,26 +265,30 @@ function QuickRecordModule() {
       </div>
 
       {/* 病历表单 */}
-      <div className="flex-1 bg-slate-900/30 p-6">
-        <div className="max-w-3xl mx-auto">
+      <div className="flex-1 bg-slate-900/30 overflow-auto">
+        <div className="max-w-3xl mx-auto p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold text-white">快速病历录入</h2>
             <div className="flex gap-2">
-              <Button variant="outline" className="border-slate-600 text-slate-300 bg-transparent">
+              <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent">
+                <Upload className="w-4 h-4 mr-2" />
                 导入历史记录
               </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700">保存病历</Button>
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                <CheckCircle className="w-4 h-4 mr-2" />
+                保存病历
+              </Button>
             </div>
           </div>
 
-          <div className="space-y-6 bg-slate-800/30 rounded-lg p-6">
+          <div className="space-y-6 bg-slate-800/30 rounded-lg p-6 border border-slate-700/50">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-slate-300">姓名 *</Label>
                 <Input
                   value={recordForm.name}
                   onChange={(e) => setRecordForm({ ...recordForm, name: e.target.value })}
-                  className="bg-slate-700/50 border-slate-600 text-white"
+                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white"
                   placeholder="请输入姓名"
                 />
               </div>
@@ -307,7 +297,7 @@ function QuickRecordModule() {
                 <Input
                   value={recordForm.age}
                   onChange={(e) => setRecordForm({ ...recordForm, age: e.target.value })}
-                  className="bg-slate-700/50 border-slate-600 text-white"
+                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white"
                   placeholder="请输入年龄"
                 />
               </div>
@@ -320,7 +310,7 @@ function QuickRecordModule() {
                   value={recordForm.gender}
                   onValueChange={(value) => setRecordForm({ ...recordForm, gender: value })}
                 >
-                  <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                  <SelectTrigger className="mt-1.5 bg-slate-700/50 border-slate-600 text-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-800 border-slate-700">
@@ -338,7 +328,7 @@ function QuickRecordModule() {
                 <Input
                   value={recordForm.phone}
                   onChange={(e) => setRecordForm({ ...recordForm, phone: e.target.value })}
-                  className="bg-slate-700/50 border-slate-600 text-white"
+                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white"
                   placeholder="请输入联系电话"
                 />
               </div>
@@ -349,7 +339,7 @@ function QuickRecordModule() {
               <Textarea
                 value={recordForm.concerns}
                 onChange={(e) => setRecordForm({ ...recordForm, concerns: e.target.value })}
-                className="bg-slate-700/50 border-slate-600 text-white min-h-[100px]"
+                className="mt-1.5 bg-slate-700/50 border-slate-600 text-white min-h-[100px]"
                 placeholder="请描述客户的主要诉求和期望..."
               />
             </div>
@@ -359,7 +349,7 @@ function QuickRecordModule() {
               <Textarea
                 value={recordForm.medicalHistory}
                 onChange={(e) => setRecordForm({ ...recordForm, medicalHistory: e.target.value })}
-                className="bg-slate-700/50 border-slate-600 text-white min-h-[80px]"
+                className="mt-1.5 bg-slate-700/50 border-slate-600 text-white min-h-[80px]"
                 placeholder="请填写相关病史..."
               />
             </div>
@@ -370,7 +360,7 @@ function QuickRecordModule() {
                 <Input
                   value={recordForm.allergies}
                   onChange={(e) => setRecordForm({ ...recordForm, allergies: e.target.value })}
-                  className="bg-slate-700/50 border-slate-600 text-white"
+                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white"
                   placeholder="如：青霉素过敏"
                 />
               </div>
@@ -380,7 +370,7 @@ function QuickRecordModule() {
                   value={recordForm.skinType}
                   onValueChange={(value) => setRecordForm({ ...recordForm, skinType: value })}
                 >
-                  <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                  <SelectTrigger className="mt-1.5 bg-slate-700/50 border-slate-600 text-white">
                     <SelectValue placeholder="请选择肤质" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-800 border-slate-700">
@@ -406,7 +396,7 @@ function QuickRecordModule() {
               <Textarea
                 value={recordForm.expectations}
                 onChange={(e) => setRecordForm({ ...recordForm, expectations: e.target.value })}
-                className="bg-slate-700/50 border-slate-600 text-white min-h-[80px]"
+                className="mt-1.5 bg-slate-700/50 border-slate-600 text-white min-h-[80px]"
                 placeholder="客户期望达到的效果..."
               />
             </div>
@@ -417,6 +407,7 @@ function QuickRecordModule() {
   )
 }
 
+// 咨询师模块 2: 资讯沟通纪要
 function CommunicationModule() {
   const [communications, setCommunications] = useState([
     {
@@ -445,9 +436,24 @@ function CommunicationModule() {
     nextStep: "",
   })
 
+  const handleAddCommunication = () => {
+    if (newComm.customer && newComm.summary) {
+      setCommunications([
+        ...communications,
+        {
+          id: communications.length + 1,
+          ...newComm,
+          date: new Date().toISOString().split("T")[0],
+        },
+      ])
+      setNewComm({ customer: "", type: "电话沟通", summary: "", nextStep: "" })
+      setShowNewDialog(false)
+    }
+  }
+
   return (
-    <div className="h-full bg-slate-900/30 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="h-full bg-slate-900/30 overflow-auto">
+      <div className="max-w-6xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold text-white">资讯沟通纪要</h2>
           <Button onClick={() => setShowNewDialog(true)} className="bg-blue-600 hover:bg-blue-700">
@@ -458,7 +464,10 @@ function CommunicationModule() {
 
         <div className="space-y-4">
           {communications.map((comm) => (
-            <div key={comm.id} className="bg-slate-800/30 rounded-lg p-5 border border-slate-700/50">
+            <div
+              key={comm.id}
+              className="bg-slate-800/30 rounded-lg p-5 border border-slate-700/50 hover:border-slate-600/50 transition-colors"
+            >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <Avatar className="w-10 h-10 bg-blue-600">
@@ -473,24 +482,30 @@ function CommunicationModule() {
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-slate-400">
+                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
                       <MoreVertical className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-slate-800 border-slate-700">
-                    <DropdownMenuItem className="text-white hover:bg-slate-700">编辑</DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-400 hover:bg-slate-700">删除</DropdownMenuItem>
+                    <DropdownMenuItem className="text-white hover:bg-slate-700">
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      编辑
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-red-400 hover:bg-slate-700">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      删除
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              <div className="space-y-2">
-                <div>
-                  <span className="text-sm text-slate-400">沟通摘要：</span>
+              <div className="space-y-3">
+                <div className="bg-slate-700/30 rounded p-3">
+                  <span className="text-xs text-slate-400 uppercase tracking-wide">沟通摘要</span>
                   <p className="text-white mt-1">{comm.summary}</p>
                 </div>
-                <div>
-                  <span className="text-sm text-slate-400">下一步行动：</span>
-                  <p className="text-blue-400 mt-1">{comm.nextStep}</p>
+                <div className="bg-blue-600/10 rounded p-3 border border-blue-500/20">
+                  <span className="text-xs text-blue-400 uppercase tracking-wide">下一步行动</span>
+                  <p className="text-blue-300 mt-1 font-medium">{comm.nextStep}</p>
                 </div>
               </div>
             </div>
@@ -499,24 +514,24 @@ function CommunicationModule() {
 
         {/* 新建纪要对话框 */}
         <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
-          <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl">
+          <DialogContent className="bg-slate-800 border-2 border-slate-700 text-white max-w-2xl shadow-2xl backdrop-blur-xl">
             <DialogHeader>
-              <DialogTitle>新建沟通纪要</DialogTitle>
+              <DialogTitle className="text-xl">新建沟通纪要</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-4 mt-4">
               <div>
-                <Label>客户姓名</Label>
+                <Label className="text-slate-300">客户姓名</Label>
                 <Input
                   value={newComm.customer}
                   onChange={(e) => setNewComm({ ...newComm, customer: e.target.value })}
-                  className="bg-slate-700/50 border-slate-600 text-white"
+                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white"
                   placeholder="请输入客户姓名"
                 />
               </div>
               <div>
-                <Label>沟通方式</Label>
+                <Label className="text-slate-300">沟通方式</Label>
                 <Select value={newComm.type} onValueChange={(value) => setNewComm({ ...newComm, type: value })}>
-                  <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                  <SelectTrigger className="mt-1.5 bg-slate-700/50 border-slate-600 text-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-800 border-slate-700">
@@ -536,41 +551,34 @@ function CommunicationModule() {
                 </Select>
               </div>
               <div>
-                <Label>沟通摘要</Label>
+                <Label className="text-slate-300">沟通摘要</Label>
                 <Textarea
                   value={newComm.summary}
                   onChange={(e) => setNewComm({ ...newComm, summary: e.target.value })}
-                  className="bg-slate-700/50 border-slate-600 text-white min-h-[120px]"
-                  placeholder="请描述本次沟通的主要内容..."
+                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white min-h-[100px]"
+                  placeholder="请输入沟通内容摘要..."
                 />
               </div>
               <div>
-                <Label>下一步行动</Label>
-                <Input
+                <Label className="text-slate-300">下一步行动</Label>
+                <Textarea
                   value={newComm.nextStep}
                   onChange={(e) => setNewComm({ ...newComm, nextStep: e.target.value })}
-                  className="bg-slate-700/50 border-slate-600 text-white"
-                  placeholder="请输入后续跟进计划..."
+                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white min-h-[80px]"
+                  placeholder="请输入下一步需要采取的行动..."
                 />
               </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="mt-6">
               <Button
                 variant="outline"
                 onClick={() => setShowNewDialog(false)}
-                className="border-slate-600 text-slate-300"
+                className="border-slate-600 text-slate-300 hover:bg-slate-700"
               >
                 取消
               </Button>
-              <Button
-                onClick={() => {
-                  setCommunications([...communications, { ...newComm, id: Date.now(), date: "2025-09-28" }])
-                  setShowNewDialog(false)
-                  setNewComm({ customer: "", type: "电话沟通", summary: "", nextStep: "" })
-                }}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                保存
+              <Button onClick={handleAddCommunication} className="bg-blue-600 hover:bg-blue-700">
+                确定
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -580,268 +588,306 @@ function CommunicationModule() {
   )
 }
 
+// 咨询师模块 3: 辅助通用方案
 function GeneralPlanModule() {
-  const [selectedProject, setSelectedProject] = useState<string | null>(null)
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState("")
 
-  const projects = [
+  const generalPlans = [
     {
-      name: "玻尿酸填充",
-      description: "面部填充，改善凹陷，提升轮廓",
-      price: "3000-8000元",
-      duration: "30-60分钟",
-      recovery: "3-7天",
+      id: "plan1",
+      name: "抗衰老基础方案",
+      category: "抗衰",
+      items: ["热玛吉", "光子嫩肤", "玻尿酸填充"],
+      price: "¥18,800",
+      duration: "3-6个月",
+      description: "适合初期抗衰需求的客户，综合改善面部轮廓和肤质",
     },
     {
-      name: "热玛吉抗衰",
-      description: "非侵入式紧肤提升，刺激胶原蛋白再生",
-      price: "15000-25000元",
-      duration: "60-90分钟",
-      recovery: "即时",
+      id: "plan2",
+      name: "美白提亮套餐",
+      category: "美白",
+      items: ["激光美白", "水光针", "维C导入"],
+      price: "¥12,600",
+      duration: "2-3个月",
+      description: "针对色素沉着，提亮肤色，改善暗沉",
     },
     {
-      name: "光子嫩肤",
-      description: "改善肤色不均，淡化色斑",
-      price: "800-2000元/次",
-      duration: "20-30分钟",
-      recovery: "1-3天",
-    },
-    {
-      name: "肉毒素注射",
-      description: "祛除动态皱纹，瘦脸",
-      price: "2000-5000元",
-      duration: "15-30分钟",
-      recovery: "即时",
+      id: "plan3",
+      name: "祛痘修复方案",
+      category: "祛痘",
+      items: ["果酸焕肤", "红蓝光治疗", "修复面膜"],
+      price: "¥8,900",
+      duration: "1-2个月",
+      description: "控油祛痘，修复痘印，改善痘肌",
     },
   ]
 
-  const planTemplates = [
-    {
-      title: "标准方案",
-      content: "适合大多数客户的基础治疗方案",
-      details: "包含术前评估、标准操作流程、术后护理指导",
-    },
-    {
-      title: "进阶方案",
-      content: "针对特殊需求的定制化方案",
-      details: "结合多项技术，提供综合解决方案",
-    },
-    {
-      title: "VIP方案",
-      content: "高端定制，全程专人服务",
-      details: "包含专家会诊、私密服务、长期跟踪",
-    },
-  ]
+  const filteredPlans = generalPlans.filter(
+    (plan) =>
+      plan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      plan.category.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
 
   return (
-    <div className="h-full flex">
-      {/* 项目列表 */}
-      <div className="w-80 bg-slate-800/30 border-r border-slate-700/50 p-4">
-        <h3 className="text-lg font-semibold text-white mb-4">项目列表</h3>
-        <ScrollArea className="h-[calc(100%-40px)]">
-          <div className="space-y-2">
-            {projects.map((project) => (
-              <div
-                key={project.name}
-                onClick={() => setSelectedProject(project.name)}
-                className={`p-4 rounded-lg cursor-pointer transition-colors ${
-                  selectedProject === project.name
-                    ? "bg-blue-600/20 border border-blue-500/50"
-                    : "bg-slate-700/30 hover:bg-slate-700/50"
-                }`}
-              >
-                <h4 className="font-medium text-white mb-1">{project.name}</h4>
-                <p className="text-sm text-slate-400">{project.description}</p>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-sm text-blue-400">{project.price}</span>
-                  <Badge variant="outline" className="text-xs border-slate-600 text-slate-300">
-                    {project.duration}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
-
-      {/* 方案模板 */}
-      <div className="flex-1 bg-slate-900/30 p-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-semibold text-white mb-6">
-            {selectedProject ? `${selectedProject} - 通用方案` : "请选择项目"}
-          </h2>
-
-          {selectedProject && (
-            <div className="space-y-4">
-              {planTemplates.map((template, idx) => (
-                <div key={idx} className="bg-slate-800/30 rounded-lg p-5 border border-slate-700/50">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="text-lg font-medium text-white mb-1">{template.title}</h3>
-                      <p className="text-slate-400">{template.content}</p>
-                    </div>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                      使用模板
-                    </Button>
-                  </div>
-                  <div className="bg-slate-700/30 rounded p-3">
-                    <p className="text-sm text-slate-300">{template.details}</p>
-                  </div>
-                </div>
-              ))}
-
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mt-6">
-                <h4 className="font-medium text-blue-400 mb-2 flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5" />
-                  注意事项
-                </h4>
-                <ul className="space-y-1 text-sm text-slate-300">
-                  <li>• 使用前需根据客户实际情况进行调整</li>
-                  <li>• 价格仅供参考，实际以当前活动为准</li>
-                  <li>• 重要决策请咨询医生意见</li>
-                </ul>
-              </div>
+    <div className="h-full bg-slate-900/30 overflow-auto">
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold text-white">辅助通用方案</h2>
+          <div className="flex gap-3">
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input
+                placeholder="搜索方案..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 bg-slate-700/50 border-slate-600 text-white"
+              />
             </div>
-          )}
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              创建方案
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredPlans.map((plan) => (
+            <div
+              key={plan.id}
+              onClick={() => setSelectedPlan(plan.id)}
+              className={`bg-slate-800/30 rounded-lg p-5 border cursor-pointer transition-all hover:shadow-lg ${
+                selectedPlan === plan.id
+                  ? "border-blue-500/50 shadow-blue-500/20"
+                  : "border-slate-700/50 hover:border-slate-600/50"
+              }`}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <Badge className="bg-blue-600/20 text-blue-400 border-blue-500/30 mb-2">{plan.category}</Badge>
+                  <h3 className="text-lg font-semibold text-white">{plan.name}</h3>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-slate-800 border-slate-700">
+                    <DropdownMenuItem className="text-white hover:bg-slate-700">
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      编辑
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-white hover:bg-slate-700">
+                      <Download className="w-4 h-4 mr-2" />
+                      导出
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-red-400 hover:bg-slate-700">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      删除
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <p className="text-sm text-slate-400 mb-4">{plan.description}</p>
+
+              <div className="space-y-3 mb-4">
+                <div className="bg-slate-700/30 rounded p-2">
+                  <div className="text-xs text-slate-400 mb-1">包含项目</div>
+                  <div className="flex flex-wrap gap-1">
+                    {plan.items.map((item, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs border-slate-600 text-slate-300">
+                        {item}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex justify-between text-sm">
+                  <div>
+                    <div className="text-slate-400">参考价格</div>
+                    <div className="text-blue-400 font-semibold">{plan.price}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-slate-400">周期</div>
+                    <div className="text-white font-medium">{plan.duration}</div>
+                  </div>
+                </div>
+              </div>
+
+              <Button className="w-full bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 border border-blue-500/30">
+                应用此方案
+              </Button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   )
 }
 
+// 医生模块 1: 智能推荐
 function SmartRecommendModule() {
-  const [selectedPatient, setSelectedPatient] = useState<string | null>("张小美")
+  const [selectedPatient, setSelectedPatient] = useState("张小美")
 
-  const patients = [
-    { name: "张小美", age: 32, project: "热玛吉术后", concerns: "抗衰老、紧致提升" },
-    { name: "王美丽", age: 28, project: "光子嫩肤", concerns: "美白、淡斑" },
-    { name: "李娜", age: 35, project: "玻尿酸填充", concerns: "面部填充、去皱" },
-  ]
+  const patientData = {
+    name: "张小美",
+    age: 28,
+    gender: "女",
+    skinType: "混合性",
+    concerns: ["面部松弛", "法令纹", "皮肤暗沉"],
+    budget: "20000-30000",
+  }
 
   const recommendations = [
     {
-      title: "术后护理方案推荐",
+      id: 1,
+      treatment: "热玛吉FLX",
       priority: "高",
-      reason: "基于患者术后第2天的恢复情况",
-      suggestions: [
-        "继续冷敷治疗，每天3-4次，每次15-20分钟",
-        "使用医用级舒缓修复面膜，隔天一次",
-        "避免高温环境，如桑拿、温泉等",
-        "加强防晒，使用SPF50+防晒霜",
-      ],
+      reason: "针对面部松弛效果显著，适合客户年龄和需求",
+      price: "¥18,800",
+      duration: "60-90分钟",
+      recovery: "无恢复期",
+      effect: "持续12-18个月",
+      confidence: 95,
     },
     {
-      title: "后续项目推荐",
-      priority: "中",
-      reason: "根据患者抗衰需求和当前项目协同效果",
-      suggestions: [
-        "3个月后可考虑超声炮项目，增强紧致效果",
-        "配合水光针疗程，改善肤质",
-        "定期光子嫩肤维护，保持肤色均匀",
-      ],
+      id: 2,
+      treatment: "玻尿酸填充",
+      priority: "高",
+      reason: "改善法令纹，立即见效，安全性高",
+      price: "¥8,600",
+      duration: "30-45分钟",
+      recovery: "1-2天",
+      effect: "持续8-12个月",
+      confidence: 92,
     },
     {
-      title: "生活方式建议",
+      id: 3,
+      treatment: "光子嫩肤",
       priority: "中",
-      reason: "促进恢复和效果维持",
-      suggestions: [
-        "保证充足睡眠，每天7-8小时",
-        "多摄入富含胶原蛋白的食物",
-        "避免辛辣刺激性食物",
-        "适量补充维生素C和E",
-      ],
+      reason: "改善肤色暗沉，提亮肤色",
+      price: "¥3,200",
+      duration: "30分钟",
+      recovery: "3-5天",
+      effect: "持续6-9个月",
+      confidence: 88,
     },
   ]
 
   return (
-    <div className="h-full flex">
-      {/* 患者列表 */}
-      <div className="w-80 bg-slate-800/30 border-r border-slate-700/50 p-4">
-        <h3 className="text-lg font-semibold text-white mb-4">患者列表</h3>
-        <ScrollArea className="h-[calc(100%-40px)]">
-          <div className="space-y-2">
-            {patients.map((patient) => (
-              <div
-                key={patient.name}
-                onClick={() => setSelectedPatient(patient.name)}
-                className={`p-4 rounded-lg cursor-pointer transition-colors ${
-                  selectedPatient === patient.name
-                    ? "bg-blue-600/20 border border-blue-500/50"
-                    : "bg-slate-700/30 hover:bg-slate-700/50"
-                }`}
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <Avatar className="w-10 h-10 bg-blue-600">
-                    <AvatarFallback className="text-white">{patient.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h4 className="font-medium text-white">{patient.name}</h4>
-                    <p className="text-sm text-slate-400">{patient.age}岁</p>
+    <div className="h-full bg-slate-900/30 overflow-auto">
+      <div className="max-w-7xl mx-auto p-6">
+        <h2 className="text-2xl font-semibold text-white mb-6">智能推荐系统</h2>
+
+        <div className="grid grid-cols-3 gap-6">
+          {/* 患者信息 */}
+          <div className="col-span-1 bg-slate-800/30 rounded-lg p-5 border border-slate-700/50 h-fit">
+            <h3 className="text-lg font-semibold text-white mb-4">患者信息</h3>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <Avatar className="w-12 h-12 bg-blue-600">
+                  <AvatarFallback className="text-white text-lg">{patientData.name[0]}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="font-medium text-white">{patientData.name}</div>
+                  <div className="text-sm text-slate-400">
+                    {patientData.age}岁 · {patientData.gender}
                   </div>
                 </div>
-                <p className="text-sm text-slate-400 mb-1">{patient.project}</p>
-                <p className="text-xs text-slate-500">{patient.concerns}</p>
               </div>
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
 
-      {/* 推荐内容 */}
-      <div className="flex-1 bg-slate-900/30 p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-white">AI智能推荐 - {selectedPatient}</h2>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Download className="w-4 h-4 mr-2" />
-              导出报告
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            {recommendations.map((rec, idx) => (
-              <div key={idx} className="bg-slate-800/30 rounded-lg p-5 border border-slate-700/50">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-medium text-white">{rec.title}</h3>
-                      <Badge
-                        className={
-                          rec.priority === "高" ? "bg-red-600 hover:bg-red-700" : "bg-yellow-600 hover:bg-yellow-700"
-                        }
-                      >
-                        {rec.priority}优先级
+              <div className="pt-3 border-t border-slate-700/50 space-y-2">
+                <div>
+                  <div className="text-xs text-slate-400">肤质类型</div>
+                  <div className="text-white">{patientData.skinType}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-400">预算范围</div>
+                  <div className="text-white">{patientData.budget}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-400">主要诉求</div>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {patientData.concerns.map((concern, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs border-slate-600 text-slate-300">
+                        {concern}
                       </Badge>
-                    </div>
-                    <p className="text-sm text-slate-400">{rec.reason}</p>
+                    ))}
                   </div>
                 </div>
-                <div className="bg-slate-700/30 rounded p-4 mt-3">
-                  <ul className="space-y-2">
-                    {rec.suggestions.map((suggestion, sIdx) => (
-                      <li key={sIdx} className="text-slate-300 flex items-start gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span>{suggestion}</span>
-                      </li>
-                    ))}
-                  </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* 推荐方案 */}
+          <div className="col-span-2 space-y-4">
+            {recommendations.map((rec) => (
+              <div
+                key={rec.id}
+                className="bg-slate-800/30 rounded-lg p-5 border border-slate-700/50 hover:border-slate-600/50 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center">
+                      <span className="text-blue-400 font-semibold">{rec.id}</span>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">{rec.treatment}</h3>
+                      <p className="text-sm text-slate-400">{rec.reason}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      className={
+                        rec.priority === "高"
+                          ? "bg-red-600/20 text-red-400 border-red-500/30"
+                          : "bg-yellow-600/20 text-yellow-400 border-yellow-500/30"
+                      }
+                    >
+                      {rec.priority}优先级
+                    </Badge>
+                    <div className="text-right">
+                      <div className="text-xs text-slate-400">推荐度</div>
+                      <div className="text-lg font-semibold text-blue-400">{rec.confidence}%</div>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex gap-2 mt-4">
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                    采纳建议
+
+                <div className="grid grid-cols-4 gap-4 mb-4">
+                  <div className="bg-slate-700/30 rounded p-3">
+                    <div className="text-xs text-slate-400 mb-1">参考价格</div>
+                    <div className="text-white font-semibold">{rec.price}</div>
+                  </div>
+                  <div className="bg-slate-700/30 rounded p-3">
+                    <div className="text-xs text-slate-400 mb-1">治疗时长</div>
+                    <div className="text-white font-medium">{rec.duration}</div>
+                  </div>
+                  <div className="bg-slate-700/30 rounded p-3">
+                    <div className="text-xs text-slate-400 mb-1">恢复期</div>
+                    <div className="text-white font-medium">{rec.recovery}</div>
+                  </div>
+                  <div className="bg-slate-700/30 rounded p-3">
+                    <div className="text-xs text-slate-400 mb-1">效果持续</div>
+                    <div className="text-white font-medium">{rec.effect}</div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    采纳方案
                   </Button>
-                  <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 bg-transparent">
-                    修改
+                  <Button
+                    variant="outline"
+                    className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent"
+                  >
+                    查看详情
                   </Button>
                 </div>
               </div>
             ))}
-          </div>
-
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mt-6">
-            <p className="text-sm text-slate-300">
-              <strong className="text-blue-400">AI提示：</strong>
-              以上推荐基于患者病历、当前项目和行业最佳实践生成，仅供参考。最终方案请结合临床经验和患者实际情况制定。
-            </p>
           </div>
         </div>
       </div>
@@ -849,167 +895,228 @@ function SmartRecommendModule() {
   )
 }
 
+// 医生模块 2: 医生制定方案
 function DoctorPlanModule() {
-  const [selectedPatient, setSelectedPatient] = useState<string | null>("张小美")
-  const [planForm, setPlanForm] = useState({
-    diagnosis: "",
-    treatment: "",
-    dosage: "",
-    frequency: "",
-    duration: "",
-    precautions: "",
-    followUp: "",
-  })
+  const [ageGroup, setAgeGroup] = useState("18-25")
+  const [gender, setGender] = useState("女")
+  const [skinTypes, setSkinTypes] = useState<string[]>([])
+  const [uploadedImages, setUploadedImages] = useState<string[]>([])
+  const [uploadedAudio, setUploadedAudio] = useState<string | null>(null)
+  const [phases, setPhases] = useState([
+    { id: 1, name: "家居皮肤调理", items: [] },
+    { id: 2, name: "院线光电治疗", items: [] },
+    { id: 3, name: "巩固保养", items: [] },
+  ])
 
-  const patients = [
-    { name: "张小美", age: 32, project: "热玛吉术后第2天", status: "术后跟踪" },
-    { name: "王美丽", age: 28, project: "光子嫩肤", status: "已预约" },
-    { name: "李娜", age: 35, project: "玻尿酸填充", status: "已预约" },
-  ]
+  const toggleSkinType = (type: string) => {
+    setSkinTypes((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]))
+  }
 
   return (
     <div className="h-full flex">
-      {/* 患者列表 */}
-      <div className="w-80 bg-slate-800/30 border-r border-slate-700/50 p-4">
-        <h3 className="text-lg font-semibold text-white mb-4">待制定方案</h3>
-        <ScrollArea className="h-[calc(100%-40px)]">
-          <div className="space-y-2">
-            {patients.map((patient) => (
-              <div
-                key={patient.name}
-                onClick={() => setSelectedPatient(patient.name)}
-                className={`p-4 rounded-lg cursor-pointer transition-colors ${
-                  selectedPatient === patient.name
-                    ? "bg-blue-600/20 border border-blue-500/50"
-                    : "bg-slate-700/30 hover:bg-slate-700/50"
-                }`}
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <Avatar className="w-10 h-10 bg-blue-600">
-                    <AvatarFallback className="text-white">{patient.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h4 className="font-medium text-white">{patient.name}</h4>
-                    <p className="text-sm text-slate-400">{patient.age}岁</p>
-                  </div>
+      {/* 左侧：客户信息录入 */}
+      <div className="w-[360px] bg-slate-800/30 border-r border-slate-700/50 flex flex-col">
+        <div className="p-4 border-b border-slate-700/50">
+          <h3 className="font-semibold text-white">客户信息录入</h3>
+        </div>
+
+        <ScrollArea className="flex-1 p-4">
+          <div className="space-y-6">
+            {/* 基本信息 */}
+            <div>
+              <h4 className="text-sm font-medium text-white mb-3">基本信息</h4>
+
+              <div className="mb-4">
+                <Label className="text-slate-300 text-sm">年龄</Label>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {["18-25", "26-35", "36-45", "46+"].map((age) => (
+                    <Button
+                      key={age}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setAgeGroup(age)}
+                      className={
+                        ageGroup === age
+                          ? "bg-blue-600 border-blue-500 text-white hover:bg-blue-700"
+                          : "border-slate-600 text-slate-300 hover:bg-slate-700"
+                      }
+                    >
+                      {age}
+                    </Button>
+                  ))}
                 </div>
-                <p className="text-sm text-slate-400 mb-1">{patient.project}</p>
-                <Badge variant="outline" className="text-xs border-slate-600 text-slate-300">
-                  {patient.status}
-                </Badge>
               </div>
-            ))}
+
+              <div>
+                <Label className="text-slate-300 text-sm">性别</Label>
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  {["女", "男", "其他"].map((g) => (
+                    <Button
+                      key={g}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setGender(g)}
+                      className={
+                        gender === g
+                          ? "bg-blue-600 border-blue-500 text-white hover:bg-blue-700"
+                          : "border-slate-600 text-slate-300 hover:bg-slate-700"
+                      }
+                    >
+                      {g}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 肤质 */}
+            <div>
+              <Label className="text-slate-300 text-sm">肤质</Label>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {["干性", "油性", "混合性", "敏感性"].map((type) => (
+                  <Button
+                    key={type}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => toggleSkinType(type)}
+                    className={
+                      skinTypes.includes(type)
+                        ? "bg-blue-600 border-blue-500 text-white hover:bg-blue-700"
+                        : "border-slate-600 text-slate-300 hover:bg-slate-700"
+                    }
+                  >
+                    {type}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* 资料上传 */}
+            <div>
+              <h4 className="text-sm font-medium text-white mb-3">资料上传</h4>
+
+              {/* 微信聊天截图 */}
+              <div className="mb-4">
+                <Label className="text-slate-300 text-sm">微信聊天截图</Label>
+                <div className="mt-2 border-2 border-dashed border-slate-600 rounded-lg p-4 text-center hover:border-slate-500 transition-colors cursor-pointer bg-slate-700/20">
+                  <ImageIcon className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                  <p className="text-sm text-slate-400 mb-1">点击或拖拽上传图</p>
+                  <p className="text-xs text-slate-500">支持 PNG, JPG 格式</p>
+                </div>
+                {uploadedImages.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {uploadedImages.map((img, idx) => (
+                      <div key={idx} className="flex items-center gap-2 bg-slate-700/30 rounded p-2">
+                        <ImageIcon className="w-4 h-4 text-slate-400" />
+                        <span className="text-xs text-slate-300 flex-1">图片 {idx + 1}</span>
+                        <Button variant="ghost" size="icon" className="h-6 w-6">
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 咨询录音 */}
+              <div>
+                <Label className="text-slate-300 text-sm">咨询录音</Label>
+                <div className="mt-2 border-2 border-dashed border-slate-600 rounded-lg p-4 text-center hover:border-slate-500 transition-colors cursor-pointer bg-slate-700/20">
+                  <Mic className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                  <p className="text-sm text-slate-400 mb-1">点击上传录音文件</p>
+                  <p className="text-xs text-slate-500">支持 MP3, WAV, M4A 格式</p>
+                </div>
+              </div>
+            </div>
           </div>
         </ScrollArea>
       </div>
 
-      {/* 方案制定表单 */}
-      <div className="flex-1 bg-slate-900/30 p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-white">制定治疗方案 - {selectedPatient}</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" className="border-slate-600 text-slate-300 bg-transparent">
-                <FileText className="w-4 h-4 mr-2" />
-                查看病历
-              </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                <CheckCircle className="w-4 h-4 mr-2" />
+      {/* 右侧：治疗方案构建 */}
+      <div className="flex-1 bg-slate-900/30 flex flex-col">
+        <div className="p-6 border-b border-slate-700/50">
+          <h2 className="text-2xl font-semibold text-white">治疗方案构建</h2>
+        </div>
+
+        <ScrollArea className="flex-1 p-6">
+          <div className="max-w-4xl mx-auto space-y-6">
+            {phases.map((phase, index) => (
+              <div key={phase.id} className="bg-slate-800/30 rounded-lg p-5 border border-slate-700/50">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+                        index === 0
+                          ? "bg-blue-600/20 text-blue-400"
+                          : index === 1
+                            ? "bg-purple-600/20 text-purple-400"
+                            : "bg-green-600/20 text-green-400"
+                      }`}
+                    >
+                      {phase.id}
+                    </div>
+                    <h3 className="text-lg font-semibold text-white">
+                      第{["一", "二", "三"][index]}阶段：{phase.name}
+                    </h3>
+                  </div>
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                    <Plus className="w-4 h-4 mr-1" />
+                    添加项目
+                  </Button>
+                </div>
+
+                {phase.items.length === 0 ? (
+                  <div className="text-center py-8 text-slate-400">
+                    <FileUp className="w-12 h-12 mx-auto mb-2 opacity-40" />
+                    <p>暂无项目，点击上方按钮添加</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {phase.items.map((item: any, idx: number) => (
+                      <div key={idx} className="bg-slate-700/30 rounded p-3 flex items-center justify-between">
+                        <span className="text-white">{item}</span>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* 方案总计 */}
+            <div className="bg-slate-800/30 rounded-lg p-5 border border-blue-500/30">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-white">方案总计</h3>
+                <div className="text-right">
+                  <div className="text-sm text-slate-400">预估总价</div>
+                  <div className="text-3xl font-bold text-blue-400">¥0</div>
+                </div>
+              </div>
+            </div>
+
+            {/* 操作按钮 */}
+            <div className="flex gap-3">
+              <Button className="flex-1 bg-blue-600 hover:bg-blue-700 h-12">
+                <FileText className="w-5 h-5 mr-2" />
                 保存方案
               </Button>
+              <Button
+                variant="outline"
+                className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700 h-12 bg-transparent"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                生成方案书
+              </Button>
             </div>
           </div>
-
-          <div className="space-y-6 bg-slate-800/30 rounded-lg p-6">
-            <div>
-              <Label className="text-slate-300">诊断结果 *</Label>
-              <Textarea
-                value={planForm.diagnosis}
-                onChange={(e) => setPlanForm({ ...planForm, diagnosis: e.target.value })}
-                className="bg-slate-700/50 border-slate-600 text-white min-h-[100px]"
-                placeholder="请输入详细的诊断结果..."
-              />
-            </div>
-
-            <div>
-              <Label className="text-slate-300">治疗方案 *</Label>
-              <Textarea
-                value={planForm.treatment}
-                onChange={(e) => setPlanForm({ ...planForm, treatment: e.target.value })}
-                className="bg-slate-700/50 border-slate-600 text-white min-h-[120px]"
-                placeholder="请描述具体的治疗方案和步骤..."
-              />
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label className="text-slate-300">用量/剂量</Label>
-                <Input
-                  value={planForm.dosage}
-                  onChange={(e) => setPlanForm({ ...planForm, dosage: e.target.value })}
-                  className="bg-slate-700/50 border-slate-600 text-white"
-                  placeholder="如：100单位"
-                />
-              </div>
-              <div>
-                <Label className="text-slate-300">频次</Label>
-                <Input
-                  value={planForm.frequency}
-                  onChange={(e) => setPlanForm({ ...planForm, frequency: e.target.value })}
-                  className="bg-slate-700/50 border-slate-600 text-white"
-                  placeholder="如：每天2次"
-                />
-              </div>
-              <div>
-                <Label className="text-slate-300">疗程</Label>
-                <Input
-                  value={planForm.duration}
-                  onChange={(e) => setPlanForm({ ...planForm, duration: e.target.value })}
-                  className="bg-slate-700/50 border-slate-600 text-white"
-                  placeholder="如：7天"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-slate-300">注意事项 *</Label>
-              <Textarea
-                value={planForm.precautions}
-                onChange={(e) => setPlanForm({ ...planForm, precautions: e.target.value })}
-                className="bg-slate-700/50 border-slate-600 text-white min-h-[100px]"
-                placeholder="请列出患者需要注意的事项..."
-              />
-            </div>
-
-            <div>
-              <Label className="text-slate-300">复诊安排</Label>
-              <Input
-                value={planForm.followUp}
-                onChange={(e) => setPlanForm({ ...planForm, followUp: e.target.value })}
-                className="bg-slate-700/50 border-slate-600 text-white"
-                placeholder="如：7天后复诊检查"
-              />
-            </div>
-
-            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
-              <div className="flex items-start gap-2">
-                <AlertCircle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-medium text-yellow-400 mb-1">医疗责任提示</h4>
-                  <p className="text-sm text-slate-300">
-                    请确保治疗方案符合医疗规范和患者实际情况。方案一经确认，将作为正式医疗文书存档。
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        </ScrollArea>
       </div>
     </div>
   )
 }
 
-// 智能服务群聊界面
 function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMessageInput }: any) {
   const [filterStage, setFilterStage] = useState("全部")
   const [aiDraft, setAiDraft] = useState({
