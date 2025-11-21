@@ -17,6 +17,12 @@ import {
   Clock,
   CheckCircle,
   ArrowLeft,
+  UserCog,
+  Stethoscope,
+  ClipboardList,
+  MessageSquare,
+  Sparkles,
+  FileSignature,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -43,12 +49,25 @@ interface CollaborativeServicePlatformProps {
   onBack: () => void
 }
 
+type UserRole = "consultant" | "doctor"
+
 export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePlatformProps) {
-  const [activeTab, setActiveTab] = useState("chat")
+  const [userRole, setUserRole] = useState<UserRole>("consultant")
+  const [activeTab, setActiveTab] = useState("quick-record") // Default to first consultant tab
   const [selectedCustomer, setSelectedCustomer] = useState("张小美")
   const [messageInput, setMessageInput] = useState("")
   const [showNewQADialog, setShowNewQADialog] = useState(false)
   const [showUploadDialog, setShowUploadDialog] = useState(false)
+
+  // Reset active tab when role changes
+  const handleRoleChange = (role: UserRole) => {
+    setUserRole(role)
+    if (role === "consultant") {
+      setActiveTab("quick-record")
+    } else {
+      setActiveTab("smart-recommend")
+    }
+  }
 
   return (
     <div className="fixed inset-0 left-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
@@ -59,49 +78,126 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-xl font-semibold text-white">智能协同服务工作台</h1>
-            <p className="text-sm text-slate-400">以群聊为中心 · AI为辅助 · 真人为决策</p>
+            <h1 className="text-xl font-semibold text-white">咨询师&医生协作平台</h1>
+            <p className="text-sm text-slate-400">
+              {userRole === "consultant" ? "咨询师工作台" : "医生工作台"} · 智能协同 · 高效服务
+            </p>
           </div>
         </div>
-        <div className="absolute left-1/2 -translate-x-1/2 flex gap-2">
-          <Button
-            variant={activeTab === "chat" ? "default" : "ghost"}
-            onClick={() => setActiveTab("chat")}
-            className={
-              activeTab === "chat"
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
-            }
+
+        {/* Role Switcher */}
+        <div className="flex items-center bg-slate-900/50 rounded-lg p-1 border border-slate-700">
+          <button
+            onClick={() => handleRoleChange("consultant")}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              userRole === "consultant" ? "bg-purple-600 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"
+            }`}
           >
-            智能服务群聊
-          </Button>
-          <Button
-            variant={activeTab === "kanban" ? "default" : "ghost"}
-            onClick={() => setActiveTab("kanban")}
-            className={
-              activeTab === "kanban"
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
-            }
+            <UserCog className="w-4 h-4" />
+            咨询师
+          </button>
+          <button
+            onClick={() => handleRoleChange("doctor")}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              userRole === "doctor" ? "bg-blue-600 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"
+            }`}
           >
-            客户旅程看板
-          </Button>
-          <Button
-            variant={activeTab === "knowledge" ? "default" : "ghost"}
-            onClick={() => setActiveTab("knowledge")}
-            className={
-              activeTab === "knowledge"
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
-            }
-          >
-            知识库管理
-          </Button>
+            <Stethoscope className="w-4 h-4" />
+            医生
+          </button>
+        </div>
+
+        <div className="flex gap-2">
+          {userRole === "consultant" ? (
+            <>
+              <Button
+                variant={activeTab === "quick-record" ? "default" : "ghost"}
+                onClick={() => setActiveTab("quick-record")}
+                className={
+                  activeTab === "quick-record"
+                    ? "bg-purple-600 hover:bg-purple-700"
+                    : "text-slate-300 hover:text-white hover:bg-slate-700/50"
+                }
+              >
+                <ClipboardList className="w-4 h-4 mr-2" />
+                快速病历
+              </Button>
+              <Button
+                variant={activeTab === "consultation-summary" ? "default" : "ghost"}
+                onClick={() => setActiveTab("consultation-summary")}
+                className={
+                  activeTab === "consultation-summary"
+                    ? "bg-purple-600 hover:bg-purple-700"
+                    : "text-slate-300 hover:text-white hover:bg-slate-700/50"
+                }
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                资讯沟通纪要
+              </Button>
+              <Button
+                variant={activeTab === "auxiliary-plan" ? "default" : "ghost"}
+                onClick={() => setActiveTab("auxiliary-plan")}
+                className={
+                  activeTab === "auxiliary-plan"
+                    ? "bg-purple-600 hover:bg-purple-700"
+                    : "text-slate-300 hover:text-white hover:bg-slate-700/50"
+                }
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                辅助通用方案
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant={activeTab === "smart-recommend" ? "default" : "ghost"}
+                onClick={() => setActiveTab("smart-recommend")}
+                className={
+                  activeTab === "smart-recommend"
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : "text-slate-300 hover:text-white hover:bg-slate-700/50"
+                }
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                智能推荐
+              </Button>
+              <Button
+                variant={activeTab === "doctor-plan" ? "default" : "ghost"}
+                onClick={() => setActiveTab("doctor-plan")}
+                className={
+                  activeTab === "doctor-plan"
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : "text-slate-300 hover:text-white hover:bg-slate-700/50"
+                }
+              >
+                <FileSignature className="w-4 h-4 mr-2" />
+                医生制定方案
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
       {/* 主内容区域 */}
       <div className="flex-1 overflow-hidden">
+        {/* Consultant Modules */}
+        {userRole === "consultant" && activeTab === "quick-record" && <QuickMedicalRecord />}
+        {userRole === "consultant" && activeTab === "consultation-summary" && (
+          <ChatInterface
+            selectedCustomer={selectedCustomer}
+            onSelectCustomer={setSelectedCustomer}
+            messageInput={messageInput}
+            setMessageInput={setMessageInput}
+            role="consultant"
+          />
+        )}
+        {userRole === "consultant" && activeTab === "auxiliary-plan" && <AuxiliaryGeneralPlan />}
+
+        {/* Doctor Modules */}
+        {userRole === "doctor" && activeTab === "smart-recommend" && <IntelligentRecommendation />}
+        {userRole === "doctor" && activeTab === "doctor-plan" && <DoctorFormulatedPlan />}
+
+        {/* Original tabs - keeping for now, might be removed or integrated later */}
         {activeTab === "chat" && (
           <ChatInterface
             selectedCustomer={selectedCustomer}
@@ -124,8 +220,303 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
   )
 }
 
-// 智能服务群聊界面
-function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMessageInput }: any) {
+// --- Consultant Components ---
+
+function QuickMedicalRecord() {
+  return (
+    <div className="h-full p-6 overflow-auto">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+            <ClipboardList className="w-6 h-6 text-purple-500" />
+            快速病历录入
+          </h2>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label className="text-slate-300">客户姓名</Label>
+              <Input placeholder="输入客户姓名" className="bg-slate-900/50 border-slate-600 text-white" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-slate-300">联系方式</Label>
+              <Input placeholder="输入手机号码" className="bg-slate-900/50 border-slate-600 text-white" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-slate-300">就诊意向</Label>
+              <Input placeholder="例如：抗衰、美白" className="bg-slate-900/50 border-slate-600 text-white" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-slate-300">预约时间</Label>
+              <Input type="datetime-local" className="bg-slate-900/50 border-slate-600 text-white" />
+            </div>
+            <div className="col-span-2 space-y-2">
+              <Label className="text-slate-300">主诉症状</Label>
+              <Textarea
+                placeholder="描述客户的主要诉求和症状..."
+                className="bg-slate-900/50 border-slate-600 text-white min-h-[100px]"
+              />
+            </div>
+            <div className="col-span-2 space-y-2">
+              <Label className="text-slate-300">既往病史</Label>
+              <Textarea
+                placeholder="过敏史、手术史等..."
+                className="bg-slate-900/50 border-slate-600 text-white min-h-[80px]"
+              />
+            </div>
+          </div>
+          <div className="mt-6 flex justify-end gap-3">
+            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent">
+              重置
+            </Button>
+            <Button className="bg-purple-600 hover:bg-purple-700">保存病历</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AuxiliaryGeneralPlan() {
+  return (
+    <div className="h-full p-6 overflow-auto">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+            <FileText className="w-6 h-6 text-purple-500" />
+            辅助通用方案库
+          </h2>
+          <Button className="bg-purple-600 hover:bg-purple-700">
+            <Plus className="w-4 h-4 mr-2" />
+            新建方案模板
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            { title: "全面部抗衰基础方案", type: "抗衰老", level: "基础版", author: "系统预设" },
+            { title: "敏感肌修复疗程", type: "皮肤管理", level: "进阶版", author: "李医生" },
+            { title: "祛斑美白综合方案", type: "美白嫩肤", level: "标准版", author: "系统预设" },
+            { title: "玻尿酸填充术后护理", type: "术后护理", level: "通用版", author: "王护士长" },
+            { title: "热玛吉+超声炮联合治疗", type: "联合治疗", level: "尊享版", author: "张主任" },
+            { title: "痤疮综合治理方案", type: "皮肤治疗", level: "标准版", author: "系统预设" },
+          ].map((plan, i) => (
+            <div
+              key={i}
+              className="bg-slate-800/50 border border-slate-700 rounded-xl p-5 hover:border-purple-500/50 transition-colors cursor-pointer group"
+            >
+              <div className="flex justify-between items-start mb-3">
+                <Badge variant="outline" className="border-purple-500/30 text-purple-400">
+                  {plan.type}
+                </Badge>
+                <MoreVertical className="w-4 h-4 text-slate-500 hover:text-white" />
+              </div>
+              <h3 className="text-lg font-medium text-white mb-2 group-hover:text-purple-400 transition-colors">
+                {plan.title}
+              </h3>
+              <div className="flex items-center gap-4 text-sm text-slate-400 mb-4">
+                <span className="flex items-center gap-1">
+                  <UserCog className="w-3 h-3" /> {plan.author}
+                </span>
+                <span className="flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" /> {plan.level}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="secondary" className="w-full bg-slate-700 hover:bg-slate-600 text-white">
+                  查看详情
+                </Button>
+                <Button size="sm" className="w-full bg-purple-600 hover:bg-purple-700">
+                  引用方案
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// --- Doctor Components ---
+
+function IntelligentRecommendation() {
+  return (
+    <div className="h-full p-6 overflow-auto">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="bg-gradient-to-r from-blue-900/40 to-slate-800/40 border border-blue-500/30 rounded-xl p-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-blue-600/20 rounded-lg">
+              <Sparkles className="w-8 h-8 text-blue-400" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-xl font-semibold text-white mb-2">AI 智能诊疗推荐</h2>
+              <p className="text-slate-300 mb-4">
+                基于客户 "张小美" 的面部特征分析与历史病历，系统为您生成以下诊疗建议。
+              </p>
+              <div className="flex gap-3">
+                <Badge className="bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 border-0">面部松弛</Badge>
+                <Badge className="bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 border-0">法令纹深</Badge>
+                <Badge className="bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 border-0">肤色暗沉</Badge>
+              </div>
+            </div>
+            <Button className="bg-blue-600 hover:bg-blue-700">重新分析</Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+            <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-green-500" />
+              推荐治疗方案 A (匹配度 95%)
+            </h3>
+            <div className="space-y-4">
+              <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700/50">
+                <div className="flex justify-between mb-2">
+                  <span className="text-white font-medium">热玛吉 FLX 全面部</span>
+                  <span className="text-blue-400">主推</span>
+                </div>
+                <p className="text-sm text-slate-400">针对中下面部松弛，提升轮廓线条，改善法令纹。</p>
+              </div>
+              <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700/50">
+                <div className="flex justify-between mb-2">
+                  <span className="text-white font-medium">超皮秒 全模式</span>
+                  <span className="text-blue-400">联合</span>
+                </div>
+                <p className="text-sm text-slate-400">改善肤色不均，提亮肤色，配合热玛吉效果更佳。</p>
+              </div>
+              <Button className="w-full bg-slate-700 hover:bg-slate-600 text-white">采用此方案并编辑</Button>
+            </div>
+          </div>
+
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+            <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-slate-500" />
+              推荐治疗方案 B (匹配度 88%)
+            </h3>
+            <div className="space-y-4">
+              <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700/50">
+                <div className="flex justify-between mb-2">
+                  <span className="text-white font-medium">超声炮 全面部+颈部</span>
+                  <span className="text-blue-400">替代</span>
+                </div>
+                <p className="text-sm text-slate-400">深层筋膜悬吊，痛感较低，适合对疼痛敏感的客户。</p>
+              </div>
+              <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700/50">
+                <div className="flex justify-between mb-2">
+                  <span className="text-white font-medium">英诺小棕瓶 导入</span>
+                  <span className="text-blue-400">辅助</span>
+                </div>
+                <p className="text-sm text-slate-400">美白淡斑，改善肌肤微循环。</p>
+              </div>
+              <Button className="w-full bg-slate-700 hover:bg-slate-600 text-white">采用此方案并编辑</Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function DoctorFormulatedPlan() {
+  return (
+    <div className="h-full p-6 overflow-auto">
+      <div className="max-w-5xl mx-auto bg-slate-800/50 border border-slate-700 rounded-xl flex flex-col h-[calc(100vh-140px)]">
+        <div className="p-6 border-b border-slate-700 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+              <FileSignature className="w-6 h-6 text-blue-500" />
+              医生定制治疗方案
+            </h2>
+            <p className="text-sm text-slate-400 mt-1">客户：张小美 | 编号：20251018001</p>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent">
+              <Download className="w-4 h-4 mr-2" />
+              导出PDF
+            </Button>
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <Send className="w-4 h-4 mr-2" />
+              发送给客户
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex-1 p-6 overflow-auto space-y-8">
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-white border-l-4 border-blue-500 pl-3">一、面部诊断</h3>
+            <Textarea
+              className="bg-slate-900/50 border-slate-600 text-white min-h-[100px]"
+              defaultValue="面部轮廓整体流畅，但中面部软组织轻度下垂，法令纹明显。下面部下颌缘线条欠清晰。肤色偏暗沉，T区毛孔粗大。皮肤屏障功能尚可。"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-white border-l-4 border-blue-500 pl-3">二、治疗建议</h3>
+            <div className="bg-slate-900/50 border border-slate-700 rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader className="bg-slate-800">
+                  <TableRow className="border-slate-700 hover:bg-slate-800">
+                    <TableHead className="text-slate-300">治疗项目</TableHead>
+                    <TableHead className="text-slate-300">治疗部位</TableHead>
+                    <TableHead className="text-slate-300">预期效果</TableHead>
+                    <TableHead className="text-slate-300 w-[100px]">操作</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow className="border-slate-700 hover:bg-slate-800/50">
+                    <TableCell className="text-white font-medium">热玛吉 FLX</TableCell>
+                    <TableCell className="text-slate-300">全面部（900发）</TableCell>
+                    <TableCell className="text-slate-300">紧致皮肤，提升轮廓，淡化法令纹</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon" className="text-slate-400 hover:text-red-400">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-slate-700 hover:bg-slate-800/50">
+                    <TableCell className="text-white font-medium">超皮秒</TableCell>
+                    <TableCell className="text-slate-300">全面部</TableCell>
+                    <TableCell className="text-slate-300">均匀肤色，细致毛孔</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon" className="text-slate-400 hover:text-red-400">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+              <div className="p-3 bg-slate-800/30 border-t border-slate-700 text-center">
+                <Button variant="ghost" className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20">
+                  <Plus className="w-4 h-4 mr-2" />
+                  添加治疗项目
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-white border-l-4 border-blue-500 pl-3">三、术后医嘱</h3>
+            <Textarea
+              className="bg-slate-900/50 border-slate-600 text-white min-h-[100px]"
+              defaultValue="1. 治疗后即刻可能出现轻微红肿，属正常现象，一般24小时内消退。
+2. 术后一周内加强补水保湿，每天敷医用面膜。
+3. 严格防晒，避免暴晒。
+4. 一周内避免桑拿、温泉等高温环境。"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// 智能服务群聊界面 (Modified to accept role prop)
+function ChatInterface({
+  selectedCustomer,
+  onSelectCustomer,
+  messageInput,
+  setMessageInput,
+  role = "consultant",
+}: any) {
   const [filterStage, setFilterStage] = useState("全部")
   const [aiDraft, setAiDraft] = useState({
     show: true,
