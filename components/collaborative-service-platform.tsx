@@ -17,12 +17,7 @@ import {
   Clock,
   CheckCircle,
   ArrowLeft,
-  UserCircle2,
-  Stethoscope,
-  Mic,
-  ImageIcon,
-  FileUp,
-  X,
+  Users,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -44,1080 +39,145 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select, // <-- Added Select component
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface CollaborativeServicePlatformProps {
   onBack: () => void
 }
 
 export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePlatformProps) {
-  const [currentRole, setCurrentRole] = useState<"咨询师" | "医生">("咨询师")
+  const [role, setRole] = useState<"咨询师" | "医生">("咨询师")
+  const [activeTab, setActiveTab] = useState("chat")
+  const [selectedCustomer, setSelectedCustomer] = useState("张小美")
+  const [messageInput, setMessageInput] = useState("")
+  const [showNewQADialog, setShowNewQADialog] = useState(false)
+  const [showUploadDialog, setShowUploadDialog] = useState(false)
+
+  const getAvailableTabs = () => {
+    if (role === "咨询师") {
+      return ["chat", "kanban", "knowledge"]
+    } else {
+      return ["chat", "kanban"]
+    }
+  }
+
+  const handleRoleChange = (newRole: "咨询师" | "医生") => {
+    setRole(newRole)
+    const availableTabs = newRole === "咨询师" ? ["chat", "kanban", "knowledge"] : ["chat", "kanban"]
+    if (!availableTabs.includes(activeTab)) {
+      setActiveTab("chat")
+    }
+  }
 
   return (
     <div className="fixed inset-0 left-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+      {/* 顶部导航栏 */}
       <div className="h-16 bg-slate-800/50 backdrop-blur-sm border-b border-slate-700/50 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack} className="hover:bg-slate-700 text-slate-200">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-600/10 rounded-lg">
-              <FileText className="w-6 h-6 text-blue-400" />
-            </div>
-            <div>
-              <h1 className="text-xl font-semibold text-white">咨询师&医生协作平台</h1>
-              <p className="text-sm text-slate-400">专业医疗协作 · 智能辅助决策</p>
-            </div>
+          <div>
+            {/* Updated title to reflect role collaboration */}
+            <h1 className="text-xl font-semibold text-white">咨询师&医生协作平台</h1>
+            {/* Updated subtitle */}
+            <p className="text-sm text-slate-400">智能协作 · 高效服务</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-sm text-slate-400">当前角色：</span>
-          <Select value={currentRole} onValueChange={(value: "咨询师" | "医生") => setCurrentRole(value)}>
-            <SelectTrigger className="w-[150px] bg-slate-700/50 border-slate-600 text-white hover:bg-slate-700">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-slate-800 border-slate-700">
-              <SelectItem value="咨询师" className="text-white hover:bg-slate-700 cursor-pointer">
-                <div className="flex items-center gap-2">
-                  <UserCircle2 className="w-4 h-4 text-blue-400" />
-                  <span>咨询师</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="医生" className="text-white hover:bg-slate-700 cursor-pointer">
-                <div className="flex items-center gap-2">
-                  <Stethoscope className="w-4 h-4 text-green-400" />
-                  <span>医生</span>
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-hidden">
-        <RoleBasedContent role={currentRole} />
-      </div>
-    </div>
-  )
-}
-
-function RoleBasedContent({ role }: { role: "咨询师" | "医生" }) {
-  const [activeTab, setActiveTab] = useState(role === "咨询师" ? "quick-record" : "smart-recommend")
-
-  useState(() => {
-    setActiveTab(role === "咨询师" ? "quick-record" : "smart-recommend")
-  })
-
-  if (role === "咨询师") {
-    return (
-      <div className="h-full flex flex-col">
-        <div className="h-14 bg-slate-800/30 border-b border-slate-700/50 flex items-center justify-center gap-2 px-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setActiveTab("quick-record")}
-            className={
-              activeTab === "quick-record"
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
-            }
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            快速病历
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setActiveTab("communication")}
-            className={
-              activeTab === "communication"
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
-            }
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            资讯沟通纪要
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setActiveTab("general-plan")}
-            className={
-              activeTab === "general-plan"
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
-            }
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            辅助通用方案
-          </Button>
-        </div>
-
-        <div className="flex-1 overflow-auto">
-          {activeTab === "quick-record" && <QuickRecordModule />}
-          {activeTab === "communication" && <CommunicationModule />}
-          {activeTab === "general-plan" && <GeneralPlanModule />}
-        </div>
-      </div>
-    )
-  } else {
-    return (
-      <div className="h-full flex flex-col">
-        <div className="h-14 bg-slate-800/30 border-b border-slate-700/50 flex items-center justify-center gap-2 px-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setActiveTab("smart-recommend")}
-            className={
-              activeTab === "smart-recommend"
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
-            }
-          >
-            <AlertCircle className="w-4 h-4 mr-2" />
-            智能推荐
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setActiveTab("doctor-plan")}
-            className={
-              activeTab === "doctor-plan"
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
-            }
-          >
-            <Stethoscope className="w-4 h-4 mr-2" />
-            医生制定方案
-          </Button>
-        </div>
-
-        <div className="flex-1 overflow-auto">
-          {activeTab === "smart-recommend" && <SmartRecommendModule />}
-          {activeTab === "doctor-plan" && <DoctorPlanModule />}
-        </div>
-      </div>
-    )
-  }
-}
-
-// 咨询师模块 1: 快速病历
-function QuickRecordModule() {
-  const [selectedPatient, setSelectedPatient] = useState<string | null>(null)
-  const [recordForm, setRecordForm] = useState({
-    name: "",
-    age: "",
-    gender: "女",
-    phone: "",
-    concerns: "",
-    medicalHistory: "",
-    allergies: "",
-    skinType: "",
-    expectations: "",
-  })
-
-  const patients = [
-    { name: "刘小姐", project: "玻尿酸咨询", lastVisit: "2025-09-25" },
-    { name: "陈女士", project: "热玛吉方案确认", lastVisit: "2025-09-26" },
-    { name: "赵美丽", project: "光子嫩肤咨询", lastVisit: "2025-09-24" },
-  ]
-
-  return (
-    <div className="h-full flex">
-      {/* 客户列表 */}
-      <div className="w-80 bg-slate-800/30 border-r border-slate-700/50 p-4">
-        <div className="mb-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input
-              placeholder="搜索客户..."
-              className="pl-9 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
-            />
+          <div className="flex items-center gap-2 bg-slate-700/50 px-3 py-2 rounded-lg">
+            <Users className="w-4 h-4 text-slate-400" />
+            <span className="text-sm text-slate-300">当前角色：</span>
+            <Select value={role} onValueChange={(value: "咨询师" | "医生") => handleRoleChange(value)}>
+              <SelectTrigger className="w-28 h-8 bg-slate-600/50 border-slate-500 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-800 border-slate-700">
+                <SelectItem value="咨询师" className="text-white hover:bg-slate-700">
+                  咨询师
+                </SelectItem>
+                <SelectItem value="医生" className="text-white hover:bg-slate-700">
+                  医生
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
-        <ScrollArea className="h-[calc(100%-60px)]">
-          <div className="space-y-2">
-            {patients.map((patient) => (
-              <div
-                key={patient.name}
-                onClick={() => setSelectedPatient(patient.name)}
-                className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                  selectedPatient === patient.name
-                    ? "bg-blue-600/20 border border-blue-500/50"
-                    : "bg-slate-700/30 hover:bg-slate-700/50"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <Avatar className="w-10 h-10 bg-blue-600">
-                    <AvatarFallback className="text-white">{patient.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-white truncate">{patient.name}</h4>
-                    <p className="text-sm text-slate-400 truncate">{patient.project}</p>
-                    <p className="text-xs text-slate-500 mt-1">最后访问：{patient.lastVisit}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
 
-      {/* 病历表单 */}
-      <div className="flex-1 bg-slate-900/30 overflow-auto">
-        <div className="max-w-3xl mx-auto p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-white">快速病历录入</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent">
-                <Upload className="w-4 h-4 mr-2" />
-                导入历史记录
-              </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                <CheckCircle className="w-4 h-4 mr-2" />
-                保存病历
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-6 bg-slate-800/30 rounded-lg p-6 border border-slate-700/50">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-slate-300">姓名 *</Label>
-                <Input
-                  value={recordForm.name}
-                  onChange={(e) => setRecordForm({ ...recordForm, name: e.target.value })}
-                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white"
-                  placeholder="请输入姓名"
-                />
-              </div>
-              <div>
-                <Label className="text-slate-300">年龄</Label>
-                <Input
-                  value={recordForm.age}
-                  onChange={(e) => setRecordForm({ ...recordForm, age: e.target.value })}
-                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white"
-                  placeholder="请输入年龄"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-slate-300">性别</Label>
-                <Select
-                  value={recordForm.gender}
-                  onValueChange={(value) => setRecordForm({ ...recordForm, gender: value })}
-                >
-                  <SelectTrigger className="mt-1.5 bg-slate-700/50 border-slate-600 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700">
-                    <SelectItem value="女" className="text-white">
-                      女
-                    </SelectItem>
-                    <SelectItem value="男" className="text-white">
-                      男
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-slate-300">联系电话</Label>
-                <Input
-                  value={recordForm.phone}
-                  onChange={(e) => setRecordForm({ ...recordForm, phone: e.target.value })}
-                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white"
-                  placeholder="请输入联系电话"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-slate-300">主要诉求 *</Label>
-              <Textarea
-                value={recordForm.concerns}
-                onChange={(e) => setRecordForm({ ...recordForm, concerns: e.target.value })}
-                className="mt-1.5 bg-slate-700/50 border-slate-600 text-white min-h-[100px]"
-                placeholder="请描述客户的主要诉求和期望..."
-              />
-            </div>
-
-            <div>
-              <Label className="text-slate-300">既往病史</Label>
-              <Textarea
-                value={recordForm.medicalHistory}
-                onChange={(e) => setRecordForm({ ...recordForm, medicalHistory: e.target.value })}
-                className="mt-1.5 bg-slate-700/50 border-slate-600 text-white min-h-[80px]"
-                placeholder="请填写相关病史..."
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-slate-300">过敏史</Label>
-                <Input
-                  value={recordForm.allergies}
-                  onChange={(e) => setRecordForm({ ...recordForm, allergies: e.target.value })}
-                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white"
-                  placeholder="如：青霉素过敏"
-                />
-              </div>
-              <div>
-                <Label className="text-slate-300">肤质类型</Label>
-                <Select
-                  value={recordForm.skinType}
-                  onValueChange={(value) => setRecordForm({ ...recordForm, skinType: value })}
-                >
-                  <SelectTrigger className="mt-1.5 bg-slate-700/50 border-slate-600 text-white">
-                    <SelectValue placeholder="请选择肤质" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700">
-                    <SelectItem value="干性" className="text-white">
-                      干性
-                    </SelectItem>
-                    <SelectItem value="油性" className="text-white">
-                      油性
-                    </SelectItem>
-                    <SelectItem value="混合性" className="text-white">
-                      混合性
-                    </SelectItem>
-                    <SelectItem value="敏感性" className="text-white">
-                      敏感性
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-slate-300">预期效果</Label>
-              <Textarea
-                value={recordForm.expectations}
-                onChange={(e) => setRecordForm({ ...recordForm, expectations: e.target.value })}
-                className="mt-1.5 bg-slate-700/50 border-slate-600 text-white min-h-[80px]"
-                placeholder="客户期望达到的效果..."
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// 咨询师模块 2: 资讯沟通纪要
-function CommunicationModule() {
-  const [communications, setCommunications] = useState([
-    {
-      id: 1,
-      customer: "刘小姐",
-      date: "2025-09-25",
-      type: "电话沟通",
-      summary: "讨论玻尿酸填充方案，客户对价格比较敏感，需要进一步沟通优惠方案",
-      nextStep: "准备优惠方案，3天内回访",
-    },
-    {
-      id: 2,
-      customer: "陈女士",
-      date: "2025-09-26",
-      type: "面诊",
-      summary: "客户对热玛吉效果很感兴趣，已完成面部评估，准备制定详细方案",
-      nextStep: "联系医生制定方案，明天提供给客户",
-    },
-  ])
-
-  const [showNewDialog, setShowNewDialog] = useState(false)
-  const [newComm, setNewComm] = useState({
-    customer: "",
-    type: "电话沟通",
-    summary: "",
-    nextStep: "",
-  })
-
-  const handleAddCommunication = () => {
-    if (newComm.customer && newComm.summary) {
-      setCommunications([
-        ...communications,
-        {
-          id: communications.length + 1,
-          ...newComm,
-          date: new Date().toISOString().split("T")[0],
-        },
-      ])
-      setNewComm({ customer: "", type: "电话沟通", summary: "", nextStep: "" })
-      setShowNewDialog(false)
-    }
-  }
-
-  return (
-    <div className="h-full bg-slate-900/30 overflow-auto">
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold text-white">资讯沟通纪要</h2>
-          <Button onClick={() => setShowNewDialog(true)} className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="w-4 h-4 mr-2" />
-            新建纪要
+        <div className="absolute left-1/2 -translate-x-1/2 flex gap-2">
+          <Button
+            variant={activeTab === "chat" ? "default" : "ghost"}
+            onClick={() => setActiveTab("chat")}
+            className={
+              activeTab === "chat"
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
+            }
+          >
+            智能服务群聊
           </Button>
-        </div>
-
-        <div className="space-y-4">
-          {communications.map((comm) => (
-            <div
-              key={comm.id}
-              className="bg-slate-800/30 rounded-lg p-5 border border-slate-700/50 hover:border-slate-600/50 transition-colors"
+          <Button
+            variant={activeTab === "kanban" ? "default" : "ghost"}
+            onClick={() => setActiveTab("kanban")}
+            className={
+              activeTab === "kanban"
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "text-slate-300 hover:text-white hover:bg-slate-700/50"
+            }
+          >
+            客户旅程看板
+          </Button>
+          {role === "咨询师" && (
+            <Button
+              variant={activeTab === "knowledge" ? "default" : "ghost"}
+              onClick={() => setActiveTab("knowledge")}
+              className={
+                activeTab === "knowledge"
+                  ? "bg-blue-600 hover:bg-blue-700"
+                  : "text-slate-300 hover:text-white hover:bg-slate-700/50"
+              }
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <Avatar className="w-10 h-10 bg-blue-600">
-                    <AvatarFallback className="text-white">{comm.customer[0]}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-medium text-white">{comm.customer}</h3>
-                    <p className="text-sm text-slate-400">
-                      {comm.date} · {comm.type}
-                    </p>
-                  </div>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-slate-800 border-slate-700">
-                    <DropdownMenuItem className="text-white hover:bg-slate-700">
-                      <Edit3 className="w-4 h-4 mr-2" />
-                      编辑
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-400 hover:bg-slate-700">
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      删除
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <div className="space-y-3">
-                <div className="bg-slate-700/30 rounded p-3">
-                  <span className="text-xs text-slate-400 uppercase tracking-wide">沟通摘要</span>
-                  <p className="text-white mt-1">{comm.summary}</p>
-                </div>
-                <div className="bg-blue-600/10 rounded p-3 border border-blue-500/20">
-                  <span className="text-xs text-blue-400 uppercase tracking-wide">下一步行动</span>
-                  <p className="text-blue-300 mt-1 font-medium">{comm.nextStep}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* 新建纪要对话框 */}
-        <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
-          <DialogContent className="bg-slate-800 border-2 border-slate-700 text-white max-w-2xl shadow-2xl backdrop-blur-xl">
-            <DialogHeader>
-              <DialogTitle className="text-xl">新建沟通纪要</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 mt-4">
-              <div>
-                <Label className="text-slate-300">客户姓名</Label>
-                <Input
-                  value={newComm.customer}
-                  onChange={(e) => setNewComm({ ...newComm, customer: e.target.value })}
-                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white"
-                  placeholder="请输入客户姓名"
-                />
-              </div>
-              <div>
-                <Label className="text-slate-300">沟通方式</Label>
-                <Select value={newComm.type} onValueChange={(value) => setNewComm({ ...newComm, type: value })}>
-                  <SelectTrigger className="mt-1.5 bg-slate-700/50 border-slate-600 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700">
-                    <SelectItem value="电话沟通" className="text-white">
-                      电话沟通
-                    </SelectItem>
-                    <SelectItem value="面诊" className="text-white">
-                      面诊
-                    </SelectItem>
-                    <SelectItem value="微信沟通" className="text-white">
-                      微信沟通
-                    </SelectItem>
-                    <SelectItem value="其他" className="text-white">
-                      其他
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-slate-300">沟通摘要</Label>
-                <Textarea
-                  value={newComm.summary}
-                  onChange={(e) => setNewComm({ ...newComm, summary: e.target.value })}
-                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white min-h-[100px]"
-                  placeholder="请输入沟通内容摘要..."
-                />
-              </div>
-              <div>
-                <Label className="text-slate-300">下一步行动</Label>
-                <Textarea
-                  value={newComm.nextStep}
-                  onChange={(e) => setNewComm({ ...newComm, nextStep: e.target.value })}
-                  className="mt-1.5 bg-slate-700/50 border-slate-600 text-white min-h-[80px]"
-                  placeholder="请输入下一步需要采取的行动..."
-                />
-              </div>
-            </div>
-            <DialogFooter className="mt-6">
-              <Button
-                variant="outline"
-                onClick={() => setShowNewDialog(false)}
-                className="border-slate-600 text-slate-300 hover:bg-slate-700"
-              >
-                取消
-              </Button>
-              <Button onClick={handleAddCommunication} className="bg-blue-600 hover:bg-blue-700">
-                确定
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
-    </div>
-  )
-}
-
-// 咨询师模块 3: 辅助通用方案
-function GeneralPlanModule() {
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
-
-  const generalPlans = [
-    {
-      id: "plan1",
-      name: "抗衰老基础方案",
-      category: "抗衰",
-      items: ["热玛吉", "光子嫩肤", "玻尿酸填充"],
-      price: "¥18,800",
-      duration: "3-6个月",
-      description: "适合初期抗衰需求的客户，综合改善面部轮廓和肤质",
-    },
-    {
-      id: "plan2",
-      name: "美白提亮套餐",
-      category: "美白",
-      items: ["激光美白", "水光针", "维C导入"],
-      price: "¥12,600",
-      duration: "2-3个月",
-      description: "针对色素沉着，提亮肤色，改善暗沉",
-    },
-    {
-      id: "plan3",
-      name: "祛痘修复方案",
-      category: "祛痘",
-      items: ["果酸焕肤", "红蓝光治疗", "修复面膜"],
-      price: "¥8,900",
-      duration: "1-2个月",
-      description: "控油祛痘，修复痘印，改善痘肌",
-    },
-  ]
-
-  const filteredPlans = generalPlans.filter(
-    (plan) =>
-      plan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      plan.category.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
-
-  return (
-    <div className="h-full bg-slate-900/30 overflow-auto">
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold text-white">辅助通用方案</h2>
-          <div className="flex gap-3">
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <Input
-                placeholder="搜索方案..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 bg-slate-700/50 border-slate-600 text-white"
-              />
-            </div>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
-              创建方案
+              知识库管理
             </Button>
-          </div>
+          )}
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredPlans.map((plan) => (
-            <div
-              key={plan.id}
-              onClick={() => setSelectedPlan(plan.id)}
-              className={`bg-slate-800/30 rounded-lg p-5 border cursor-pointer transition-all hover:shadow-lg ${
-                selectedPlan === plan.id
-                  ? "border-blue-500/50 shadow-blue-500/20"
-                  : "border-slate-700/50 hover:border-slate-600/50"
-              }`}
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <Badge className="bg-blue-600/20 text-blue-400 border-blue-500/30 mb-2">{plan.category}</Badge>
-                  <h3 className="text-lg font-semibold text-white">{plan.name}</h3>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-slate-800 border-slate-700">
-                    <DropdownMenuItem className="text-white hover:bg-slate-700">
-                      <Edit3 className="w-4 h-4 mr-2" />
-                      编辑
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-white hover:bg-slate-700">
-                      <Download className="w-4 h-4 mr-2" />
-                      导出
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-400 hover:bg-slate-700">
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      删除
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
-              <p className="text-sm text-slate-400 mb-4">{plan.description}</p>
-
-              <div className="space-y-3 mb-4">
-                <div className="bg-slate-700/30 rounded p-2">
-                  <div className="text-xs text-slate-400 mb-1">包含项目</div>
-                  <div className="flex flex-wrap gap-1">
-                    {plan.items.map((item, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs border-slate-600 text-slate-300">
-                        {item}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex justify-between text-sm">
-                  <div>
-                    <div className="text-slate-400">参考价格</div>
-                    <div className="text-blue-400 font-semibold">{plan.price}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-slate-400">周期</div>
-                    <div className="text-white font-medium">{plan.duration}</div>
-                  </div>
-                </div>
-              </div>
-
-              <Button className="w-full bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 border border-blue-500/30">
-                应用此方案
-              </Button>
-            </div>
-          ))}
-        </div>
+      {/* 主内容区域 */}
+      <div className="flex-1 overflow-hidden">
+        {activeTab === "chat" && (
+          <ChatInterface
+            selectedCustomer={selectedCustomer}
+            onSelectCustomer={setSelectedCustomer}
+            messageInput={messageInput}
+            setMessageInput={setMessageInput}
+            role={role} // <-- Pass role to ChatInterface
+          />
+        )}
+        {activeTab === "kanban" && <KanbanBoard role={role} />} {/* <-- Pass role to KanbanBoard */}
+        {activeTab === "knowledge" && role === "咨询师" && (
+          <KnowledgeCenter
+            showNewQADialog={showNewQADialog}
+            setShowNewQADialog={setShowNewQADialog}
+            showUploadDialog={showUploadDialog}
+            setShowUploadDialog={setShowUploadDialog}
+          />
+        )}
       </div>
     </div>
   )
 }
 
-// 医生模块 1: 智能推荐
-function SmartRecommendModule() {
-  const [selectedPatient, setSelectedPatient] = useState("张小美")
-
-  const patientData = {
-    name: "张小美",
-    age: 28,
-    gender: "女",
-    skinType: "混合性",
-    concerns: ["面部松弛", "法令纹", "皮肤暗沉"],
-    budget: "20000-30000",
-  }
-
-  const recommendations = [
-    {
-      id: 1,
-      treatment: "热玛吉FLX",
-      priority: "高",
-      reason: "针对面部松弛效果显著，适合客户年龄和需求",
-      price: "¥18,800",
-      duration: "60-90分钟",
-      recovery: "无恢复期",
-      effect: "持续12-18个月",
-      confidence: 95,
-    },
-    {
-      id: 2,
-      treatment: "玻尿酸填充",
-      priority: "高",
-      reason: "改善法令纹，立即见效，安全性高",
-      price: "¥8,600",
-      duration: "30-45分钟",
-      recovery: "1-2天",
-      effect: "持续8-12个月",
-      confidence: 92,
-    },
-    {
-      id: 3,
-      treatment: "光子嫩肤",
-      priority: "中",
-      reason: "改善肤色暗沉，提亮肤色",
-      price: "¥3,200",
-      duration: "30分钟",
-      recovery: "3-5天",
-      effect: "持续6-9个月",
-      confidence: 88,
-    },
-  ]
-
-  return (
-    <div className="h-full bg-slate-900/30 overflow-auto">
-      <div className="max-w-7xl mx-auto p-6">
-        <h2 className="text-2xl font-semibold text-white mb-6">智能推荐系统</h2>
-
-        <div className="grid grid-cols-3 gap-6">
-          {/* 患者信息 */}
-          <div className="col-span-1 bg-slate-800/30 rounded-lg p-5 border border-slate-700/50 h-fit">
-            <h3 className="text-lg font-semibold text-white mb-4">患者信息</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <Avatar className="w-12 h-12 bg-blue-600">
-                  <AvatarFallback className="text-white text-lg">{patientData.name[0]}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="font-medium text-white">{patientData.name}</div>
-                  <div className="text-sm text-slate-400">
-                    {patientData.age}岁 · {patientData.gender}
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-slate-700/50 space-y-2">
-                <div>
-                  <div className="text-xs text-slate-400">肤质类型</div>
-                  <div className="text-white">{patientData.skinType}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-slate-400">预算范围</div>
-                  <div className="text-white">{patientData.budget}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-slate-400">主要诉求</div>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {patientData.concerns.map((concern, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs border-slate-600 text-slate-300">
-                        {concern}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 推荐方案 */}
-          <div className="col-span-2 space-y-4">
-            {recommendations.map((rec) => (
-              <div
-                key={rec.id}
-                className="bg-slate-800/30 rounded-lg p-5 border border-slate-700/50 hover:border-slate-600/50 transition-colors"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center">
-                      <span className="text-blue-400 font-semibold">{rec.id}</span>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-white">{rec.treatment}</h3>
-                      <p className="text-sm text-slate-400">{rec.reason}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      className={
-                        rec.priority === "高"
-                          ? "bg-red-600/20 text-red-400 border-red-500/30"
-                          : "bg-yellow-600/20 text-yellow-400 border-yellow-500/30"
-                      }
-                    >
-                      {rec.priority}优先级
-                    </Badge>
-                    <div className="text-right">
-                      <div className="text-xs text-slate-400">推荐度</div>
-                      <div className="text-lg font-semibold text-blue-400">{rec.confidence}%</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-4 gap-4 mb-4">
-                  <div className="bg-slate-700/30 rounded p-3">
-                    <div className="text-xs text-slate-400 mb-1">参考价格</div>
-                    <div className="text-white font-semibold">{rec.price}</div>
-                  </div>
-                  <div className="bg-slate-700/30 rounded p-3">
-                    <div className="text-xs text-slate-400 mb-1">治疗时长</div>
-                    <div className="text-white font-medium">{rec.duration}</div>
-                  </div>
-                  <div className="bg-slate-700/30 rounded p-3">
-                    <div className="text-xs text-slate-400 mb-1">恢复期</div>
-                    <div className="text-white font-medium">{rec.recovery}</div>
-                  </div>
-                  <div className="bg-slate-700/30 rounded p-3">
-                    <div className="text-xs text-slate-400 mb-1">效果持续</div>
-                    <div className="text-white font-medium">{rec.effect}</div>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    采纳方案
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent"
-                  >
-                    查看详情
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// 医生模块 2: 医生制定方案
-function DoctorPlanModule() {
-  const [ageGroup, setAgeGroup] = useState("18-25")
-  const [gender, setGender] = useState("女")
-  const [skinTypes, setSkinTypes] = useState<string[]>([])
-  const [uploadedImages, setUploadedImages] = useState<string[]>([])
-  const [uploadedAudio, setUploadedAudio] = useState<string | null>(null)
-  const [phases, setPhases] = useState([
-    { id: 1, name: "家居皮肤调理", items: [] },
-    { id: 2, name: "院线光电治疗", items: [] },
-    { id: 3, name: "巩固保养", items: [] },
-  ])
-
-  const toggleSkinType = (type: string) => {
-    setSkinTypes((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]))
-  }
-
-  return (
-    <div className="h-full flex">
-      {/* 左侧：客户信息录入 */}
-      <div className="w-[360px] bg-slate-800/30 border-r border-slate-700/50 flex flex-col">
-        <div className="p-4 border-b border-slate-700/50">
-          <h3 className="font-semibold text-white">客户信息录入</h3>
-        </div>
-
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-6">
-            {/* 基本信息 */}
-            <div>
-              <h4 className="text-sm font-medium text-white mb-3">基本信息</h4>
-
-              <div className="mb-4">
-                <Label className="text-slate-300 text-sm">年龄</Label>
-                <div className="grid grid-cols-2 gap-2 mt-2">
-                  {["18-25", "26-35", "36-45", "46+"].map((age) => (
-                    <Button
-                      key={age}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setAgeGroup(age)}
-                      className={
-                        ageGroup === age
-                          ? "bg-blue-600 border-blue-500 text-white hover:bg-blue-700"
-                          : "border-slate-600 text-slate-300 hover:bg-slate-700"
-                      }
-                    >
-                      {age}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-slate-300 text-sm">性别</Label>
-                <div className="grid grid-cols-3 gap-2 mt-2">
-                  {["女", "男", "其他"].map((g) => (
-                    <Button
-                      key={g}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setGender(g)}
-                      className={
-                        gender === g
-                          ? "bg-blue-600 border-blue-500 text-white hover:bg-blue-700"
-                          : "border-slate-600 text-slate-300 hover:bg-slate-700"
-                      }
-                    >
-                      {g}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* 肤质 */}
-            <div>
-              <Label className="text-slate-300 text-sm">肤质</Label>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {["干性", "油性", "混合性", "敏感性"].map((type) => (
-                  <Button
-                    key={type}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => toggleSkinType(type)}
-                    className={
-                      skinTypes.includes(type)
-                        ? "bg-blue-600 border-blue-500 text-white hover:bg-blue-700"
-                        : "border-slate-600 text-slate-300 hover:bg-slate-700"
-                    }
-                  >
-                    {type}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {/* 资料上传 */}
-            <div>
-              <h4 className="text-sm font-medium text-white mb-3">资料上传</h4>
-
-              {/* 微信聊天截图 */}
-              <div className="mb-4">
-                <Label className="text-slate-300 text-sm">微信聊天截图</Label>
-                <div className="mt-2 border-2 border-dashed border-slate-600 rounded-lg p-4 text-center hover:border-slate-500 transition-colors cursor-pointer bg-slate-700/20">
-                  <ImageIcon className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-400 mb-1">点击或拖拽上传图</p>
-                  <p className="text-xs text-slate-500">支持 PNG, JPG 格式</p>
-                </div>
-                {uploadedImages.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    {uploadedImages.map((img, idx) => (
-                      <div key={idx} className="flex items-center gap-2 bg-slate-700/30 rounded p-2">
-                        <ImageIcon className="w-4 h-4 text-slate-400" />
-                        <span className="text-xs text-slate-300 flex-1">图片 {idx + 1}</span>
-                        <Button variant="ghost" size="icon" className="h-6 w-6">
-                          <X className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* 咨询录音 */}
-              <div>
-                <Label className="text-slate-300 text-sm">咨询录音</Label>
-                <div className="mt-2 border-2 border-dashed border-slate-600 rounded-lg p-4 text-center hover:border-slate-500 transition-colors cursor-pointer bg-slate-700/20">
-                  <Mic className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-400 mb-1">点击上传录音文件</p>
-                  <p className="text-xs text-slate-500">支持 MP3, WAV, M4A 格式</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ScrollArea>
-      </div>
-
-      {/* 右侧：治疗方案构建 */}
-      <div className="flex-1 bg-slate-900/30 flex flex-col">
-        <div className="p-6 border-b border-slate-700/50">
-          <h2 className="text-2xl font-semibold text-white">治疗方案构建</h2>
-        </div>
-
-        <ScrollArea className="flex-1 p-6">
-          <div className="max-w-4xl mx-auto space-y-6">
-            {phases.map((phase, index) => (
-              <div key={phase.id} className="bg-slate-800/30 rounded-lg p-5 border border-slate-700/50">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
-                        index === 0
-                          ? "bg-blue-600/20 text-blue-400"
-                          : index === 1
-                            ? "bg-purple-600/20 text-purple-400"
-                            : "bg-green-600/20 text-green-400"
-                      }`}
-                    >
-                      {phase.id}
-                    </div>
-                    <h3 className="text-lg font-semibold text-white">
-                      第{["一", "二", "三"][index]}阶段：{phase.name}
-                    </h3>
-                  </div>
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                    <Plus className="w-4 h-4 mr-1" />
-                    添加项目
-                  </Button>
-                </div>
-
-                {phase.items.length === 0 ? (
-                  <div className="text-center py-8 text-slate-400">
-                    <FileUp className="w-12 h-12 mx-auto mb-2 opacity-40" />
-                    <p>暂无项目，点击上方按钮添加</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {phase.items.map((item: any, idx: number) => (
-                      <div key={idx} className="bg-slate-700/30 rounded p-3 flex items-center justify-between">
-                        <span className="text-white">{item}</span>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {/* 方案总计 */}
-            <div className="bg-slate-800/30 rounded-lg p-5 border border-blue-500/30">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-white">方案总计</h3>
-                <div className="text-right">
-                  <div className="text-sm text-slate-400">预估总价</div>
-                  <div className="text-3xl font-bold text-blue-400">¥0</div>
-                </div>
-              </div>
-            </div>
-
-            {/* 操作按钮 */}
-            <div className="flex gap-3">
-              <Button className="flex-1 bg-blue-600 hover:bg-blue-700 h-12">
-                <FileText className="w-5 h-5 mr-2" />
-                保存方案
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700 h-12 bg-transparent"
-              >
-                <Download className="w-5 h-5 mr-2" />
-                生成方案书
-              </Button>
-            </div>
-          </div>
-        </ScrollArea>
-      </div>
-    </div>
-  )
-}
-
-function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMessageInput }: any) {
+// 智能服务群聊界面
+// Added 'role' prop to ChatInterface
+function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMessageInput, role }: any) {
   const [filterStage, setFilterStage] = useState("全部")
   const [aiDraft, setAiDraft] = useState({
     show: true,
@@ -1214,8 +274,36 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
     },
   ]
 
-  // 根据筛选条件过滤客户
-  const customers = filterStage === "全部" ? allCustomers : allCustomers.filter((c) => c.stageFilter === filterStage)
+  const getFilteredCustomers = () => {
+    let filtered = allCustomers
+
+    // 咨询师只能看售前客户
+    if (role === "咨询师") {
+      filtered = filtered.filter((c) => c.stageFilter === "售前")
+    }
+    // 医生能看术前和术后客户
+    else if (role === "医生") {
+      filtered = filtered.filter((c) => c.stageFilter === "术前" || c.stageFilter === "术后")
+    }
+
+    // Apply stage filter
+    if (filterStage !== "全部") {
+      filtered = filtered.filter((c) => c.stageFilter === filterStage)
+    }
+
+    return filtered
+  }
+
+  const customers = getFilteredCustomers()
+
+  const getStageFilters = () => {
+    if (role === "咨询师") {
+      return ["全部", "售前"]
+    } else if (role === "医生") {
+      return ["全部", "术前", "术后"]
+    }
+    return ["全部", "售前", "术前", "术后"]
+  }
 
   const messages = [
     {
@@ -1291,8 +379,8 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
               className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
             />
           </div>
-          <div className="flex gap-2">
-            {["全部", "售前", "术前", "术后"].map((stage) => (
+          <div className="flex gap-2 flex-wrap">
+            {getStageFilters().map((stage) => (
               <Button
                 key={stage}
                 variant={filterStage === stage ? "default" : "outline"}
@@ -1480,8 +568,7 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
                       <li>• 避免高温环境，如桑拿、温泉</li>
                       <li>• 加强保湿，使用温和护肤产品</li>
                       <li>• 避免刺激性、美白、去角质产品</li>
-                      <li>• 仪器清洁，避免辛辣刺激食物</li>
-                      <li>• 让顾客因熟悉而安得来，打消顾客怕来的不安</li>
+                      <li>• 清淡饮食，避免辛辣刺激食物</li> {/* <-- Updated this line */}
                     </ul>
                   </div>
                 </div>
@@ -1495,7 +582,8 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
 }
 
 // 客户旅程看板
-function KanbanBoard() {
+// Added 'role' prop to KanbanBoard
+function KanbanBoard({ role }: { role: "咨询师" | "医生" }) {
   const [draggedCard, setDraggedCard] = useState<any>(null)
   const [dragOverStage, setDragOverStage] = useState<string | null>(null)
   const [showAutomationPreview, setShowAutomationPreview] = useState(false)
@@ -1503,14 +591,23 @@ function KanbanBoard() {
   const [showAutomationResult, setShowAutomationResult] = useState(false)
   const [executedActions, setExecutedActions] = useState<string[]>([])
 
-  const stages = [
-    { id: "new", name: "新线索", count: 3, color: "bg-blue-600" },
-    { id: "filing", name: "待建档", count: 1, color: "bg-purple-600" },
-    { id: "planning", name: "方案确认中", count: 1, color: "bg-yellow-600" },
-    { id: "scheduled", name: "已预约", count: 3, color: "bg-green-600" },
-    { id: "followup", name: "术后跟踪", count: 2, color: "bg-orange-600" },
-    { id: "completed", name: "服务完成", count: 1, color: "bg-slate-600" },
-  ]
+  const getAllStages = () => {
+    if (role === "咨询师") {
+      return [
+        { id: "new", name: "新线索", count: 3, color: "bg-blue-600" },
+        { id: "filing", name: "待建档", count: 1, color: "bg-purple-600" },
+        { id: "planning", name: "方案确认中", count: 1, color: "bg-yellow-600" },
+      ]
+    } else {
+      return [
+        { id: "scheduled", name: "已预约", count: 3, color: "bg-green-600" },
+        { id: "followup", name: "术后跟踪", count: 2, color: "bg-orange-600" },
+        { id: "completed", name: "服务完成", count: 1, color: "bg-slate-600" },
+      ]
+    }
+  }
+
+  const stages = getAllStages()
 
   // 与智能服务群聊对应的客户数据
   const [customers, setCustomers] = useState([
@@ -1566,28 +663,29 @@ function KanbanBoard() {
   const getAutomationRules = (fromStage: string, toStage: string, customer: any) => {
     const rules: string[] = []
 
-    if (fromStage === "scheduled" && toStage === "followup") {
-      rules.push(`📱 发送术后注意事项给${customer.name}`)
-      rules.push(`👩‍⚕️ 创建护士回访任务`)
-      rules.push(`📋 设置术后第1天问卷提醒`)
-      rules.push(`📋 设置术后第3天问卷提醒`)
-      rules.push(`📋 设置术后第7天问卷提醒`)
-    } else if (fromStage === "new" && toStage === "filing") {
-      rules.push(`📝 创建客户档案`)
-      rules.push(`📞 安排初次咨询`)
-      rules.push(`📧 发送欢迎邮件`)
+    // Updated automation rules based on role and stage transitions
+    if (fromStage === "new" && toStage === "filing") {
+      rules.push(`✓ 创建${customer.name}的电子病历档案`)
+      rules.push(`✓ 发送建档成功通知给${customer.name}`)
+      rules.push("✓ 分配责任咨询师")
     } else if (fromStage === "filing" && toStage === "planning") {
-      rules.push(`📋 生成方案模板`)
-      rules.push(`👨‍⚕️ 分配主治医生`)
-      rules.push(`💰 发送报价单`)
+      rules.push("✓ 触发方案制定流程")
+      rules.push(`✓ 通知医生为${customer.name}制定方案`)
+      rules.push("✓ 推送相关项目知识库")
     } else if (fromStage === "planning" && toStage === "scheduled") {
-      rules.push(`📅 创建预约日程`)
-      rules.push(`📱 发送术前准备事项`)
-      rules.push(`🔔 设置术前提醒`)
+      rules.push("✓ 方案确认完成")
+      rules.push(`✓ 发送预约确认短信给${customer.name}`)
+      rules.push("✓ 添加到医生日程")
+      rules.push("✓ 推送术前注意事项")
+    } else if (fromStage === "scheduled" && toStage === "followup") {
+      rules.push("✓ 手术完成确认")
+      rules.push(`✓ 自动发送术后关怀消息给${customer.name}`)
+      rules.push("✓ 启动术后跟踪计划（第1、3、7、30天）")
+      rules.push("✓ 推送术后护理指南")
     } else if (fromStage === "followup" && toStage === "completed") {
-      rules.push(`✅ 标记服务完成`)
-      rules.push(`⭐ 发送满意度调查`)
-      rules.push(`🎁 发送优惠券`)
+      rules.push("✓ 服务流程完结")
+      rules.push(`✓ 发送满意度调查给${customer.name}`)
+      rules.push("✓ 生成服务报告")
     }
 
     return rules
@@ -2531,6 +1629,7 @@ function DocumentLibrary({ showUploadDialog, setShowUploadDialog }: any) {
               <Button
                 variant="outline"
                 className="border-slate-600 text-slate-300 hover:bg-slate-700/50 bg-transparent"
+                onClick={() => setShowUploadDialog(true)} // <-- Trigger upload dialog
               >
                 <Upload className="w-4 h-4 mr-2" />
                 上传文档
