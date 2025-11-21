@@ -418,7 +418,7 @@ export function AICollaborationAssistant({ onBack }: AICollaborationAssistantPro
         </Button>
         <div className="ml-4 flex items-center space-x-2">
           <Stethoscope className="w-5 h-5 text-blue-400" />
-          <h1 className="text-lg font-semibold text-white">咨询师&医生协作平台</h1>
+          <h1 className="text-lg font-semibold text-white">患者信息流转平台</h1>
         </div>
       </div>
 
