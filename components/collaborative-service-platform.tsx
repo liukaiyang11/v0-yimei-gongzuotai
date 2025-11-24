@@ -18,11 +18,6 @@ import {
   CheckCircle,
   ArrowLeft,
   Users,
-  MessageSquare,
-  Lightbulb,
-  Sparkles,
-  ClipboardCheck,
-  CheckCircle2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -57,7 +52,7 @@ interface CollaborativeServicePlatformProps {
 }
 
 export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePlatformProps) {
-  const [role, setRole] = useState<"咨询师" | "医生">("咨询师")
+  const [role, setRole] = useState<"咨询师" | "医生" | "店长">("咨询师")
   const [activeTab, setActiveTab] = useState("chat")
   const [selectedCustomer, setSelectedCustomer] = useState("张小美")
   const [messageInput, setMessageInput] = useState("")
@@ -66,15 +61,21 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
 
   const getAvailableTabs = () => {
     if (role === "咨询师") {
-      return ["chat", "kanban", "knowledge"]
-    } else {
+      // 咨询师：智能群聊服务、客户旅程看板（不含知识库管理）
       return ["chat", "kanban"]
+    } else if (role === "医生") {
+      // 医生：智能群聊服务、客户旅程看板（不含知识库管理）
+      return ["chat", "kanban"]
+    } else if (role === "店长") {
+      // 店长：全部功能
+      return ["chat", "kanban", "knowledge"]
     }
+    return ["chat", "kanban"]
   }
 
-  const handleRoleChange = (newRole: "咨询师" | "医生") => {
+  const handleRoleChange = (newRole: "咨询师" | "医生" | "店长") => {
     setRole(newRole)
-    const availableTabs = newRole === "咨询师" ? ["chat", "kanban", "knowledge"] : ["chat", "kanban"]
+    const availableTabs = getAvailableTabs()
     if (!availableTabs.includes(activeTab)) {
       setActiveTab("chat")
     }
@@ -98,7 +99,7 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
           <div className="flex items-center gap-2 bg-slate-700/50 px-3 py-2 rounded-lg">
             <Users className="w-4 h-4 text-slate-400" />
             <span className="text-sm text-slate-300">当前角色：</span>
-            <Select value={role} onValueChange={(value: "咨询师" | "医生") => handleRoleChange(value)}>
+            <Select value={role} onValueChange={(value: "咨询师" | "医生" | "店长") => handleRoleChange(value)}>
               <SelectTrigger className="w-28 h-8 bg-slate-600/50 border-slate-500 text-white">
                 <SelectValue />
               </SelectTrigger>
@@ -108,6 +109,9 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
                 </SelectItem>
                 <SelectItem value="医生" className="text-white hover:bg-slate-700">
                   医生
+                </SelectItem>
+                <SelectItem value="店长" className="text-white hover:bg-slate-700">
+                  店长
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -137,7 +141,7 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
           >
             客户旅程看板
           </Button>
-          {role === "咨询师" && (
+          {role === "店长" && (
             <Button
               variant={activeTab === "knowledge" ? "default" : "ghost"}
               onClick={() => setActiveTab("knowledge")}
@@ -161,11 +165,11 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
             onSelectCustomer={setSelectedCustomer}
             messageInput={messageInput}
             setMessageInput={setMessageInput}
-            role={role} // <-- Pass role to ChatInterface
+            role={role}
           />
         )}
-        {activeTab === "kanban" && <KanbanBoard role={role} />} {/* <-- Pass role to KanbanBoard */}
-        {activeTab === "knowledge" && role === "咨询师" && (
+        {activeTab === "kanban" && <KanbanBoard role={role} />}
+        {activeTab === "knowledge" && role === "店长" && (
           <KnowledgeCenter
             showNewQADialog={showNewQADialog}
             setShowNewQADialog={setShowNewQADialog}
@@ -179,15 +183,8 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
 }
 
 // 智能服务群聊界面
-// Added 'role' prop to ChatInterface
 function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMessageInput, role }: any) {
   const [filterStage, setFilterStage] = useState("全部")
-  const [showQuickMedicalRecord, setShowQuickMedicalRecord] = useState(false)
-  const [showConsultationNotes, setShowConsultationNotes] = useState(false)
-  const [showAssistPlan, setShowAssistPlan] = useState(false)
-  const [showSmartRecommend, setShowSmartRecommend] = useState(false)
-  const [showDoctorPlan, setShowDoctorPlan] = useState(false)
-
   const [aiDraft, setAiDraft] = useState({
     show: true,
     content:
@@ -294,6 +291,10 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
     else if (role === "医生") {
       filtered = filtered.filter((c) => c.stageFilter === "术前" || c.stageFilter === "术后")
     }
+    // 店长能看全部客户
+    else if (role === "店长") {
+      // No filtering - store manager sees all customers
+    }
 
     // Apply stage filter
     if (filterStage !== "全部") {
@@ -310,6 +311,9 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
       return ["全部", "售前"]
     } else if (role === "医生") {
       return ["全部", "术前", "术后"]
+    } else if (role === "店长") {
+      // Store manager can see all stages
+      return ["全部", "售前", "术前", "术后"]
     }
     return ["全部", "售前", "术前", "术后"]
   }
@@ -526,53 +530,6 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
                 <Badge className="mt-2 bg-orange-600 hover:bg-orange-700">热玛吉术后第2天</Badge>
               </div>
 
-              {role === "咨询师" && (
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-slate-400 mb-3">咨询师工具</h4>
-                  <Button
-                    onClick={() => setShowQuickMedicalRecord(true)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 justify-start"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    快速病历
-                  </Button>
-                  <Button
-                    onClick={() => setShowConsultationNotes(true)}
-                    className="w-full bg-purple-600 hover:bg-purple-700 justify-start"
-                  >
-                    <MessageSquare className="w-4 h-4 mr-2" />
-                    资讯沟通纪要
-                  </Button>
-                  <Button
-                    onClick={() => setShowAssistPlan(true)}
-                    className="w-full bg-green-600 hover:bg-green-700 justify-start"
-                  >
-                    <Lightbulb className="w-4 h-4 mr-2" />
-                    辅助通用方案
-                  </Button>
-                </div>
-              )}
-
-              {role === "医生" && (
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-slate-400 mb-3">医生工具</h4>
-                  <Button
-                    onClick={() => setShowSmartRecommend(true)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 justify-start"
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    智能推荐
-                  </Button>
-                  <Button
-                    onClick={() => setShowDoctorPlan(true)}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 justify-start"
-                  >
-                    <ClipboardCheck className="w-4 h-4 mr-2" />
-                    医生制定方案
-                  </Button>
-                </div>
-              )}
-
               <div className="space-y-4">
                 <div>
                   <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2">
@@ -632,474 +589,13 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
             </div>
           </div>
         </ScrollArea>
-
-        <Dialog open={showQuickMedicalRecord} onOpenChange={setShowQuickMedicalRecord}>
-          <DialogContent className="max-w-3xl bg-white border-slate-200">
-            <DialogHeader>
-              <DialogTitle className="text-slate-900">快速病历</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 max-h-[600px] overflow-y-auto">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-slate-700 mb-1 block">客户姓名</label>
-                  <Input defaultValue={selectedCustomer} className="bg-white border-slate-300" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-700 mb-1 block">年龄</label>
-                  <Input defaultValue="32" className="bg-white border-slate-300" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-700 mb-1 block">肤质类型</label>
-                  <Select defaultValue="mixed">
-                    <SelectTrigger className="bg-white border-slate-300">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white border-slate-200">
-                      <SelectItem value="mixed">敏感混合性</SelectItem>
-                      <SelectItem value="dry">干性</SelectItem>
-                      <SelectItem value="oily">油性</SelectItem>
-                      <SelectItem value="normal">中性</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-700 mb-1 block">过敏史</label>
-                  <Input placeholder="请输入过敏信息" defaultValue="无" className="bg-white border-slate-300" />
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-1 block">咨询需求</label>
-                <Textarea
-                  placeholder="请输入客户咨询的需求和关注点..."
-                  className="min-h-[100px] bg-white border-slate-300"
-                  defaultValue="面部抗衰，关注热玛吉效果和恢复期"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-1 block">既往治疗史</label>
-                <Textarea
-                  placeholder="请输入客户既往的医美治疗经历..."
-                  className="min-h-[80px] bg-white border-slate-300"
-                  defaultValue="6个月前做过水光针"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-1 block">备注</label>
-                <Textarea placeholder="其他需要记录的信息..." className="min-h-[60px] bg-white border-slate-300" />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setShowQuickMedicalRecord(false)}>
-                取消
-              </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700">保存病历</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={showConsultationNotes} onOpenChange={setShowConsultationNotes}>
-          <DialogContent className="max-w-3xl bg-white border-slate-200">
-            <DialogHeader>
-              <DialogTitle className="text-slate-900">资讯沟通纪要</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 max-h-[600px] overflow-y-auto">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-slate-700 mb-1 block">沟通日期</label>
-                  <Input type="date" defaultValue="2025-09-28" className="bg-white border-slate-300" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-700 mb-1 block">沟通方式</label>
-                  <Select defaultValue="wechat">
-                    <SelectTrigger className="bg-white border-slate-300">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white border-slate-200">
-                      <SelectItem value="wechat">微信</SelectItem>
-                      <SelectItem value="phone">电话</SelectItem>
-                      <SelectItem value="offline">面对面</SelectItem>
-                      <SelectItem value="video">视频通话</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-1 block">沟通主题</label>
-                <Input
-                  placeholder="请输入本次沟通的主题..."
-                  defaultValue="热玛吉项目咨询及方案确认"
-                  className="bg-white border-slate-300"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-1 block">客户关注点</label>
-                <Textarea
-                  placeholder="记录客户重点关注的问题..."
-                  className="min-h-[100px] bg-white border-slate-300"
-                  defaultValue="1. 热玛吉效果能维持多久\n2. 恢复期需要注意什么\n3. 价格和优惠政策"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-1 block">解答内容</label>
-                <Textarea
-                  placeholder="记录对客户问题的解答..."
-                  className="min-h-[100px] bg-white border-slate-300"
-                  defaultValue="1. 效果可维持1-2年，个人体质不同略有差异\n2. 详细说明了术后护理要点\n3. 介绍了当前优惠活动"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-1 block">下一步跟进</label>
-                <Textarea
-                  placeholder="记录后续跟进计划..."
-                  className="min-h-[80px] bg-white border-slate-300"
-                  defaultValue="客户表示需要考虑3天，周五再次跟进"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setShowConsultationNotes(false)}>
-                取消
-              </Button>
-              <Button className="bg-purple-600 hover:bg-purple-700">保存纪要</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={showAssistPlan} onOpenChange={setShowAssistPlan}>
-          <DialogContent className="max-w-4xl bg-white border-slate-200">
-            <DialogHeader>
-              <DialogTitle className="text-slate-900">辅助通用方案</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 max-h-[600px] overflow-y-auto">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-blue-600" />
-                  <span className="font-medium text-blue-900">AI智能推荐方案</span>
-                </div>
-                <p className="text-sm text-blue-700">根据客户档案和需求，系统推荐以下方案供参考</p>
-              </div>
-
-              <div className="space-y-3">
-                <div className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 cursor-pointer transition-colors">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium text-slate-900">热玛吉面部抗衰方案</h4>
-                    <Badge className="bg-green-100 text-green-700 border-green-200">推荐</Badge>
-                  </div>
-                  <p className="text-sm text-slate-600 mb-3">
-                    适合32岁轻熟龄肌肤，针对面部松弛、细纹等初期老化问题。采用第五代热玛吉技术，安全高效。
-                  </p>
-                  <div className="grid grid-cols-3 gap-3 text-sm">
-                    <div>
-                      <span className="text-slate-500">治疗部位：</span>
-                      <span className="text-slate-900">全面部</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">治疗次数：</span>
-                      <span className="text-slate-900">1次</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">维持时间：</span>
-                      <span className="text-slate-900">1-2年</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 cursor-pointer transition-colors">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium text-slate-900">超声刀 + 水光针组合方案</h4>
-                    <Badge variant="outline" className="border-slate-300 text-slate-600">
-                      备选
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-slate-600 mb-3">
-                    超声刀提升紧致，水光针补水保湿，双管齐下改善肌肤状态。适合追求全面改善的客户。
-                  </p>
-                  <div className="grid grid-cols-3 gap-3 text-sm">
-                    <div>
-                      <span className="text-slate-500">治疗部位：</span>
-                      <span className="text-slate-900">面部+颈部</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">治疗次数：</span>
-                      <span className="text-slate-900">2-3次</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">维持时间：</span>
-                      <span className="text-slate-900">6-12个月</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 cursor-pointer transition-colors">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium text-slate-900">光子嫩肤美白方案</h4>
-                    <Badge variant="outline" className="border-slate-300 text-slate-600">
-                      备选
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-slate-600 mb-3">
-                    针对肤色暗沉、色素沉着问题，通过光子嫩肤技术改善肤质，提亮肤色。
-                  </p>
-                  <div className="grid grid-cols-3 gap-3 text-sm">
-                    <div>
-                      <span className="text-slate-500">治疗部位：</span>
-                      <span className="text-slate-900">全面部</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">治疗次数：</span>
-                      <span className="text-slate-900">3-5次</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">维持时间：</span>
-                      <span className="text-slate-900">6-9个月</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-2 block">方案说明</label>
-                <Textarea
-                  placeholder="可以添加个性化的方案说明和建议..."
-                  className="min-h-[100px] bg-white border-slate-300"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setShowAssistPlan(false)}>
-                取消
-              </Button>
-              <Button className="bg-green-600 hover:bg-green-700">发送方案给客户</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={showSmartRecommend} onOpenChange={setShowSmartRecommend}>
-          <DialogContent className="max-w-4xl bg-white border-slate-200">
-            <DialogHeader>
-              <DialogTitle className="text-slate-900">智能推荐</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 max-h-[600px] overflow-y-auto">
-              <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-indigo-600" />
-                  <span className="font-medium text-indigo-900">AI智能分析</span>
-                </div>
-                <p className="text-sm text-indigo-700">基于客户档案、既往治疗史和当前状况，系统为您提供专业建议</p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="border border-slate-200 rounded-lg p-4">
-                  <h4 className="font-medium text-slate-900 mb-3">客户基本情况</h4>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-slate-500">姓名：</span>
-                      <span className="text-slate-900">{selectedCustomer}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-500">年龄：</span>
-                      <span className="text-slate-900">32岁</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-500">肤质：</span>
-                      <span className="text-slate-900">敏感混合性</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-500">当前项目：</span>
-                      <span className="text-slate-900">热玛吉术后第2天</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border border-green-200 bg-green-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle2 className="w-5 h-5 text-green-600" />
-                    <h4 className="font-medium text-green-900">推荐后续护理方案</h4>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="bg-white rounded-lg p-3">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-sm font-medium text-green-700">1</span>
-                        </div>
-                        <div className="flex-1">
-                          <h5 className="font-medium text-slate-900 mb-1">术后第3-7天：舒缓修复期</h5>
-                          <p className="text-sm text-slate-600">
-                            建议使用医用修复面膜，每天1次，搭配温和保湿精华。避免化妆，继续防晒。
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-white rounded-lg p-3">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-sm font-medium text-green-700">2</span>
-                        </div>
-                        <div className="flex-1">
-                          <h5 className="font-medium text-slate-900 mb-1">术后第8-30天：效果显现期</h5>
-                          <p className="text-sm text-slate-600">
-                            可恢复正常护肤，建议配合水光针补水，增强效果。预约第14天复诊检查。
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-white rounded-lg p-3">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-sm font-medium text-green-700">3</span>
-                        </div>
-                        <div className="flex-1">
-                          <h5 className="font-medium text-slate-900 mb-1">术后1-3个月：效果稳定期</h5>
-                          <p className="text-sm text-slate-600">
-                            效果逐渐显现，建议每月进行皮肤检测，根据情况调整护理方案。
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border border-blue-200 bg-blue-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <AlertCircle className="w-5 h-5 text-blue-600" />
-                    <h4 className="font-medium text-blue-900">推荐搭配项目</h4>
-                  </div>
-                  <ul className="space-y-2 text-sm text-blue-800">
-                    <li>
-                      • <strong>水光针补水</strong> - 术后30天进行，增强皮肤水润度
-                    </li>
-                    <li>
-                      • <strong>胶原蛋白补充</strong> - 口服或注射，促进胶原生成
-                    </li>
-                    <li>
-                      • <strong>射频紧致</strong> - 6个月后可考虑，巩固抗衰效果
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setShowSmartRecommend(false)}>
-                关闭
-              </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700">添加到治疗方案</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={showDoctorPlan} onOpenChange={setShowDoctorPlan}>
-          <DialogContent className="max-w-4xl bg-white border-slate-200">
-            <DialogHeader>
-              <DialogTitle className="text-slate-900">医生制定方案</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 max-h-[600px] overflow-y-auto">
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-2 block">患者信息</label>
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 grid grid-cols-3 gap-3 text-sm">
-                  <div>
-                    <span className="text-slate-500">姓名：</span>
-                    <span className="text-slate-900">{selectedCustomer}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">年龄：</span>
-                    <span className="text-slate-900">32岁</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">肤质：</span>
-                    <span className="text-slate-900">敏感混合性</span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-2 block">治疗项目</label>
-                <Select defaultValue="thermage">
-                  <SelectTrigger className="bg-white border-slate-300">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white border-slate-200">
-                    <SelectItem value="thermage">热玛吉面部抗衰</SelectItem>
-                    <SelectItem value="ultherapy">超声刀提升</SelectItem>
-                    <SelectItem value="laser">激光美肤</SelectItem>
-                    <SelectItem value="injection">注射类项目</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-slate-700 mb-2 block">治疗部位</label>
-                  <Input defaultValue="全面部" className="bg-white border-slate-300" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-700 mb-2 block">计划日期</label>
-                  <Input type="date" defaultValue="2025-10-25" className="bg-white border-slate-300" />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-2 block">治疗目标</label>
-                <Textarea
-                  placeholder="描述本次治疗希望达到的目标..."
-                  className="min-h-[80px] bg-white border-slate-300"
-                  defaultValue="改善面部松弛，减少细纹，提升整体紧致度"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-2 block">治疗方案详情</label>
-                <Textarea
-                  placeholder="详细描述治疗方案、使用的设备、技术参数等..."
-                  className="min-h-[120px] bg-white border-slate-300"
-                  defaultValue="使用第五代热玛吉设备，面部600发，重点加强：\n1. 额头抬头纹区域 - 120发\n2. 眼周细纹区域 - 150发\n3. 法令纹区域 - 150发\n4. 下颌线提升 - 180发"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-2 block">注意事项</label>
-                <Textarea
-                  placeholder="列出术前准备和术后注意事项..."
-                  className="min-h-[100px] bg-white border-slate-300"
-                  defaultValue="术前：\n- 清洁面部，卸除所有化妆品\n- 确认无过敏史和禁忌症\n\n术后：\n- 48小时内避免热水洗脸\n- 加强保湿和防晒\n- 避免剧烈运动\n- 一周内不要使用刺激性产品"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-slate-700 mb-2 block">预计恢复期</label>
-                  <Input defaultValue="3-7天" className="bg-white border-slate-300" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-slate-700 mb-2 block">效果维持时间</label>
-                  <Input defaultValue="12-24个月" className="bg-white border-slate-300" />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-2 block">后续跟进计划</label>
-                <Textarea
-                  placeholder="制定后续的复诊和护理计划..."
-                  className="min-h-[80px] bg-white border-slate-300"
-                  defaultValue="- 术后第3天：电话回访\n- 术后第7天：线上复诊\n- 术后第14天：到院复诊\n- 术后第30天：效果评估"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setShowDoctorPlan(false)}>
-                取消
-              </Button>
-              <Button className="bg-indigo-600 hover:bg-indigo-700">保存方案</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   )
 }
 
 // 客户旅程看板
-// Added 'role' prop to KanbanBoard
-function KanbanBoard({ role }: { role: "咨询师" | "医生" }) {
+function KanbanBoard({ role }: { role: "咨询师" | "医生" | "店长" }) {
   const [draggedCard, setDraggedCard] = useState<any>(null)
   const [dragOverStage, setDragOverStage] = useState<string | null>(null)
   const [showAutomationPreview, setShowAutomationPreview] = useState(false)
@@ -1114,13 +610,24 @@ function KanbanBoard({ role }: { role: "咨询师" | "医生" }) {
         { id: "filing", name: "待建档", count: 1, color: "bg-purple-600" },
         { id: "planning", name: "方案确认中", count: 1, color: "bg-yellow-600" },
       ]
-    } else {
+    } else if (role === "医生") {
       return [
         { id: "scheduled", name: "已预约", count: 3, color: "bg-green-600" },
         { id: "followup", name: "术后跟踪", count: 2, color: "bg-orange-600" },
         { id: "completed", name: "服务完成", count: 1, color: "bg-slate-600" },
       ]
+    } else if (role === "店长") {
+      // Store manager sees all stages across the entire customer journey
+      return [
+        { id: "new", name: "新线索", count: 3, color: "bg-blue-600" },
+        { id: "filing", name: "待建档", count: 1, color: "bg-purple-600" },
+        { id: "planning", name: "方案确认中", count: 1, color: "bg-yellow-600" },
+        { id: "scheduled", name: "已预约", count: 3, color: "bg-green-600" },
+        { id: "followup", name: "术后跟踪", count: 2, color: "bg-orange-600" },
+        { id: "completed", name: "服务完成", count: 1, color: "bg-slate-600" },
+      ]
     }
+    return []
   }
 
   const stages = getAllStages()
