@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Dialog,
   DialogContent,
@@ -49,11 +49,12 @@ import {
 
 interface CollaborativeServicePlatformProps {
   onBack: () => void
+  onNavigateToPatientFlow?: (customer: any) => void
 }
 
-export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePlatformProps) {
+export function CollaborativeServicePlatform({ onBack, onNavigateToPatientFlow }: CollaborativeServicePlatformProps) {
   const [role, setRole] = useState<"咨询师" | "医生" | "店长">("咨询师")
-  const [activeTab, setActiveTab] = useState("chat")
+  const [activeView, setActiveView] = useState("chat") // Renamed activeTab to activeView for clarity with Tabs
   const [selectedCustomer, setSelectedCustomer] = useState("张小美")
   const [messageInput, setMessageInput] = useState("")
   const [showNewQADialog, setShowNewQADialog] = useState(false)
@@ -76,13 +77,13 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
   const handleRoleChange = (newRole: "咨询师" | "医生" | "店长") => {
     setRole(newRole)
     const availableTabs = getAvailableTabs()
-    if (!availableTabs.includes(activeTab)) {
-      setActiveTab("chat")
+    if (!availableTabs.includes(activeView)) {
+      setActiveView("chat")
     }
   }
 
   return (
-    <div className="fixed inset-0 left-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
       {/* 顶部导航栏 */}
       <div className="h-16 bg-slate-800/50 backdrop-blur-sm border-b border-slate-700/50 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
@@ -120,10 +121,10 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
 
         <div className="absolute left-1/2 -translate-x-1/2 flex gap-2">
           <Button
-            variant={activeTab === "chat" ? "default" : "ghost"}
-            onClick={() => setActiveTab("chat")}
+            variant={activeView === "chat" ? "default" : "ghost"}
+            onClick={() => setActiveView("chat")}
             className={
-              activeTab === "chat"
+              activeView === "chat"
                 ? "bg-blue-600 hover:bg-blue-700"
                 : "text-slate-300 hover:text-white hover:bg-slate-700/50"
             }
@@ -131,10 +132,10 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
             智能服务群聊
           </Button>
           <Button
-            variant={activeTab === "kanban" ? "default" : "ghost"}
-            onClick={() => setActiveTab("kanban")}
+            variant={activeView === "kanban" ? "default" : "ghost"}
+            onClick={() => setActiveView("kanban")}
             className={
-              activeTab === "kanban"
+              activeView === "kanban"
                 ? "bg-blue-600 hover:bg-blue-700"
                 : "text-slate-300 hover:text-white hover:bg-slate-700/50"
             }
@@ -143,10 +144,10 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
           </Button>
           {role === "店长" && (
             <Button
-              variant={activeTab === "knowledge" ? "default" : "ghost"}
-              onClick={() => setActiveTab("knowledge")}
+              variant={activeView === "knowledge" ? "default" : "ghost"}
+              onClick={() => setActiveView("knowledge")}
               className={
-                activeTab === "knowledge"
+                activeView === "knowledge"
                   ? "bg-blue-600 hover:bg-blue-700"
                   : "text-slate-300 hover:text-white hover:bg-slate-700/50"
               }
@@ -159,24 +160,38 @@ export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePla
 
       {/* 主内容区域 */}
       <div className="flex-1 overflow-hidden">
-        {activeTab === "chat" && (
-          <ChatInterface
-            selectedCustomer={selectedCustomer}
-            onSelectCustomer={setSelectedCustomer}
-            messageInput={messageInput}
-            setMessageInput={setMessageInput}
-            role={role}
-          />
-        )}
-        {activeTab === "kanban" && <KanbanBoard role={role} />}
-        {activeTab === "knowledge" && role === "店长" && (
-          <KnowledgeCenter
-            showNewQADialog={showNewQADialog}
-            setShowNewQADialog={setShowNewQADialog}
-            showUploadDialog={showUploadDialog}
-            setShowUploadDialog={setShowUploadDialog}
-          />
-        )}
+        <Tabs value={activeView} onValueChange={setActiveView} className="h-full flex flex-col">
+          <TabsList className="invisible h-0 w-0 p-0 m-0">
+            <TabsTrigger value="chat">Chat</TabsTrigger>
+            <TabsTrigger value="kanban">Kanban</TabsTrigger>
+            <TabsTrigger value="knowledge">Knowledge</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="chat" className="h-full m-0">
+            <ChatInterface
+              selectedCustomer={selectedCustomer}
+              onSelectCustomer={setSelectedCustomer}
+              messageInput={messageInput}
+              setMessageInput={setMessageInput}
+              role={role}
+            />
+          </TabsContent>
+
+          <TabsContent value="kanban" className="h-full m-0">
+            <KanbanBoard role={role} onNavigateToPatientFlow={onNavigateToPatientFlow} />
+          </TabsContent>
+
+          {role === "店长" && (
+            <TabsContent value="knowledge" className="h-full m-0">
+              <KnowledgeCenter
+                showNewQADialog={showNewQADialog}
+                setShowNewQADialog={setShowNewQADialog}
+                showUploadDialog={showUploadDialog}
+                setShowUploadDialog={setShowUploadDialog}
+              />
+            </TabsContent>
+          )}
+        </Tabs>
       </div>
     </div>
   )
@@ -595,7 +610,10 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
 }
 
 // 客户旅程看板
-function KanbanBoard({ role }: { role: "咨询师" | "医生" | "店长" }) {
+function KanbanBoard({
+  role,
+  onNavigateToPatientFlow,
+}: { role: "咨询师" | "医生" | "店长"; onNavigateToPatientFlow?: (customer: any) => void }) {
   const [draggedCard, setDraggedCard] = useState<any>(null)
   const [dragOverStage, setDragOverStage] = useState<string | null>(null)
   const [showAutomationPreview, setShowAutomationPreview] = useState(false)
@@ -812,6 +830,13 @@ function KanbanBoard({ role }: { role: "咨询师" | "医生" | "店长" }) {
                       draggable
                       onDragStart={(e) => handleDragStart(e, customer)}
                       onDragEnd={handleDragEnd}
+                      onClick={(e) => {
+                        // Only navigate if not dragging
+                        if (!draggedCard && onNavigateToPatientFlow) {
+                          e.stopPropagation()
+                          onNavigateToPatientFlow(customer)
+                        }
+                      }}
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-2">

@@ -78,6 +78,16 @@ const apps = [
     size: "regular",
   },
   {
+    id: "patient-flow-2",
+    name: "患者信息流转平台2.0",
+    description: "以客户为中心的全流程管理",
+    icon: UserSearch,
+    gradient: "from-cyan-500 to-blue-600",
+    bgColor: "bg-cyan-500",
+    action: "进入",
+    size: "regular",
+  },
+  {
     id: "customer-acquisition",
     name: "精准获客系统",
     description: "视频评论获客",

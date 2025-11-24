@@ -17,6 +17,7 @@ import { MedicalBeautyThinkTank } from "@/components/medical-beauty-think-tank"
 import { Screensaver } from "@/components/screensaver"
 import { ContentCreativeWorkshop } from "@/components/content-creative-workshop"
 import { MedicalBeautyMall } from "@/components/medical-beauty-mall"
+import { PatientInfoFlowPlatform } from "@/components/patient-info-flow-platform"
 
 const IDLE_TIMEOUT = 5 * 60 * 1000 // 5 minutes in milliseconds
 
@@ -38,6 +39,8 @@ export function WorkspaceLayout() {
   const [showAppMarketplace, setShowAppMarketplace] = useState(false)
   const [showScreensaver, setShowScreensaver] = useState(false)
   const [showContentWorkshop, setShowContentWorkshop] = useState(false)
+  const [showPatientFlow2, setShowPatientFlow2] = useState(false)
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null)
 
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -104,8 +107,12 @@ export function WorkspaceLayout() {
     if (appId === "collaborative-service") {
       setShowCollaborativeService(true)
     }
+    if (appId === "patient-flow-2") {
+      setShowPatientFlow2(true)
+      setSelectedCustomer(null)
+    }
     if (appId === "customer-acquisition") {
-      setShowCustomerAcquisition(true)
+      setShowCustomerAcquisition(false)
     }
     if (appId === "content-workshop") {
       setShowContentWorkshop(true)
@@ -120,6 +127,10 @@ export function WorkspaceLayout() {
 
   if (showScreensaver) {
     return <Screensaver onExit={() => setShowScreensaver(false)} />
+  }
+
+  if (showPatientFlow2) {
+    return <PatientInfoFlowPlatform onBack={() => setShowPatientFlow2(false)} selectedCustomer={selectedCustomer} />
   }
 
   if (showContentWorkshop) {
