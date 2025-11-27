@@ -8,6 +8,7 @@ import { LaunchpadGrid } from "@/components/launchpad-grid"
 import { Sidebar } from "@/components/sidebar"
 import { KnowledgeBase } from "@/components/knowledge-base"
 import { IndustryKnowledgeBase } from "@/components/industry-knowledge-base"
+import { AdComplianceReview } from "@/components/ad-compliance-review"
 import { CollaborativeServicePlatform } from "@/components/collaborative-service-platform"
 import { CustomerAcquisitionSystem } from "@/components/customer-acquisition-system"
 import { AppMarketplace } from "@/components/app-marketplace"
@@ -15,7 +16,6 @@ import { MedicalBeautyThinkTank } from "@/components/medical-beauty-think-tank"
 import { Screensaver } from "@/components/screensaver"
 import { ContentCreativeWorkshop } from "@/components/content-creative-workshop"
 import { MedicalBeautyMall } from "@/components/medical-beauty-mall"
-import { PatientInfoPlatform } from "@/components/patient-info-platform"
 
 const IDLE_TIMEOUT = 5 * 60 * 1000 // 5 minutes in milliseconds
 
@@ -31,10 +31,7 @@ export function WorkspaceLayout() {
     courseTitle: "",
   })
   const [showAdCompliance, setShowAdCompliance] = useState(false)
-  const [showCollaborationAssistant, setShowCollaborationAssistant] = useState(false)
   const [showCollaborativeService, setShowCollaborativeService] = useState(false)
-  const [showPatientInfoPlatform, setShowPatientInfoPlatform] = useState(false)
-  const [selectedPatientId, setSelectedPatientId] = useState<number | undefined>(undefined)
   const [showCustomerAcquisition, setShowCustomerAcquisition] = useState(false)
   const [showAppMarketplace, setShowAppMarketplace] = useState(false)
   const [showScreensaver, setShowScreensaver] = useState(false)
@@ -99,15 +96,8 @@ export function WorkspaceLayout() {
     if (appId === "ad-compliance") {
       setShowAdCompliance(true)
     }
-    if (appId === "sales-assistant") {
-      setShowCollaborationAssistant(true)
-    }
     if (appId === "collaborative-service") {
       setShowCollaborativeService(true)
-    }
-    if (appId === "patient-info-platform") {
-      setShowPatientInfoPlatform(true)
-      setSelectedPatientId(undefined)
     }
     if (appId === "customer-acquisition") {
       setShowCustomerAcquisition(true)
@@ -123,12 +113,6 @@ export function WorkspaceLayout() {
     }
   }
 
-  const handlePatientSelect = (patientId: number) => {
-    setSelectedPatientId(patientId)
-    setShowPatientInfoPlatform(true)
-    setShowCollaborativeService(false)
-  }
-
   if (showScreensaver) {
     return <Screensaver onExit={() => setShowScreensaver(false)} />
   }
@@ -141,25 +125,12 @@ export function WorkspaceLayout() {
     return <CustomerAcquisitionSystem onBack={() => setShowCustomerAcquisition(false)} />
   }
 
-  if (showPatientInfoPlatform) {
-    return (
-      <PatientInfoPlatform
-        onBack={() => {
-          setShowPatientInfoPlatform(false)
-          setSelectedPatientId(undefined)
-        }}
-        selectedPatientId={selectedPatientId}
-      />
-    )
+  if (showCollaborativeService) {
+    return <CollaborativeServicePlatform onBack={() => setShowCollaborativeService(false)} />
   }
 
-  if (showCollaborativeService) {
-    return (
-      <CollaborativeServicePlatform
-        onBack={() => setShowCollaborativeService(false)}
-        onPatientSelect={handlePatientSelect}
-      />
-    )
+  if (showAdCompliance) {
+    return <AdComplianceReview onBack={() => setShowAdCompliance(false)} />
   }
 
   const renderContent = () => {

@@ -49,84 +49,12 @@ const allApps: App[] = [
     category: "featured",
   },
   {
-    id: "sales-assistant",
-    name: "患者信息流转平台", // Updated from "咨询师&医生协作平台"
-    description: "咨询师医生协作平台",
-    icon: "Stethoscope",
-    category: "featured",
-  },
-  {
     id: "doctor-assistant",
     name: "医生专业助手",
     description: "AI医疗助手",
     icon: "Stethoscope",
     category: "featured",
   },
-  { id: "marketing-system", name: "精准营销系统", description: "智能营销管理", icon: "Target", category: "featured" },
-  {
-    id: "xinyang-featured",
-    name: "新氧医美",
-    description: "医美消费平台",
-    icon: "Sparkles",
-    category: "featured",
-  },
-  {
-    id: "gengmei-featured",
-    name: "更美",
-    description: "医美社区平台",
-    icon: "Heart",
-    category: "featured",
-  },
-  {
-    id: "yuemei-featured",
-    name: "悦美",
-    description: "医美服务平台",
-    icon: "Smile",
-    category: "featured",
-  },
-  {
-    id: "meibei-featured",
-    name: "美呗医美",
-    description: "医美消费社区",
-    icon: "Star",
-    category: "featured",
-  },
-  {
-    id: "meibei-course-featured",
-    name: "美呗课",
-    description: "医美在线学习",
-    icon: "GraduationCap",
-    category: "featured",
-  },
-  {
-    id: "zhihui-circle-featured",
-    name: "智慧医美圈",
-    description: "医美知识社区",
-    icon: "Users",
-    category: "featured",
-  },
-  {
-    id: "haozhixue-featured",
-    name: "好智学",
-    description: "医美培训平台",
-    icon: "BookOpen",
-    category: "featured",
-  },
-  {
-    id: "perfect-training-featured",
-    name: "完美培训",
-    description: "医美专业培训",
-    icon: "Award",
-    category: "featured",
-  },
-  {
-    id: "capa-featured",
-    name: "中国整形美容协会",
-    description: "行业权威组织",
-    icon: "Shield",
-    category: "featured",
-  },
-
   {
     id: "ai-ppt",
     name: "AI PPT",
@@ -370,13 +298,6 @@ const allApps: App[] = [
     category: "marketing",
   },
   { id: "decision-cockpit", name: "决策驾驶舱", description: "数据分析决策", icon: "Gauge", category: "marketing" },
-  {
-    id: "sales-assistant-marketing",
-    name: "患者信息流转平台", // Updated from "咨询师&医生协作平台"
-    description: "咨询师医生协作平台",
-    icon: "Stethoscope",
-    category: "marketing",
-  },
   {
     id: "customer-acquisition-marketing",
     name: "精准获客系统",

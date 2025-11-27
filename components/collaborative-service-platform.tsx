@@ -14,6 +14,7 @@ import {
   MoreVertical,
   AlertCircle,
   FileText,
+  Clock,
   CheckCircle,
   ArrowLeft,
   Users,
@@ -48,10 +49,9 @@ import {
 
 interface CollaborativeServicePlatformProps {
   onBack: () => void
-  onPatientSelect?: (patientId: number) => void
 }
 
-export function CollaborativeServicePlatform({ onBack, onPatientSelect }: CollaborativeServicePlatformProps) {
+export function CollaborativeServicePlatform({ onBack }: CollaborativeServicePlatformProps) {
   const [role, setRole] = useState<"咨询师" | "医生" | "店长">("咨询师")
   const [activeTab, setActiveTab] = useState("chat")
   const [selectedCustomer, setSelectedCustomer] = useState("张小美")
@@ -168,9 +168,9 @@ export function CollaborativeServicePlatform({ onBack, onPatientSelect }: Collab
             role={role}
           />
         )}
-        {activeTab === "kanban" && <KanbanBoard role={role} onPatientSelect={onPatientSelect} />}
+        {activeTab === "kanban" && <KanbanBoard role={role} />}
         {activeTab === "knowledge" && role === "店长" && (
-          <KnowledgeManagement
+          <KnowledgeCenter
             showNewQADialog={showNewQADialog}
             setShowNewQADialog={setShowNewQADialog}
             showUploadDialog={showUploadDialog}
@@ -595,10 +595,7 @@ function ChatInterface({ selectedCustomer, onSelectCustomer, messageInput, setMe
 }
 
 // 客户旅程看板
-function KanbanBoard({
-  role,
-  onPatientSelect,
-}: { role: "咨询师" | "医生" | "店长"; onPatientSelect?: (patientId: number) => void }) {
+function KanbanBoard({ role }: { role: "咨询师" | "医生" | "店长" }) {
   const [draggedCard, setDraggedCard] = useState<any>(null)
   const [dragOverStage, setDragOverStage] = useState<string | null>(null)
   const [showAutomationPreview, setShowAutomationPreview] = useState(false)
@@ -791,85 +788,115 @@ function KanbanBoard({
             key={stage.id}
             className={`w-80 bg-slate-800/30 rounded-lg border-2 transition-all ${
               dragOverStage === stage.id ? "border-blue-500 bg-blue-500/10" : "border-slate-700/50"
-            }`}
+            } flex flex-col`}
             onDragOver={(e) => handleDragOver(e, stage.id)}
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, stage.id)}
           >
             <div className="p-4 border-b border-slate-700/50">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-white flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${stage.color}`} />
-                  {stage.name}
-                </h3>
-                <Badge variant="secondary" className="text-xs">
-                  {customers.filter((c) => c.stage === stage.id).length}
-                </Badge>
+                <h3 className="font-semibold text-white">{stage.name}</h3>
+                <Badge className={`${stage.color}`}>{customers.filter((c) => c.stage === stage.id).length}</Badge>
               </div>
             </div>
-
-            <ScrollArea className="h-[calc(100%-60px)] p-4">
+            <ScrollArea className="flex-1 p-4">
               <div className="space-y-3">
                 {customers
                   .filter((c) => c.stage === stage.id)
                   .map((customer) => (
                     <div
                       key={customer.id}
+                      className={`bg-slate-700/50 rounded-lg p-4 cursor-move hover:bg-slate-700/70 transition-all border border-slate-600/50 ${
+                        draggedCard?.id === customer.id ? "opacity-50 scale-95" : ""
+                      }`}
                       draggable
                       onDragStart={(e) => handleDragStart(e, customer)}
                       onDragEnd={handleDragEnd}
-                      onClick={() => onPatientSelect?.(customer.id)}
-                      className="bg-slate-800/50 p-4 rounded-lg shadow cursor-grab active:cursor-grabbing border border-slate-700/50 hover:border-blue-500/50 hover:bg-slate-700/50 transition-all"
                     >
-                      <div className="flex items-center gap-3 mb-2">
-                        <Avatar className="w-10 h-10 bg-blue-600">
-                          <AvatarFallback className="text-white">{customer.avatar}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h4 className="font-medium text-white">{customer.name}</h4>
-                          <p className="text-sm text-slate-400 truncate">{customer.project}</p>
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="w-10 h-10 bg-blue-600">
+                            <AvatarFallback className="text-white">{customer.avatar}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h4 className="font-medium text-white">{customer.name}</h4>
+                            <p className="text-xs text-slate-400">{customer.project}</p>
+                          </div>
                         </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="bg-slate-800 border-slate-700">
+                            <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">查看详情</DropdownMenuItem>
+                            <DropdownMenuItem className="text-slate-300 hover:bg-slate-700">编辑信息</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-                      <div className="text-xs text-slate-500 flex justify-between">
-                        <span>{customer.doctor}</span>
-                        <span>{customer.daysInStage}天在当前阶段</span>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Avatar className="w-5 h-5 bg-blue-600">
+                            <AvatarFallback className="text-xs text-white">{customer.doctor[0]}</AvatarFallback>
+                          </Avatar>
+                          <span className="text-slate-400">{customer.doctor}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-sm">
+                          <Clock className="w-4 h-4 text-orange-400" />
+                          <span className="text-slate-400">
+                            滞留 <span className="text-orange-400 font-medium">{customer.daysInStage}</span> 天
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))}
-                {customers.filter((c) => c.stage === stage.id).length === 0 && (
-                  <div className="text-center text-slate-500 py-8">
-                    <p className="text-sm">暂无客户</p>
-                  </div>
-                )}
               </div>
             </ScrollArea>
           </div>
         ))}
       </div>
 
-      {/* Automation Preview */}
-      {showAutomationPreview && automationActions.length > 0 && (
-        <div className="absolute bottom-4 right-4 z-50 w-80 bg-slate-800/90 border border-blue-500 rounded-lg p-4 shadow-lg backdrop-blur">
-          <h4 className="text-sm font-semibold text-white mb-3">即将执行的自动化操作</h4>
-          <ul className="space-y-2 text-sm text-slate-300">
-            {automationActions.map((action, index) => (
-              <li key={index}>{action}</li>
-            ))}
-          </ul>
+      {/* 拖拽预览提示 */}
+      {showAutomationPreview && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 border-2 border-blue-500 rounded-lg p-4 shadow-2xl z-50 max-w-md">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <h4 className="text-white font-semibold mb-2">即将触发自动化动作</h4>
+              <ul className="space-y-1">
+                {automationActions.map((action, idx) => (
+                  <li key={idx} className="text-sm text-slate-300">
+                    {action}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Automation Result */}
-      {showAutomationResult && executedActions.length > 0 && (
-        <div className="absolute bottom-4 right-4 z-50 w-80 bg-slate-800/90 border border-green-500 rounded-lg p-4 shadow-lg backdrop-blur">
-          <h4 className="text-sm font-semibold text-green-400 mb-3 flex items-center gap-2">
-            <CheckCircle className="w-4 h-4" /> 自动化操作成功
-          </h4>
-          <ul className="space-y-2 text-sm text-slate-300">
-            {executedActions.map((action, index) => (
-              <li key={index}>{action}</li>
-            ))}
-          </ul>
+      {/* 自动化执行结果 */}
+      {showAutomationResult && (
+        <div className="fixed top-20 right-8 bg-green-600 border border-green-500 rounded-lg p-4 shadow-2xl z-50 max-w-md animate-in slide-in-from-right">
+          <div className="flex items-start gap-3">
+            <CheckCircle className="w-6 h-6 text-white flex-shrink-0" />
+            <div className="flex-1">
+              <h4 className="text-white font-semibold mb-2">自动化任务已执行</h4>
+              <ul className="space-y-1">
+                {executedActions.map((action, idx) => (
+                  <li key={idx} className="text-sm text-white/90 flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3" />
+                    {action}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -1826,33 +1853,6 @@ function DocumentLibrary({ showUploadDialog, setShowUploadDialog }: any) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  )
-}
-
-// Renamed KnowledgeCenter to KnowledgeManagement for clarity
-function KnowledgeManagement({ showNewQADialog, setShowNewQADialog, showUploadDialog, setShowUploadDialog }: any) {
-  const [knowledgeTab, setKnowledgeTab] = useState("qa")
-
-  return (
-    <div className="h-full flex flex-col">
-      <div className="p-6 border-b border-slate-700/50">
-        <Tabs value={knowledgeTab} onValueChange={setKnowledgeTab}>
-          <TabsList className="bg-slate-800/50">
-            <TabsTrigger value="qa">精准问答库</TabsTrigger>
-            <TabsTrigger value="documents">深度知识库</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-
-      <div className="flex-1 overflow-hidden">
-        {knowledgeTab === "qa" && (
-          <QALibrary showNewQADialog={showNewQADialog} setShowNewQADialog={setShowNewQADialog} />
-        )}
-        {knowledgeTab === "documents" && (
-          <DocumentLibrary showUploadDialog={showUploadDialog} setShowUploadDialog={setShowUploadDialog} />
-        )}
-      </div>
     </div>
   )
 }
