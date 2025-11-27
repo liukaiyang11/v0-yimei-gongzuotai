@@ -1,7 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Suspense } from "react"
 
@@ -24,10 +23,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className="dark">
       <body className={`font-sans ${inter.variable}`}>
-        <Suspense>
-          {children}
-          <Analytics />
-        </Suspense>
+        <Suspense>{children}</Suspense>
       </body>
     </html>
   )
